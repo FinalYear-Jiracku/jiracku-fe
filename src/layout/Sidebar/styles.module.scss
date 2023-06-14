@@ -1,0 +1,48 @@
+.sidebar{
+    background: white;
+    border-inline-end: none;
+    max-width: 200px;
+    .sider {
+        width: 0px !important;
+        background: white !important;
+    }
+    .logo{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        :global{
+            .ant-image-img{
+                width: 70px;
+                height: 70px;
+                margin-left: 55px;
+            }
+            .ant-btn{
+                font-size: 16px;
+                width: 35px;
+                height: 70px;
+                border: 0px;
+                padding: 0;
+                &:hover {
+                    background-color: white;
+                }
+            }
+        }
+        .button-after{
+            font-size: 16px;
+            width: 80px;
+            height: 70px;
+            border: 0px;
+            padding: 0;
+            &:hover {
+                background-color: white;
+            }
+        }
+    }
+    .menu{
+        :global{
+            border-inline-end: none !important;
+        }
+    }
+}
+
+
