@@ -5,25 +5,24 @@ import styles from "./styles.module.scss";
 
 const { Header } = Layout;
 
-const Navbar = ({sidebarWidth}) => {
+const Navbar = () => {
   return (
     <Layout
       className={styles.layout}
-      style={{ width: `calc(100% - ${sidebarWidth})` }}
     >
       <Header className={styles.header}>PROJECT MANAGEMENT</Header>
       <div className={styles.breadcrumb}>
         <Breadcrumb
-          style={{ margin: "16px 0" }}
+          className={styles['breadcrumb-item']}
           items={[
             {
               title: "Home",
             },
             {
-              title: <a href="">Application Center</a>,
+              title: <a href="abc">Application Center</a>,
             },
             {
-              title: <a href="">Application List</a>,
+              title: <a href="abc">Application List</a>,
             },
             {
               title: "An Application",
