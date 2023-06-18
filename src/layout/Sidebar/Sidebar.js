@@ -1,29 +1,21 @@
 import {
-  UserOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  ReadOutlined,
 } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 import { Layout, Menu, Button, Image } from "antd";
 import icon from "../../assets/logo.png";
 import styles from "./styles.module.scss";
 
 const { Sider } = Layout;
 const SideBar = ({ collapsed, handleOnCollapse }) => {
+  const navigate = useNavigate();
   const menu = [
     {
-      key: "1",
-      icon: <UserOutlined />,
-      label: "Project 1",
-    },
-    {
-      key: "2",
-      icon: <UserOutlined />,
-      label: "Project 2",
-    },
-    {
-      key: "3",
-      icon: <UserOutlined />,
-      label: "Project 3",
+      key: "/projects",
+      icon: <ReadOutlined />,
+      label: "Project",
     },
   ];
   return (
@@ -48,8 +40,13 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         <Menu
           mode="inline"
           className={styles.menu}
-          defaultSelectedKeys={["1"]}
+          defaultSelectedKeys={["/projects"]}
           items={menu}
+          onClick={({ key }) => {
+            if (key) {
+              navigate(key);
+            }
+          }}
         />
       </Sider>
     </Layout>

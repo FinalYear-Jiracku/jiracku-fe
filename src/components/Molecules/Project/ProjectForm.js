@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import { useEffect } from "react";
 import { Button, Form, Input } from "antd";
 import styles from "./styles.module.scss";
 
@@ -7,37 +7,35 @@ const ProjectForm = ({
   onCancel,
   editMode,
   projectDetail,
-  projectList,
 }) => {
   const [form] = Form.useForm();
   const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
   };
+
   const onFinish = (values) => {
     const data = { ...values };
     onSubmit(data);
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
+
   useEffect(() => {
-    if(!editMode){
-        form.setFields([
-            {
-                name:'name',
-                value:''
-            }
-        ])
+    if (!editMode) {
+      form.setFields([
+        {
+          name: "name",
+          value: "",
+        },
+      ]);
     }
-    if(editMode && projectDetail){
-        form.setFields([
-            {
-                name:'name',
-                value: projectDetail.name
-            }
-        ])
+    if (editMode && projectDetail) {
+      form.setFields([
+        {
+          name: "name",
+          value: projectDetail.name,
+        },
+      ]);
     }
-  },[editMode,form,projectDetail])
+  }, [editMode, form, projectDetail]);
 
   return (
     <Form
@@ -46,7 +44,6 @@ const ProjectForm = ({
         remember: true,
       }}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
       autoComplete="off"
       form={form}
     >
@@ -64,13 +61,23 @@ const ProjectForm = ({
       </Form.Item>
 
       <Form.Item {...tailLayout}>
-        <Button
-          className={styles["button-submit"]}
-          type="primary"
-          htmlType="submit"
-        >
-          Submit
-        </Button>
+        {editMode ? (
+          <Button
+            className={styles["button-submit"]}
+            type="primary"
+            htmlType="submit"
+          >
+            Save
+          </Button>
+        ) : (
+          <Button
+            className={styles["button-submit"]}
+            type="primary"
+            htmlType="submit"
+          >
+            Submit
+          </Button>
+        )}
         <Button
           className={styles["button-cancel"]}
           htmlType="button"

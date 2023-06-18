@@ -1,14 +1,10 @@
 import { createContext, useState } from "react";
-
 const HeaderContext = createContext({});
 
 export const HeaderProvider = ({ children }) => {
-  const [header, setheader] = useState({
-    title: "",
-    breadCrumb: [],
-  });
+  const [header, setHeader] = useState({ title: "", breadCrumb: [] });
   return (
-    <HeaderContext.Provider value={{ header, setheader }}>
+    <HeaderContext.Provider value={{ header, setHeader }}>
       {children}
     </HeaderContext.Provider>
   );

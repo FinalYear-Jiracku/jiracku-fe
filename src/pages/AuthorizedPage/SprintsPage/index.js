@@ -1,7 +1,12 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
-import { getProjectList } from "../../../api/project-api";
+import { getSprintList } from "../../../api/sprint-api";
 import { Button, Card, message } from "antd";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+  useParams,
+} from "react-router-dom";
 import {
   FormOutlined,
   DatabaseOutlined,
@@ -20,15 +25,16 @@ import UpdateProject from "../../../components/Organisms/Project/UpdateProject/U
 import DeleteProject from "../../../components/Organisms/Project/DeleteProject/DeleteProject";
 import EmptyData from "../../../components/Atoms/EmptyData/EmptyData";
 
-const ProjectsPage = () => {
+const SprintsPage = () => {
+  const { projectId } = useParams();
   const refAddModal = useRef(null);
   const refEditModal = useRef(null);
   const refDeleteModal = useRef(null);
   const [loading, setLoading] = useState(false);
-  const [projectList, setProjectList] = useState([]);
-  const [projectId, setProjectId] = useState(null);
+  const [sprintList, setSprintList] = useState([]);
+  const [projectName, setProjectName] = useState();
+  const [sprintId, setSprintId] = useState(null);
   const [totalRecord, setTotalRecord] = useState(0);
-
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const header = useContext(HeaderContext);
@@ -43,7 +49,7 @@ const ProjectsPage = () => {
 
   const handlePagination = (value) => {
     navigate({
-      pathname: "/projects",
+      pathname: `/projects/${projectId}`,
       search: `?page=${value}${
         params.searchKey ? `&search=${params.searchKey}` : ""
       }`,
@@ -52,62 +58,66 @@ const ProjectsPage = () => {
 
   const handleSearch = (value) => {
     navigate({
-      pathname: "/projects",
+      pathname: `/projects/${projectId}`,
       search: `?page=1${value !== "" ? `&search=${value}` : ""}`,
     });
   };
 
-  const getProjectData = ({ currentPage, searchKey }) => {
+  const getSprintData = ({ currentPage, searchKey }) => {
     setLoading(true);
-    getProjectList(
-      `projects?pageNumber=${currentPage || 1}&search=${
-        searchKey || ""
-      }&pageSize=8`
+    getSprintList(
+      `sprints/data/projects/${projectId}?pageNumber=${
+        currentPage || 1
+      }&search=${searchKey || ""}&pageSize=8`
     )
       .then((response) => {
-        setProjectList(response?.data?.data);
+        setProjectName(response?.data?.name);
+        setSprintList(response?.data?.sprints?.data);
         setTotalRecord(response?.data?.totalRecords);
       })
       .catch((err) => {
         message.success(MESSAGE.GET_DATA_FAIL);
-        setProjectList([]);
+        setSprintList([]);
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  const handleOpenEditModal = (projectId) => {
-    setProjectId(projectId);
+  const handleOpenEditModal = (sprintId) => {
+    setSprintId(sprintId);
     refEditModal.current.openModalHandle();
   };
 
-  const handleOpenDeleteModal = (projectId) => {
-    setProjectId(projectId);
+  const handleOpenDeleteModal = (sprintId) => {
+    setSprintId(sprintId);
     refDeleteModal.current.openModalHandle();
   };
 
   useEffect(() => {
     header.setHeader({
-      title: "PROJECTS MANAGEMENT",
-      breadCrumb: [{ name: "Projects", url: "/projects" }],
+      title: "SPRINTS MANAGEMENT",
+      breadCrumb: [
+        { name: "Projects", url: "/projects" },
+        { name: projectName, url: `/projects/${projectId}?page=1` },
+      ],
     });
     if (!params.page) {
       navigate({
-        pathname: "/projects",
+        pathname: `/projects/${projectId}`,
         search: `?page=1${
           params.searchKey ? `&search=${params.searchKey}` : ""
         }`,
       });
     }
     if (params.page) {
-      getProjectData({
+      getSprintData({
         currentPage: params.page,
         searchKey: params.searchKey,
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, projectName]);
 
   return (
     <div>
@@ -115,12 +125,12 @@ const ProjectsPage = () => {
         <div>
           <SeachBar
             onChangeEvent={handleSearch}
-            placeholder="Search Projects"
+            placeholder="Search Sprints"
             borderColor="#155E75"
           />
         </div>
         <CreateButton
-          content="Create New Project"
+          content="Create New Sprint"
           color="#155E75"
           action={() => refAddModal?.current?.openModalHandle()}
         />
@@ -128,8 +138,8 @@ const ProjectsPage = () => {
       {loading ? (
         <Loading />
       ) : (
-        <div className={styles.projects}>
-          {projectList?.map((data, index) => (
+        <div className={styles.sprints}>
+          {sprintList?.map((data, index) => (
             <Card key={index} className={styles.card}>
               <div className={styles.button}>
                 <div></div>
@@ -160,17 +170,15 @@ const ProjectsPage = () => {
                 </div>
               </div>
               <div className={styles.button}>
-                <p>Lead: {data.createdBy}</p>
-                <p>
-                  Created Date: {moment(data.createdAt).format("DD-MM-YYYY")}
-                </p>
+                <p>Start Date: {moment(data.startDate).format("DD-MM-YYYY")}</p>
+                <p>End Date: {moment(data.endDate).format("DD-MM-YYYY")}</p>
               </div>
             </Card>
           ))}
         </div>
       )}
       {
-        projectList?.length === 0 && !loading && (
+        sprintList?.length === 0 && !loading && (
           <EmptyData/>
         )
       }
@@ -184,17 +192,19 @@ const ProjectsPage = () => {
           />
         </div>
       )}
-      <NewProject ref={refAddModal}/>
+      <NewProject ref={refAddModal} getSprintData={getSprintData} />
       <UpdateProject
         ref={refEditModal}
-        projectId={projectId}
+        sprintId={sprintId}
+        getSprintData={getSprintData}
       />
       <DeleteProject
         ref={refDeleteModal}
-        projectId={projectId}
+        sprintId={sprintId}
+        getSprintData={getSprintData}
       />
     </div>
   );
 };
 
-export default ProjectsPage;
+export default SprintsPage;
