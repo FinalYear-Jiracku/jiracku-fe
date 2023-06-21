@@ -2,15 +2,11 @@ import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import { getProjectList } from "../../../api/project-api";
 import { Button, Card, message } from "antd";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import {
-  FormOutlined,
-  DatabaseOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import {FormOutlined,DatabaseOutlined,DeleteOutlined} from "@ant-design/icons";
 import { MESSAGE } from "../../../constants/constants";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
-import moment from "moment";
+import dayjs from "dayjs";
 import Paginate from "../../../components/Atoms/Paginate/Paginate";
 import SeachBar from "../../../components/Atoms/SearchBar/SeachBar";
 import CreateButton from "../../../components/Atoms/Buttons/CreateButton";
@@ -69,7 +65,7 @@ const ProjectsPage = () => {
         setTotalRecord(response?.data?.totalRecords);
       })
       .catch((err) => {
-        message.success(MESSAGE.GET_DATA_FAIL);
+        message.error(MESSAGE.GET_DATA_FAIL);
         setProjectList([]);
       })
       .finally(() => {
@@ -162,7 +158,7 @@ const ProjectsPage = () => {
               <div className={styles.button}>
                 <p>Lead: {data.createdBy}</p>
                 <p>
-                  Created Date: {moment(data.createdAt).format("DD-MM-YYYY")}
+                  Created Date: {dayjs(data.createdAt).format("YYYY-MM-DD")}
                 </p>
               </div>
             </Card>

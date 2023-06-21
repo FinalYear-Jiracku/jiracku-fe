@@ -16,7 +16,12 @@
       }
     .sider {
         width: 0px !important;
-        background: white !important;
+        background: white;
+        :global{
+            .ant-menu-item{
+                border-radius: 0px;
+            }
+        }
     }
     .logo{
         display: flex;
@@ -24,8 +29,6 @@
         justify-content: space-between;
         :global{
             .ant-image-img{
-                // width: 70px;
-                // height: 70px;
                 margin: auto;
             }
             .ant-btn{

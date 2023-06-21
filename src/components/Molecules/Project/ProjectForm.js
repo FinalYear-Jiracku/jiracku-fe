@@ -18,6 +18,14 @@ const ProjectForm = ({
     onSubmit(data);
   };
 
+  const validateName = (_, value) => {
+    const { name } = form.getFieldsValue(["name"]);
+    if (value && name && value.trim().length > 30 ) {
+      return Promise.reject("Project Name field max length 30 characters");
+    }
+    return Promise.resolve();
+  };
+
   useEffect(() => {
     if (!editMode) {
       form.setFields([
@@ -55,7 +63,11 @@ const ProjectForm = ({
             required: true,
             message: "Please input your Project Name!",
           },
+          {
+            validator: validateName
+          },
         ]}
+        validateTrigger="onBlur"
       >
         <Input />
       </Form.Item>

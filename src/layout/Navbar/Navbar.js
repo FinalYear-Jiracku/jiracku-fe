@@ -22,16 +22,10 @@ const Navbar = () => {
     <Layout className={styles.layout}>
       <Header className={styles.header}>{breadCrumb.title}</Header>
       <div className={styles.breadcrumb}>
-        <Breadcrumb className={styles["breadcrumb-item"]}>
-          {breadCrumb.data.map((item, index) => (
-            index === breadCrumb.data.length - 1 ? (
-              <Breadcrumb.Item key={index}>{item.name}</Breadcrumb.Item>
-            ) :
-            <Breadcrumb.Item key={index}>
-              <Link to={item.url}>{item.name}</Link>
-            </Breadcrumb.Item>
-          ))}
-        </Breadcrumb>
+        <Breadcrumb className={styles["breadcrumb-item"]} items={breadCrumb.data.map((item, index) => ({
+            title: index === breadCrumb.data.length - 1 ? item.name : <Link to={item.url}>{item.name}</Link>,
+            key: index
+        }))} />
         <div className={styles["image-logout"]}>
           <Image src={icon} alt="icon" className={styles.icon} />
           <div>Gia Bao</div>
