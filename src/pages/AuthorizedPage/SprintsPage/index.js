@@ -15,17 +15,17 @@ import {
 import { MESSAGE } from "../../../constants/constants";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
-import moment from "moment";
+import dayjs from "dayjs";
 import Paginate from "../../../components/Atoms/Paginate/Paginate";
 import SeachBar from "../../../components/Atoms/SearchBar/SeachBar";
 import CreateButton from "../../../components/Atoms/Buttons/CreateButton";
-import NewProject from "../../../components/Organisms/Project/NewProject/NewProject";
 import Loading from "../../../components/Atoms/Loading/Loading";
-import UpdateProject from "../../../components/Organisms/Project/UpdateProject/UpdateProject";
-import DeleteProject from "../../../components/Organisms/Project/DeleteProject/DeleteProject";
 import EmptyData from "../../../components/Atoms/EmptyData/EmptyData";
+import NewSprint from "../../../components/Organisms/Sprint/NewSprint/NewSprint";
+import UpdateSprint from "../../../components/Organisms/Sprint/UpdateSprint/UpdateSprint";
+import DeleteSprint from "../../../components/Organisms/Sprint/DeleteSprint/DeleteSprint";
 
-const SprintsPage = () => {
+const SprintsPage = ({ setId }) => {
   const { projectId } = useParams();
   const refAddModal = useRef(null);
   const refEditModal = useRef(null);
@@ -73,10 +73,10 @@ const SprintsPage = () => {
       .then((response) => {
         setProjectName(response?.data?.name);
         setSprintList(response?.data?.sprints?.data);
-        setTotalRecord(response?.data?.totalRecords);
+        setTotalRecord(response?.data?.sprints?.totalRecords);
       })
       .catch((err) => {
-        message.success(MESSAGE.GET_DATA_FAIL);
+        message.error(MESSAGE.GET_DATA_FAIL);
         setSprintList([]);
       })
       .finally(() => {
@@ -95,6 +95,7 @@ const SprintsPage = () => {
   };
 
   useEffect(() => {
+    setId(projectId);
     header.setHeader({
       title: "SPRINTS MANAGEMENT",
       breadCrumb: [
@@ -116,8 +117,9 @@ const SprintsPage = () => {
         searchKey: params.searchKey,
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params, projectName]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params, projectName, projectId]);
 
   return (
     <div>
@@ -142,7 +144,15 @@ const SprintsPage = () => {
           {sprintList?.map((data, index) => (
             <Card key={index} className={styles.card}>
               <div className={styles.button}>
-                <div></div>
+                <div className={styles.button}>
+                  <Link
+                    key={index}
+                    to={`/projects/${data?.id}?page=1`}
+                    className={styles.link}
+                  >
+                    <p>{data.name}</p>
+                  </Link>
+                </div>
                 <div>
                   <Button
                     type="text"
@@ -157,31 +167,14 @@ const SprintsPage = () => {
                 </div>
               </div>
               <div className={styles.button}>
-                <Link
-                  key={index}
-                  to={`/projects/${data?.id}?page=1`}
-                  className={styles.link}
-                >
-                  <p>{data.name}</p>
-                </Link>
-                <div className={styles.button}>
-                  <DatabaseOutlined />
-                  <p>{data.sprints} Sprints</p>
-                </div>
-              </div>
-              <div className={styles.button}>
-                <p>Start Date: {moment(data.startDate).format("DD-MM-YYYY")}</p>
-                <p>End Date: {moment(data.endDate).format("DD-MM-YYYY")}</p>
+                <p>Start Date: {dayjs(data.startDate).format("YYYY-MM-DD")}</p>
+                <p>End Date: {dayjs(data.endDate).format("YYYY-MM-DD")}</p>
               </div>
             </Card>
           ))}
         </div>
       )}
-      {
-        sprintList?.length === 0 && !loading && (
-          <EmptyData/>
-        )
-      }
+      {sprintList?.length === 0 && !loading && <EmptyData />}
       {!loading && totalRecord > 8 && (
         <div className={styles["pagination-container"]}>
           <Paginate
@@ -192,17 +185,9 @@ const SprintsPage = () => {
           />
         </div>
       )}
-      <NewProject ref={refAddModal} getSprintData={getSprintData} />
-      <UpdateProject
-        ref={refEditModal}
-        sprintId={sprintId}
-        getSprintData={getSprintData}
-      />
-      <DeleteProject
-        ref={refDeleteModal}
-        sprintId={sprintId}
-        getSprintData={getSprintData}
-      />
+      <NewSprint ref={refAddModal} />
+      <UpdateSprint ref={refEditModal} sprintId={sprintId} />
+      <DeleteSprint ref={refDeleteModal} sprintId={sprintId} />
     </div>
   );
 };

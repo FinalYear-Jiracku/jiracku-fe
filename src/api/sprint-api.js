@@ -5,17 +5,17 @@ export const getSprintList = (type) => {
 };
 
 export const getSprintDetail = (id) => {
-  return api.get(`/projects/${id}`)
+  return api.get(`/sprints/${id}`)
 }
 
 export const postSprint = (data) => {
-  return api.post('/projects',data)
+  return api.post('/sprints',data)
 }
 
 export const updateSprint = (data) => {
-  return api.put('/projects',data)
+  return api.put('/sprints',data)
 }
 
 export const deleteSprint = (id) => {
-  return api.patch(`/projects/${id}`)
+  return api.patch(`/sprints/${id}`)
 }
