@@ -1,9 +1,11 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
-import { getProjectList } from "../../../api/project-api";
-import { Button, Card, message } from "antd";
+import { Button, Card } from "antd";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import {FormOutlined,DatabaseOutlined,DeleteOutlined} from "@ant-design/icons";
-import { MESSAGE } from "../../../constants/constants";
+import {
+  FormOutlined,
+  DatabaseOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
 import dayjs from "dayjs";
@@ -11,24 +13,26 @@ import Paginate from "../../../components/Atoms/Paginate/Paginate";
 import SeachBar from "../../../components/Atoms/SearchBar/SeachBar";
 import CreateButton from "../../../components/Atoms/Buttons/CreateButton";
 import NewProject from "../../../components/Organisms/Project/NewProject/NewProject";
-import Loading from "../../../components/Atoms/Loading/Loading";
 import UpdateProject from "../../../components/Organisms/Project/UpdateProject/UpdateProject";
 import DeleteProject from "../../../components/Organisms/Project/DeleteProject/DeleteProject";
 import EmptyData from "../../../components/Atoms/EmptyData/EmptyData";
+import { useDispatch, useSelector } from "react-redux";
+import { getProjectListAction } from "../../../redux/action/project-action";
+import { getSprintListAction } from "../../../redux/action/sprint-action";
+import Loading from "../../../components/Atoms/Loading/Loading";
 
 const ProjectsPage = () => {
   const refAddModal = useRef(null);
   const refEditModal = useRef(null);
   const refDeleteModal = useRef(null);
-  const [loading, setLoading] = useState(false);
-  const [projectList, setProjectList] = useState([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [projectId, setProjectId] = useState(null);
   const [totalRecord, setTotalRecord] = useState(0);
-
+  const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const header = useContext(HeaderContext);
-
+  const projectList = useSelector((state) => state.projectReducer.projectList);
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -53,26 +57,6 @@ const ProjectsPage = () => {
     });
   };
 
-  const getProjectData = ({ currentPage, searchKey }) => {
-    setLoading(true);
-    getProjectList(
-      `projects?pageNumber=${currentPage || 1}&search=${
-        searchKey || ""
-      }&pageSize=8`
-    )
-      .then((response) => {
-        setProjectList(response?.data?.data);
-        setTotalRecord(response?.data?.totalRecords);
-      })
-      .catch((err) => {
-        message.error(MESSAGE.GET_DATA_FAIL);
-        setProjectList([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
   const handleOpenEditModal = (projectId) => {
     setProjectId(projectId);
     refEditModal.current.openModalHandle();
@@ -82,7 +66,7 @@ const ProjectsPage = () => {
     setProjectId(projectId);
     refDeleteModal.current.openModalHandle();
   };
-
+  
   useEffect(() => {
     header.setHeader({
       title: "PROJECTS MANAGEMENT",
@@ -97,13 +81,21 @@ const ProjectsPage = () => {
       });
     }
     if (params.page) {
-      getProjectData({
-        currentPage: params.page,
-        searchKey: params.searchKey,
-      });
+      setLoading(true);
+      dispatch(
+        getProjectListAction({
+          currentPage: params.page,
+          searchKey: params.searchKey,
+        })
+        )
+        .then((response) => response)
+        .finally(() => {
+          setLoading(false);
+        });
     }
+    setTotalRecord(projectList.totalRecords);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [params, projectList.totalRecords]);
 
   return (
     <div>
@@ -125,8 +117,8 @@ const ProjectsPage = () => {
         <Loading />
       ) : (
         <div className={styles.projects}>
-          {projectList?.map((data, index) => (
-            <Card key={index} className={styles.card}>
+          {projectList?.data?.map((data) => (
+            <Card key={Math.random()} className={styles.card}>
               <div className={styles.button}>
                 <div></div>
                 <div>
@@ -142,9 +134,20 @@ const ProjectsPage = () => {
                   ></Button>
                 </div>
               </div>
-              <div className={styles.button}>
+              <div
+                className={styles.button}
+                onClick={() =>
+                  dispatch(
+                    getSprintListAction({
+                      projectId: data.id,
+                      currentPage: 1,
+                      searchKey: "",
+                    })
+                  )
+                }
+              >
                 <Link
-                  key={index}
+                  key={Math.random()}
                   to={`/projects/${data?.id}?page=1`}
                   className={styles.link}
                 >
@@ -165,12 +168,8 @@ const ProjectsPage = () => {
           ))}
         </div>
       )}
-      {
-        projectList?.length === 0 && !loading && (
-          <EmptyData/>
-        )
-      }
-      {!loading && totalRecord > 8 && (
+      {/* {projectList?.data?.length === 0 && <EmptyData />} */}
+      {totalRecord > 8 && (
         <div className={styles["pagination-container"]}>
           <Paginate
             currentPage={parseInt(params.page)}
@@ -180,15 +179,9 @@ const ProjectsPage = () => {
           />
         </div>
       )}
-      <NewProject ref={refAddModal}/>
-      <UpdateProject
-        ref={refEditModal}
-        projectId={projectId}
-      />
-      <DeleteProject
-        ref={refDeleteModal}
-        projectId={projectId}
-      />
+      <NewProject ref={refAddModal} />
+      <UpdateProject ref={refEditModal} projectId={projectId}/>
+      <DeleteProject ref={refDeleteModal} projectId={projectId} />
     </div>
   );
 };

@@ -4,32 +4,68 @@ import {
   ReadOutlined,
   BookOutlined,
   LineChartOutlined,
+  CarryOutOutlined
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Menu, Button, Image } from "antd";
 import icon from "../../assets/logo.png";
 import styles from "./styles.module.scss";
+import { useSelector } from "react-redux";
 
 const { Sider } = Layout;
-const SideBar = ({ collapsed, handleOnCollapse, id }) => {
+const SideBar = ({ collapsed, handleOnCollapse }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const projectId = useSelector((state) => state.projectReducer.projectId);
+  const sprintId = useSelector((state) => state.sprintReducer.sprintId);
   const isProjectsPage = location.pathname === "/projects";
+  const isSprintsPage = location.pathname === `/projects/${projectId}`;
+  const isIssuesPage = location.pathname === `/projects/${projectId}/${sprintId}`;
 
   const getMenuItems = () => {
     let menuItems = [];
-    if (isProjectsPage) {
+    if(isProjectsPage) {
       menuItems.push({
         key: "/projects",
         icon: <ReadOutlined />,
         label: "Project",
       });
-    } else {
+    }
+    if (isSprintsPage) {
       menuItems.push(
         {
-          key: `/projects/${id}`,
+          key: "/projects",
+          icon: <ReadOutlined />,
+          label: "Project",
+        },
+        {
+          key: `/projects/${projectId}`,
           icon: <BookOutlined />,
           label: "Sprint",
+        },
+        {
+          key: "/report",
+          icon: <LineChartOutlined />,
+          label: "Report",
+        }
+      );
+    } 
+    if (isIssuesPage) {
+      menuItems.push(
+        {
+          key: "/projects",
+          icon: <ReadOutlined />,
+          label: "Project",
+        },
+        {
+          key: `/projects/${projectId}`,
+          icon: <BookOutlined />,
+          label: "Sprint",
+        },
+        {
+          key: `/projects/${projectId}/${sprintId}`,
+          icon: <CarryOutOutlined />,
+          label: "Issue",
         },
         {
           key: "/report",

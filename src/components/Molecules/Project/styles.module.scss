@@ -2,3 +2,14 @@
     margin-right: 10px;
     background-color: #155E75;
 }
+
+.form-item {
+    :global{
+        .ant-form-item-required{
+        &::before{
+            content: '' !important;
+            margin-right: 0px !important;
+        }
+        }
+    }
+}

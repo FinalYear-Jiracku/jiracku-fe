@@ -1,15 +1,20 @@
 import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 import { Modal, message } from "antd";
 import { MESSAGE } from "../../../../constants/constants";
-import { useNavigate, useParams } from "react-router-dom";
-import { getSprintDetail, updateSprint } from "../../../../api/sprint-api";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { updateSprint } from "../../../../api/sprint-api";
 import SprintForm from "../../../Molecules/Sprint/SprintForm";
+import { useDispatch, useSelector } from "react-redux";
+import { getSprintDetailAction, getSprintListAction } from "../../../../redux/action/sprint-action";
 
 const UpdateSprint = forwardRef((props, ref) => {
   const { projectId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get("page")) || 1;
   const [openModal, setOpenModal] = useState(false);
-  const [sprintDetail, setSprintDetail] = useState();
+  const sprintDetail = useSelector((state) => state.sprintReducer.sprintDetail);
 
   const openModalHandle = () => {
     setOpenModal(true);
@@ -43,7 +48,14 @@ const UpdateSprint = forwardRef((props, ref) => {
       .then((res) => {
         message.success(MESSAGE.UPDATE_SPRINT_SUCCESS);
         setOpenModal(false);
-        navigate(`/projects/${projectId}`);
+        navigate(`/projects/${projectId}?page=${currentPage}`);
+        dispatch(
+          getSprintListAction({
+            projectId: projectId,
+            currentPage: currentPage,
+            searchKey: "",
+          })
+        )
       })
       .catch((error) => {
         if (error.response.status === 400) {
@@ -56,15 +68,9 @@ const UpdateSprint = forwardRef((props, ref) => {
 
   useEffect(() => {
     if (props.sprintId && openModal) {
-      const SprintDetail = () => {
-        getSprintDetail(props.sprintId)
-          .then((res) => setSprintDetail(res?.data))
-          .catch((error) => {
-            message.error(MESSAGE.GET_DATA_FAIL);
-          });
-      };
-      SprintDetail();
+      dispatch(getSprintDetailAction(props.sprintId));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openModal, props.sprintId]);
   return (
     <Modal

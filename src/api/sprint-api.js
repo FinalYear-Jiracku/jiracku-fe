@@ -4,6 +4,10 @@ export const getSprintList = (type) => {
   return api.get(`/${type}`);
 };
 
+export const dropdownSprintList = (type) => {
+  return api.get(`/${type}`);
+};
+
 export const getSprintDetail = (id) => {
   return api.get(`/sprints/${id}`)
 }

@@ -16,10 +16,10 @@ const SprintForm = ({ onSubmit, onCancel, editMode, sprintDetail }) => {
     };
     onSubmit(data);
   };
-  
+
   const validateName = (_, value) => {
     const { name } = form.getFieldsValue(["name"]);
-    if (value && name && value.trim().length > 30 ) {
+    if (value && name && value.trim().length > 30) {
       return Promise.reject("Sprint Name field max length 30 characters");
     }
     return Promise.resolve();
@@ -30,6 +30,10 @@ const SprintForm = ({ onSubmit, onCancel, editMode, sprintDetail }) => {
     if (value && startDate && value.isBefore(startDate, "day")) {
       return Promise.reject("End date must be later than the start date");
     }
+    return Promise.resolve();
+  };
+
+  const ignore = () => {
     return Promise.resolve();
   };
 
@@ -91,7 +95,12 @@ const SprintForm = ({ onSubmit, onCancel, editMode, sprintDetail }) => {
                     message: form.error,
                   },
                   {
-                    validator: form.name === "name" ? validateName : validateEndDate,
+                    validator:
+                      form.name === "name"
+                        ? validateName
+                        : form.name === "startDate" || form.name === "endDate"
+                        ? validateEndDate
+                        : ignore,
                   },
                 ]}
                 validateTrigger="onBlur"
@@ -99,7 +108,7 @@ const SprintForm = ({ onSubmit, onCancel, editMode, sprintDetail }) => {
                 {form.type === "input" ? (
                   <Input />
                 ) : (
-                  <DatePicker format={"YYYY-MMMM-DD"} />
+                  <DatePicker format={"YYYY-MMMM-DD"} className={styles.date} />
                 )}
               </Form.Item>
             </Col>

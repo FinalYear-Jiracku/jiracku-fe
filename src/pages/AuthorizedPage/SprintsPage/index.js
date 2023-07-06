@@ -1,43 +1,42 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
-import { getSprintList } from "../../../api/sprint-api";
-import { Button, Card, message } from "antd";
+import { Button, Card } from "antd";
 import {
   Link,
   useNavigate,
   useSearchParams,
   useParams,
 } from "react-router-dom";
-import {
-  FormOutlined,
-  DatabaseOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
-import { MESSAGE } from "../../../constants/constants";
+import { FormOutlined, DeleteOutlined } from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
 import dayjs from "dayjs";
 import Paginate from "../../../components/Atoms/Paginate/Paginate";
 import SeachBar from "../../../components/Atoms/SearchBar/SeachBar";
 import CreateButton from "../../../components/Atoms/Buttons/CreateButton";
-import Loading from "../../../components/Atoms/Loading/Loading";
 import EmptyData from "../../../components/Atoms/EmptyData/EmptyData";
 import NewSprint from "../../../components/Organisms/Sprint/NewSprint/NewSprint";
 import UpdateSprint from "../../../components/Organisms/Sprint/UpdateSprint/UpdateSprint";
 import DeleteSprint from "../../../components/Organisms/Sprint/DeleteSprint/DeleteSprint";
+import { useDispatch, useSelector } from "react-redux";
+import { getIssueListAction } from "../../../redux/action/issue-action";
+import { getSprintListAction } from "../../../redux/action/sprint-action";
+import Loading from "../../../components/Atoms/Loading/Loading";
+import { setProjectId } from "../../../redux/reducer/project-reducer";
 
-const SprintsPage = ({ setId }) => {
+const SprintsPage = () => {
   const { projectId } = useParams();
   const refAddModal = useRef(null);
   const refEditModal = useRef(null);
   const refDeleteModal = useRef(null);
-  const [loading, setLoading] = useState(false);
-  const [sprintList, setSprintList] = useState([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const header = useContext(HeaderContext);
   const [projectName, setProjectName] = useState();
   const [sprintId, setSprintId] = useState(null);
   const [totalRecord, setTotalRecord] = useState(0);
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const header = useContext(HeaderContext);
+  const [loading, setLoading] = useState(false);
+  const sprintList = useSelector((state) => state.sprintReducer.sprintList);
 
   const params = useMemo(() => {
     return {
@@ -63,27 +62,6 @@ const SprintsPage = ({ setId }) => {
     });
   };
 
-  const getSprintData = ({ currentPage, searchKey }) => {
-    setLoading(true);
-    getSprintList(
-      `sprints/data/projects/${projectId}?pageNumber=${
-        currentPage || 1
-      }&search=${searchKey || ""}&pageSize=8`
-    )
-      .then((response) => {
-        setProjectName(response?.data?.name);
-        setSprintList(response?.data?.sprints?.data);
-        setTotalRecord(response?.data?.sprints?.totalRecords);
-      })
-      .catch((err) => {
-        message.error(MESSAGE.GET_DATA_FAIL);
-        setSprintList([]);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
   const handleOpenEditModal = (sprintId) => {
     setSprintId(sprintId);
     refEditModal.current.openModalHandle();
@@ -95,7 +73,8 @@ const SprintsPage = ({ setId }) => {
   };
 
   useEffect(() => {
-    setId(projectId);
+    dispatch(setProjectId(projectId));
+    setProjectName(sprintList.name);
     header.setHeader({
       title: "SPRINTS MANAGEMENT",
       breadCrumb: [
@@ -112,14 +91,28 @@ const SprintsPage = ({ setId }) => {
       });
     }
     if (params.page) {
-      getSprintData({
-        currentPage: params.page,
-        searchKey: params.searchKey,
-      });
+      setLoading(true);
+      dispatch(
+        getSprintListAction({
+          projectId: projectId,
+          currentPage: params.page,
+          searchKey: params.searchKey,
+        })
+      )
+        .then((response) => response)
+        .finally(() => {
+          setLoading(false);
+        });
     }
-
+    setTotalRecord(sprintList?.sprints?.totalRecords);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params, projectName, projectId]);
+  }, [
+    params,
+    sprintList.name,
+    sprintList?.sprints?.totalRecords,
+    projectName,
+    projectId,
+  ]);
 
   return (
     <div>
@@ -141,13 +134,23 @@ const SprintsPage = ({ setId }) => {
         <Loading />
       ) : (
         <div className={styles.sprints}>
-          {sprintList?.map((data, index) => (
+          {sprintList?.sprints?.data?.map((data, index) => (
             <Card key={index} className={styles.card}>
               <div className={styles.button}>
-                <div className={styles.button}>
+                <div
+                  className={styles.button}
+                  onClick={() =>
+                    dispatch(
+                      getIssueListAction({
+                        sprintId: `${data?.id}`,
+                        searchKey: "",
+                      })
+                    )
+                  }
+                >
                   <Link
                     key={index}
-                    to={`/projects/${data?.id}?page=1`}
+                    to={`/projects/${projectId}/${data?.id}?page=1`}
                     className={styles.link}
                   >
                     <p>{data.name}</p>
@@ -174,8 +177,8 @@ const SprintsPage = ({ setId }) => {
           ))}
         </div>
       )}
-      {sprintList?.length === 0 && !loading && <EmptyData />}
-      {!loading && totalRecord > 8 && (
+      {sprintList?.sprints?.data?.length === 0 && <EmptyData />}
+      {totalRecord > 8 && (
         <div className={styles["pagination-container"]}>
           <Paginate
             currentPage={parseInt(params.page)}
