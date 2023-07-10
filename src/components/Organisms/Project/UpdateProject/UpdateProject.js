@@ -43,7 +43,7 @@ const UpdateProject = forwardRef((props, ref) => {
     const updateProjectData = {
       id: props.projectId === undefined ? "" : props.projectId,
       name: item.name === undefined ? "" : item.name,
-      updatedBy: "Gia Bao",
+      updatedBy: `${props.userDetail.email === null ? "" : props.userDetail.email}`,
     };
     await updateProject(updateProjectData)
       .then((res) => {

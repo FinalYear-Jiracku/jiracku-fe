@@ -35,7 +35,7 @@ const NewIssue = forwardRef((props, ref) => {
       sprintId: Number(sprintId) === 0 ? null : Number(sprintId),
       startDate: item.startDate === undefined ? null : item.startDate,
       dueDate: item.dueDate === undefined ? null : item.dueDate,
-      createdBy: "Gia Bao",
+      createdBy: `${props.userDetail.email === null ? "" : props.userDetail.email}`,
     };
     await postIssue(postIssueData)
       .then((res) => {

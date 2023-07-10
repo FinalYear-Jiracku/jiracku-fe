@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getDropdownStatusListAction } from "../../../../redux/action/status-action";
 
-const NewIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
+const NewIssueForm = ({ onSubmit, onCancel }) => {
   const { sprintId } = useParams();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -34,13 +34,13 @@ const NewIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
   const validateName = (_, value) => {
     const { name } = form.getFieldsValue(["name"]);
     if (value && name && value.trim().length > 30) {
-      return Promise.reject("Sprint Name field max length 30 characters");
+      return Promise.reject("Name field max length 30 characters");
     }
     return Promise.resolve();
   };
 
   const validateStoryPoint = (_, value) => {
-    const check =/[^0-9]+/;
+    const check = /[^0-9]+/;
     const { storyPoint } = form.getFieldsValue(["storyPoint"]);
     if (value && storyPoint && check.test(value)) {
       return Promise.reject("Invalid Format");
@@ -61,77 +61,39 @@ const NewIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
   };
 
   useEffect(() => {
-    if (!editMode) {
-      form.setFields([
-        {
-          name: "name",
-          value: "",
-        },
-        {
-          name: "type",
-          value: "",
-        },
-        {
-          name: "priority",
-          value: "",
-        },
-        {
-          name: "storyPoint",
-          value: Number(),
-        },
-        {
-          name: "statusId",
-          value: "",
-        },
-        {
-          name: "startDate",
-          value: dayjs()
-        },
-        {
-          name: "dueDate",
-          value: dayjs(),
-        },
-      ]);
-    }
-    if (editMode && issueDetail) {
-      form.setFields([
-        {
-          name: "name",
-          value: issueDetail.name,
-        },
-        {
-          name: "type",
-          value: issueDetail.type,
-        },
-        {
-          name: "priority",
-          value: issueDetail.priority,
-        },
-        {
-          name: "storyPoint",
-          value: issueDetail.storyPoint,
-        },
-        {
-          name: "statusId",
-          value: issueDetail?.status?.name,
-        },
-        {
-          name: "userIssues",
-          value: issueDetail.userIssues,
-        },
-        {
-          name: "startDate",
-          value: dayjs(issueDetail.startDate),
-        },
-        {
-          name: "dueDate",
-          value: dayjs(issueDetail.dueDate),
-        },
-      ]);
-    }
+    form.setFields([
+      {
+        name: "name",
+        value: "",
+      },
+      {
+        name: "type",
+        value: "",
+      },
+      {
+        name: "priority",
+        value: "",
+      },
+      {
+        name: "storyPoint",
+        value: Number(),
+      },
+      {
+        name: "statusId",
+        value: "",
+      },
+      {
+        name: "startDate",
+        value: dayjs(),
+      },
+      {
+        name: "dueDate",
+        value: dayjs(),
+      },
+    ]);
     dispatch(getDropdownStatusListAction(`${sprintId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editMode, form, issueDetail, sprintId]);
+  }, [form, sprintId]);
 
   return (
     <Form
@@ -163,7 +125,7 @@ const NewIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
                         ? validateEndDate
                         : form.name === "storyPoint"
                         ? validateStoryPoint
-                        : ignore
+                        : ignore,
                   },
                 ]}
                 validateTrigger="onBlur"
@@ -191,23 +153,13 @@ const NewIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
       })}
 
       <Form.Item {...tailLayout}>
-        {editMode ? (
-          <Button
-            className={styles["button-submit"]}
-            type="primary"
-            htmlType="submit"
-          >
-            Save
-          </Button>
-        ) : (
-          <Button
-            className={styles["button-submit"]}
-            type="primary"
-            htmlType="submit"
-          >
-            Submit
-          </Button>
-        )}
+        <Button
+          className={styles["button-submit"]}
+          type="primary"
+          htmlType="submit"
+        >
+          Submit
+        </Button>
         <Button
           className={styles["button-cancel"]}
           htmlType="button"

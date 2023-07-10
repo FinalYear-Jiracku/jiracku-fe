@@ -46,11 +46,11 @@ const SprintForm = ({ onSubmit, onCancel, editMode, sprintDetail }) => {
         },
         {
           name: "startDate",
-          value: "",
+          value: dayjs(),
         },
         {
           name: "endDate",
-          value: "",
+          value: dayjs(),
         },
       ]);
     }
@@ -58,15 +58,15 @@ const SprintForm = ({ onSubmit, onCancel, editMode, sprintDetail }) => {
       form.setFields([
         {
           name: "name",
-          value: sprintDetail.name,
+          value: sprintDetail.name === null ? "" : sprintDetail.name,
         },
         {
           name: "startDate",
-          value: dayjs(sprintDetail.startDate),
+          value: sprintDetail.startDate === null ? "" : dayjs(sprintDetail.startDate),
         },
         {
           name: "endDate",
-          value: dayjs(sprintDetail.endDate),
+          value: sprintDetail.endDate === null ? "" : dayjs(sprintDetail.endDate),
         },
       ]);
     }

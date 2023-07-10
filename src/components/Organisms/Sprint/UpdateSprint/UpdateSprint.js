@@ -40,9 +40,9 @@ const UpdateSprint = forwardRef((props, ref) => {
       id: props.sprintId === undefined ? "" : props.sprintId,
       name: item.name === undefined ? "" : item.name,
       projectId: Number(projectId) === undefined ? "" : Number(projectId),
-      startDate: item.startDate === undefined ? "" : item.startDate,
-      endDate: item.endDate === undefined ? "" : item.endDate,
-      updatedBy: "Gia Bao",
+      startDate: item.startDate === undefined ? null : item.startDate,
+      endDate: item.endDate === undefined ? null : item.endDate,
+      updatedBy: `${props.userDetail.email === null ? "" : props.userDetail.email}`,
     };
     await updateSprint(updateSprintData)
       .then((res) => {

@@ -1,0 +1,126 @@
+.button-submit{
+    margin-right: 10px;
+    background-color: #155E75;
+}
+.layout{
+    display: flex;
+    justify-content: space-between;
+}
+.form-item {
+    :global{
+        .ant-form-item-required{
+        &::before{
+            content: '' !important;
+            margin-right: 0px !important;
+        }
+        }
+    }
+}
+.table{
+    width: 650px;
+    :global{
+        .ant-table-thead{
+            .ant-table-cell{
+                background-color: #0597c4;
+                color: white;
+            }
+        }
+    }
+}
+
+.button{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.comment{
+    margin-top: 5px;
+    width: 650px;
+}
+
+.image-comment{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.avatar{
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 20px !important;
+    margin-right: 10px;
+}
+
+.card{
+    border: none !important; 
+    :global{
+        .ant-card-body{
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    }
+}
+
+.scroll{
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.image-button{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.name-button{
+    width: 563px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.content{
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.upload-button-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+.upload-button-text {
+margin-top: 8px;
+}
+
+.file-list-container {
+    overflow-x: auto;
+    .item-upload{
+        display: flex;
+        flex-wrap: nowrap;
+        :global{
+            .ant-upload-list-item-container{
+                margin-block: 0 2px !important;
+                margin-inline: 0 2px !important;
+            }
+        }
+    }
+}
+
+.file{
+    display: flex;
+    overflow-x: auto; /* Tạo thanh cuộn ngang khi nội dung vượt quá kích thước container */
+    white-space: nowrap; /* Ngăn các thẻ img xuống dòng */
+    width: 100%;
+}

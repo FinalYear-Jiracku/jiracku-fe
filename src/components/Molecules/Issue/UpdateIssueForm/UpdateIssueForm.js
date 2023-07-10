@@ -27,19 +27,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDropdownStatusListAction } from "../../../../redux/action/status-action";
 import { getDropdownSprintListAction } from "../../../../redux/action/sprint-action";
 import CreateButton from "../../../Atoms/Buttons/CreateButton";
-import NewIssue from "../../../Organisms/Issue/NewIssue/NewIssue";
-import UpdateIssue from "../../../Organisms/Issue/UpdateIssue/UpdateIssue";
-import DeleteIssue from "../../../Organisms/Issue/DeleteIssue/DeleteIssue";
+import NewSubIssue from "../../../Organisms/SubIssue/NewSubIssue/NewSubIssue";
+import UpdateSubIssue from "../../../Organisms/SubIssue/UpdateSubIssue/UpdateSubIssue";
+import DeleteSubIssue from "../../../Organisms/SubIssue/DeleteSubIssue/DeleteSubIssue";
+import NewCommentForm from "../../Comment/NewCommentForm/NewCommentForm";
+import UpdateComment from "../../../Organisms/Comment/UpdateComment/UpdateComment";
+import DeleteComment from "../../../Organisms/Comment/DeleteComment/DeleteComment";
 const { TextArea } = Input;
 
-const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
+const UpdateIssueForm = ({
+  onSubmit,
+  onCancel,
+  editMode,
+  issueDetail,
+  userDetail,
+}) => {
   const { sprintId, projectId } = useParams();
   const dispatch = useDispatch();
   const refAddModal = useRef(null);
   const refEditModal = useRef(null);
   const refDeleteModal = useRef(null);
+  const refEditModalComment = useRef(null);
+  const refDeleteModalComment = useRef(null);
   const [form] = Form.useForm();
   const [subIssueId, setSubIssueId] = useState(null);
+  const [commentId, setCommentId] = useState(null);
   const [renderAttachment, setRenderAttachment] = useState([]);
   const handleChange = ({ target }) => {
     const files = target.files;
@@ -126,11 +138,6 @@ const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
     return Promise.resolve();
   };
 
-  const handleOpenEditModal = (subIssueId) => {
-    setSubIssueId(subIssueId);
-    refEditModal.current.openModalHandle();
-  };
-
   const handleDelete = (id) => {
     const updatedRenderAttachment = renderAttachment.filter(
       (data) => data.id !== id
@@ -138,9 +145,24 @@ const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
     setRenderAttachment(updatedRenderAttachment);
   };
 
+  const handleOpenEditModal = (subIssueId) => {
+    setSubIssueId(subIssueId);
+    refEditModal.current.openModalHandle();
+  };
+
   const handleOpenDeleteModal = (subIssueId) => {
     setSubIssueId(subIssueId);
     refDeleteModal.current.openModalHandle();
+  };
+
+  const handleOpenEditModalComment = (commentId) => {
+    setCommentId(commentId);
+    refEditModalComment.current.openModalHandle();
+  };
+
+  const handleOpenDeleteModalComment = (commentId) => {
+    setCommentId(commentId);
+    refDeleteModalComment.current.openModalHandle();
   };
 
   const defaultColumns = [
@@ -161,12 +183,6 @@ const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
       title: "Point",
       dataIndex: "storyPoint",
       width: "70px",
-      align: "center",
-    },
-    {
-      title: "SubIssues",
-      dataIndex: "subIssues",
-      width: "100px",
       align: "center",
     },
     {
@@ -317,7 +333,8 @@ const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
         },
         {
           name: "description",
-          value: issueDetail.description,
+          value:
+            issueDetail.description === null ? "" : issueDetail.description,
         },
         {
           name: "atachments",
@@ -474,8 +491,12 @@ const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
         />
         <div className={styles.comment}>
           <div className={styles["image-comment"]}>
-            <Image src={icon} alt="icon" className={styles.avatar} />
-            <Input placeholder="Type here to comment" />
+            <Image
+              src={userDetail.image}
+              alt="icon"
+              className={styles.avatar}
+            />
+            <NewCommentForm issueDetail={issueDetail} userDetail={userDetail} />
           </div>
           <div className={styles.scroll}>
             {issueDetail?.comments?.map((data, index) => (
@@ -490,12 +511,12 @@ const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
                       <Button
                         type="text"
                         icon={<FormOutlined />}
-                        //onClick={() => handleOpenEditModal(data.id)}
+                        onClick={() => handleOpenEditModalComment(data.id)}
                       ></Button>
                       <Button
                         type="text"
                         icon={<DeleteOutlined />}
-                        //onClick={() => handleOpenDeleteModal(data.id)}
+                        onClick={() => handleOpenDeleteModalComment(data.id)}
                       ></Button>
                     </div>
                   </div>
@@ -508,9 +529,33 @@ const UpdateIssueForm = ({ onSubmit, onCancel, editMode, issueDetail }) => {
           </div>
         </div>
       </div>
-      <NewIssue ref={refAddModal} />
-      <UpdateIssue ref={refEditModal} subIssueId={subIssueId} />
-      <DeleteIssue ref={refDeleteModal} subIssueId={subIssueId} />
+      <NewSubIssue
+        ref={refAddModal}
+        issueDetail={issueDetail}
+        userDetail={userDetail}
+      />
+      <UpdateSubIssue
+        ref={refEditModal}
+        subIssueId={subIssueId}
+        issueDetail={issueDetail}
+        userDetail={userDetail}
+      />
+      <DeleteSubIssue
+        ref={refDeleteModal}
+        subIssueId={subIssueId}
+        issueDetail={issueDetail}
+      />
+      <UpdateComment
+        ref={refEditModalComment}
+        commentId={commentId}
+        issueDetail={issueDetail}
+        userDetail={userDetail}
+      />
+      <DeleteComment
+        ref={refDeleteModalComment}
+        commentId={commentId}
+        issueDetail={issueDetail}
+      />
     </div>
   );
 };

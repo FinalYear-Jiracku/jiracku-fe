@@ -1,18 +1,28 @@
 import { useState, useContext, useEffect } from "react";
-import { Breadcrumb, Layout, Image } from "antd";
+import { Breadcrumb, Layout, Image, Button } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
-import icon from "../../assets/anh.jpg";
 import HeaderContext from "../../context/HeaderProvider";
 import styles from "./styles.module.scss";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import GoogleAuthContext from "../../context/AuthProvider";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants/constants";
+import Cookies from "js-cookie";
 const { Header } = Layout;
 
 const Navbar = () => {
-  const { auth } = useContext(GoogleAuthContext);
+  const navigate = useNavigate();
   const { header } = useContext(HeaderContext);
+  const { auth, setAuth } = useContext(GoogleAuthContext);
   const [breadCrumb, setBreadCrumb] = useState({ title: "", data: [] });
-  
+
+  const logOut = () => {
+    window.localStorage.removeItem(ACCESS_TOKEN);
+    window.localStorage.removeItem(REFRESH_TOKEN);
+    // Cookies.remove(ACCESS_TOKEN);
+    // Cookies.remove(REFRESH_TOKEN);
+    setAuth({});
+    navigate("/home");
+  };
   useEffect(() => {
     setBreadCrumb({
       title: header.title.toUpperCase(),
@@ -41,11 +51,12 @@ const Navbar = () => {
             <div></div>
           ) : (
             <>
-              <Image src={icon} alt="icon" className={styles.icon} />
-              <div>Gia Bao</div>
-              <button className={styles["button-logout"]}>
+              <Link to={"/user"} className={styles.link}>
+                <Button>Profile</Button>
+              </Link>
+              <Button className={styles["button-logout"]} onClick={logOut}>
                 <LogoutOutlined className={styles.logout} />
-              </button>
+              </Button>
             </>
           )}
         </div>

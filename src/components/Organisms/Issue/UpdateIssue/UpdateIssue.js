@@ -142,7 +142,7 @@ const UpdateIssue = forwardRef((props, ref) => {
       "sprintId",
       Number(item.sprintId) === 0 ? null : Number(item.sprintId)
     );
-    formData.append("updatedBy", "Nhat Phuong");
+    formData.append("updatedBy", `${props.userDetail.email === null ? "" : props.userDetail.email}`);
     for (let i = 0; i < files.length; i++) {
       formData.append("files", files[i], files[i].name);
     }
@@ -184,6 +184,7 @@ const UpdateIssue = forwardRef((props, ref) => {
         onCancel={closeModalHandle}
         onSubmit={onSubmitForm}
         issueDetail={issueDetail}
+        userDetail={props.userDetail}
       />
     </Modal>
   );

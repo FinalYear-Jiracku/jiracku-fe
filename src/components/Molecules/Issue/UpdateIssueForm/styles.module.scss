@@ -21,7 +21,8 @@
     :global{
         .ant-table-thead{
             .ant-table-cell{
-                background-color: #155E75;
+                background-color: #0597c4;
+                color: white;
             }
         }
     }
@@ -41,8 +42,7 @@
 
 .image-comment{
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    
 }
 
 .avatar{

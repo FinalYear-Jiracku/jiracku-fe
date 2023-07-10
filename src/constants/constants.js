@@ -1,7 +1,10 @@
 export const MESSAGE = {
   AUTHORIZATION_FAIL: "Login Fail",
+  USER_NOT_FOUND: "User Not Found",
+  INVALID_REQUEST : "Invalid client request",
+  FPT_FE: "Email must be end @fpt.edu.vn or @fe.edu.vn",
   AUTHORIZATION: "Don't have permission to access this page",
-  GET_DATA_FAIL: "Server is currently down, please reload",
+  GET_DATA_FAIL: "Server down",
   CREATE_FAIL: "Create Fail",
   UPDATE_FAIL: "Update Fail",
   DELETE_FAIL: "Delete Fail",
@@ -17,6 +20,13 @@ export const MESSAGE = {
   CREATE_ISSUE_SUCCESS: "Issue has been created",
   UPDATE_ISSUE_SUCCESS: "Issue has been updated",
   DELETE_ISSUE_SUCCESS: "Issue has been deleted",
+  UPDATE_USER_SUCCESS: "User has been updated",
+  CREATE_SUB_ISSUE_SUCCESS: "SubIssue has been created",
+  UPDATE_SUB_ISSUE_SUCCESS: "SubIssue has been updated",
+  DELETE_SUB_ISSUE_SUCCESS: "SubIssue has been deleted",
+  CREATE_COMMENT_SUCCESS: "Comment has been created",
+  UPDATE_COMMENT_SUCCESS: "Comment has been updated",
+  DELETE_COMMENT_SUCCESS: "Comment has been deleted",
 }
 export const ACCESS_TOKEN = "access_token";
 export const REFRESH_TOKEN = "refresh_token";

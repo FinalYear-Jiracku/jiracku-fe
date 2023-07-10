@@ -4,7 +4,9 @@ import {
   ReadOutlined,
   BookOutlined,
   LineChartOutlined,
-  CarryOutOutlined
+  CarryOutOutlined,
+  HomeOutlined,
+  ProfileOutlined
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Menu, Button, Image } from "antd";
@@ -18,12 +20,28 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const location = useLocation();
   const projectId = useSelector((state) => state.projectReducer.projectId);
   const sprintId = useSelector((state) => state.sprintReducer.sprintId);
+  const isHomePage = location.pathname === "/home";
+  const isUsersPage = location.pathname === "/user";
   const isProjectsPage = location.pathname === "/projects";
   const isSprintsPage = location.pathname === `/projects/${projectId}`;
   const isIssuesPage = location.pathname === `/projects/${projectId}/${sprintId}`;
 
   const getMenuItems = () => {
     let menuItems = [];
+    if(isHomePage) {
+      menuItems.push({
+        key: "/home",
+        icon: <HomeOutlined />,
+        label: "Home",
+      });
+    }
+    if(isUsersPage) {
+      menuItems.push({
+        key: "/user",
+        icon: <ProfileOutlined />,
+        label: "Profile",
+      });
+    }
     if(isProjectsPage) {
       menuItems.push({
         key: "/projects",

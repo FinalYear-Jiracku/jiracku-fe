@@ -22,6 +22,7 @@ import { getIssueListAction } from "../../../redux/action/issue-action";
 import { getSprintListAction } from "../../../redux/action/sprint-action";
 import Loading from "../../../components/Atoms/Loading/Loading";
 import { setProjectId } from "../../../redux/reducer/project-reducer";
+import { getUserDetailAction } from "../../../redux/action/user-action";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
@@ -37,6 +38,7 @@ const SprintsPage = () => {
   const [totalRecord, setTotalRecord] = useState(0);
   const [loading, setLoading] = useState(false);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
+  const userDetail = useSelector((state) => state.userReducer.userDetail);
 
   const params = useMemo(() => {
     return {
@@ -92,6 +94,7 @@ const SprintsPage = () => {
     }
     if (params.page) {
       setLoading(true);
+      dispatch(getUserDetailAction());
       dispatch(
         getSprintListAction({
           projectId: projectId,
@@ -170,8 +173,8 @@ const SprintsPage = () => {
                 </div>
               </div>
               <div className={styles.button}>
-                <p>Start Date: {dayjs(data.startDate).format("YYYY-MM-DD")}</p>
-                <p>End Date: {dayjs(data.endDate).format("YYYY-MM-DD")}</p>
+                <p>Start Date: {data.startDate === null ? "" : dayjs(data.startDate).format("YYYY-MM-DD")}</p>
+                <p>End Date: {data.endDate === null ? "" : dayjs(data.endDate).format("YYYY-MM-DD")}</p>
               </div>
             </Card>
           ))}
@@ -188,8 +191,8 @@ const SprintsPage = () => {
           />
         </div>
       )}
-      <NewSprint ref={refAddModal} />
-      <UpdateSprint ref={refEditModal} sprintId={sprintId} />
+      <NewSprint ref={refAddModal} userDetail={userDetail}/>
+      <UpdateSprint ref={refEditModal} sprintId={sprintId} userDetail={userDetail}/>
       <DeleteSprint ref={refDeleteModal} sprintId={sprintId} />
     </div>
   );

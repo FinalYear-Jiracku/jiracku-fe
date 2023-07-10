@@ -29,10 +29,11 @@ const NewSprint = forwardRef((props, ref) => {
     const postSprintData = {
       name: item.name === undefined ? "" : item.name,
       projectId: Number(projectId) === undefined ? "" : Number(projectId),
-      startDate: item.startDate === undefined ? "" : item.startDate,
-      endDate: item.endDate === undefined ? "" : item.endDate,
-      createdBy: "Gia Bao",
+      startDate: item.startDate === undefined ? null : item.startDate,
+      endDate: item.endDate === undefined ? null : item.endDate,
+      createdBy: `${props.userDetail.email === null ? "" : props.userDetail.email}`,
     };
+    console.log(postSprintData);
     await postSprint(postSprintData)
       .then((res) => {
         message.success(MESSAGE.CREATE_SPRINT_SUCCESS);

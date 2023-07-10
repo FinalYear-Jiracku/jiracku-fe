@@ -21,6 +21,7 @@ import { getSprintListAction } from "../../../redux/action/sprint-action";
 import DeleteIssue from "../../../components/Organisms/Issue/DeleteIssue/DeleteIssue";
 import NewIssue from "../../../components/Organisms/Issue/NewIssue/NewIssue";
 import UpdateIssue from "../../../components/Organisms/Issue/UpdateIssue/UpdateIssue";
+import { getUserDetailAction } from "../../../redux/action/user-action";
 const IssuesPage = () => {
   const { projectId, sprintId } = useParams();
   const refAddModal = useRef(null);
@@ -36,6 +37,7 @@ const IssuesPage = () => {
   const [searchParams] = useSearchParams();
   const issueList = useSelector((state) => state.issueReducer.issueList);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
+  const userDetail = useSelector((state) => state.userReducer.userDetail);  
 
   const params = useMemo(() => {
     return {
@@ -211,6 +213,7 @@ const IssuesPage = () => {
     }
     if (params.page) {
       setLoading(true);
+      dispatch(getUserDetailAction());
       dispatch(
         getIssueListAction({
           sprintId: `${sprintId}`,
@@ -266,8 +269,8 @@ const IssuesPage = () => {
           />
         </div>
       )}
-      <NewIssue ref={refAddModal} />
-      <UpdateIssue ref={refEditModal} issueId={issueId} />
+      <NewIssue ref={refAddModal} userDetail={userDetail}/>
+      <UpdateIssue ref={refEditModal} issueId={issueId} userDetail={userDetail}/>
       <DeleteIssue ref={refDeleteModal} issueId={issueId} />
     </div>
   );

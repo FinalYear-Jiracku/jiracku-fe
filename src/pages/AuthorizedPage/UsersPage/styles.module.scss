@@ -1,0 +1,14 @@
+.card-layout{
+    display: flex;
+    align-items: center;
+    justify-content:space-around;
+}
+.card-sms{
+    width: 400px;
+    height: 180px;
+    border: 1px solid black;
+}
+.card-totp{
+    width: 400px;
+    border: 1px solid black;
+}

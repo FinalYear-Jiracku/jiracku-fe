@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProjectListAction } from "../../../redux/action/project-action";
 import { getSprintListAction } from "../../../redux/action/sprint-action";
 import Loading from "../../../components/Atoms/Loading/Loading";
+import { getUserDetailAction } from "../../../redux/action/user-action";
 
 const ProjectsPage = () => {
   const refAddModal = useRef(null);
@@ -33,6 +34,8 @@ const ProjectsPage = () => {
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
   const projectList = useSelector((state) => state.projectReducer.projectList);
+  const userDetail = useSelector((state) => state.userReducer.userDetail);
+  
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -82,6 +85,7 @@ const ProjectsPage = () => {
     }
     if (params.page) {
       setLoading(true);
+      dispatch(getUserDetailAction());
       dispatch(
         getProjectListAction({
           currentPage: params.page,
@@ -118,7 +122,7 @@ const ProjectsPage = () => {
       ) : (
         <div className={styles.projects}>
           {projectList?.data?.map((data) => (
-            <Card key={Math.random()} className={styles.card}>
+            <Card key={data?.id} className={styles.card}>
               <div className={styles.button}>
                 <div></div>
                 <div>
@@ -147,7 +151,7 @@ const ProjectsPage = () => {
                 }
               >
                 <Link
-                  key={Math.random()}
+                  key={data?.id}
                   to={`/projects/${data?.id}?page=1`}
                   className={styles.link}
                 >
@@ -168,7 +172,7 @@ const ProjectsPage = () => {
           ))}
         </div>
       )}
-      {/* {projectList?.data?.length === 0 && <EmptyData />} */}
+      {projectList?.data?.length === 0 && <EmptyData />}
       {totalRecord > 8 && (
         <div className={styles["pagination-container"]}>
           <Paginate
@@ -179,8 +183,8 @@ const ProjectsPage = () => {
           />
         </div>
       )}
-      <NewProject ref={refAddModal} />
-      <UpdateProject ref={refEditModal} projectId={projectId}/>
+      <NewProject ref={refAddModal} userDetail={userDetail}/>
+      <UpdateProject ref={refEditModal} projectId={projectId} userDetail={userDetail}/>
       <DeleteProject ref={refDeleteModal} projectId={projectId} />
     </div>
   );
