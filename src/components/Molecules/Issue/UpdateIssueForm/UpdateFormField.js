@@ -91,7 +91,7 @@ export const INFO_FORM = [
     children: [
       {
         id: 1,
-        name: "userIssues",
+        name: "userId",
         label: "Assignee",
         type: "select",
         require: false,

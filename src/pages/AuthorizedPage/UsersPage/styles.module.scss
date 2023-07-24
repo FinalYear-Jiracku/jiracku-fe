@@ -1,14 +1,16 @@
 .card-layout{
-    display: flex;
-    align-items: center;
-    justify-content:space-around;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); // Hiển thị 2 card trên một hàng
+    grid-gap: 30px; // Khoảng cách giữa các card
+    margin: 10px 20px 0px;
+    @media screen and (max-width: 768px) {
+        grid-template-columns: 1fr; // Khi màn hình nhỏ hơn hoặc bằng 768px, hiển thị 1 card trên một hàng
+    }
 }
 .card-sms{
-    width: 400px;
     height: 180px;
     border: 1px solid black;
 }
 .card-totp{
-    width: 400px;
     border: 1px solid black;
 }

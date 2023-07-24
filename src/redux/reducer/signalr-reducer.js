@@ -5,8 +5,8 @@ const initialState = {
   userProjectList: [],
 };
 
-const userReducer = createSlice({
-  name: "userReducer",
+const signalrReducer = createSlice({
+  name: "signalrReducer",
   initialState,
   reducers: {
     getUserDetailReducer: (state, action) => {
@@ -18,6 +18,6 @@ const userReducer = createSlice({
   },
 });
 
-export const { getUserDetailReducer, getUserProjectListReducer } = userReducer.actions;
+export const { getUserDetailReducer, getUserProjectListReducer } = signalrReducer.actions;
 
-export default userReducer.reducer;
+export default signalrReducer.reducer;

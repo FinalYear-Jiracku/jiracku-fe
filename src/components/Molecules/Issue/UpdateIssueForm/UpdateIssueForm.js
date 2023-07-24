@@ -33,6 +33,7 @@ import DeleteSubIssue from "../../../Organisms/SubIssue/DeleteSubIssue/DeleteSub
 import NewCommentForm from "../../Comment/NewCommentForm/NewCommentForm";
 import UpdateComment from "../../../Organisms/Comment/UpdateComment/UpdateComment";
 import DeleteComment from "../../../Organisms/Comment/DeleteComment/DeleteComment";
+import { getUserProjectListAction } from "../../../../redux/action/user-action";
 const { TextArea } = Input;
 
 const UpdateIssueForm = ({
@@ -85,6 +86,9 @@ const UpdateIssueForm = ({
   const dropdownSprintList = useSelector(
     (state) => state.sprintReducer.dropdownSprintList
   );
+  const userProjectList = useSelector(
+    (state) => state.userReducer.userProjectList
+  );
   const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
   };
@@ -96,6 +100,10 @@ const UpdateIssueForm = ({
     value: data.id,
     label: data.name,
   }));
+  const renderUserProject = userProjectList.map((data) => ({
+    value: data.id,
+    label: data.email,
+  }));
   const renderSubIssues = issueDetail?.subIssues?.map((data) => {
     return data;
   });
@@ -104,6 +112,7 @@ const UpdateIssueForm = ({
       ...values,
       statusId: values.statusId,
       sprintId: values.sprintId,
+      userId: values.userId,
       files: renderAttachment.map((attachment) => attachment),
     };
     onSubmit(data);
@@ -238,9 +247,12 @@ const UpdateIssueForm = ({
     },
     {
       title: "Assignee",
-      dataIndex: "userIssues",
+      dataIndex: "user",
       width: "100px",
       align: "center",
+      render: (_, record) => {
+        return record?.user === null ? "" : <Image src={record?.user.image} alt="icon" className={styles.avatar} />;
+      },
     },
     {
       title: "Start Date",
@@ -314,8 +326,9 @@ const UpdateIssueForm = ({
           label: issueDetail?.status?.name,
         },
         {
-          name: "userIssues",
-          value: issueDetail.userIssues,
+          name: "userId",
+          value: issueDetail.user?.id,
+          label: issueDetail?.user?.name,
         },
         {
           name: "sprintId",
@@ -337,7 +350,7 @@ const UpdateIssueForm = ({
             issueDetail.description === null ? "" : issueDetail.description,
         },
         {
-          name: "atachments",
+          name: "attachments",
           value:
             issueDetail.attachments === null ? [] : issueDetail.attachments,
         },
@@ -349,6 +362,7 @@ const UpdateIssueForm = ({
     setRenderAttachment(updatedRenderAttachment);
     dispatch(getDropdownStatusListAction(`${sprintId}`));
     dispatch(getDropdownSprintListAction(`${projectId}`));
+    dispatch(getUserProjectListAction(`${projectId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode, form, issueDetail, sprintId, projectId]);
 
@@ -410,8 +424,11 @@ const UpdateIssueForm = ({
                               ? dataSelectOption(form.name)
                               : form.name === "statusId"
                               ? renderStatus
-                              : renderSprint
+                              : form.name === "sprintId"
+                              ? renderSprint
+                              : renderUserProject
                           }
+                          allowClear={form.name === "userId" ? true : false}
                         />
                       ) : form.type === "files" ? (
                         <div className={styles["file-list-container"]}>
@@ -491,11 +508,7 @@ const UpdateIssueForm = ({
         />
         <div className={styles.comment}>
           <div className={styles["image-comment"]}>
-            <Image
-              src={userDetail.image}
-              alt="icon"
-              className={styles.avatar}
-            />
+            <img src={userDetail.image} alt="icon" className={styles.avatar} />
             <NewCommentForm issueDetail={issueDetail} userDetail={userDetail} />
           </div>
           <div className={styles.scroll}>
@@ -503,7 +516,7 @@ const UpdateIssueForm = ({
               <Card key={index} className={styles.card}>
                 <div className={styles["image-button"]}>
                   <div>
-                    <Image src={icon} alt="icon" className={styles.avatar} />
+                    <img src={icon} alt="icon" className={styles.avatar} />
                   </div>
                   <div className={styles["name-button"]}>
                     <div>Dinh Gia Bao</div>

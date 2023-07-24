@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useContext, useMemo } from "react";
-import { Button, Table } from "antd";
+import { Button, Image, Table } from "antd";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   DeleteOutlined,
@@ -139,9 +139,12 @@ const IssuesPage = () => {
     },
     {
       title: "Assignee",
-      dataIndex: "userIssues",
+      dataIndex: "user",
       width: "100px",
       align: "center",
+      render: (_, record) => {
+        return record?.user === null ? "" : <Image src={record?.user.image} alt="icon" className={styles.avatar} />;
+      },
     },
     {
       title: "Start Date",

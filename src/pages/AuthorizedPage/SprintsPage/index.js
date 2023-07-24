@@ -6,7 +6,11 @@ import {
   useSearchParams,
   useParams,
 } from "react-router-dom";
-import { FormOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  FormOutlined,
+  DeleteOutlined,
+  UserAddOutlined,
+} from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
 import dayjs from "dayjs";
@@ -23,12 +27,15 @@ import { getSprintListAction } from "../../../redux/action/sprint-action";
 import Loading from "../../../components/Atoms/Loading/Loading";
 import { setProjectId } from "../../../redux/reducer/project-reducer";
 import { getUserDetailAction } from "../../../redux/action/user-action";
+import InviteUser from "../../../components/Organisms/InviteUser/InviteUser";
+import { receiveMessage } from "../../../signalR/signalRService";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
   const refAddModal = useRef(null);
   const refEditModal = useRef(null);
   const refDeleteModal = useRef(null);
+  const refInviteUser = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -73,6 +80,16 @@ const SprintsPage = () => {
     setSprintId(sprintId);
     refDeleteModal.current.openModalHandle();
   };
+
+  const handleOpenInviteUserModal = () => {
+    refInviteUser.current.openModalHandle();
+  };
+
+  useEffect(() => {
+    receiveMessage((message) => {
+      console.log("Received message", message);
+    });
+  }, []);
 
   useEffect(() => {
     dispatch(setProjectId(projectId));
@@ -120,11 +137,16 @@ const SprintsPage = () => {
   return (
     <div>
       <div className={styles["common-bar"]}>
-        <div>
+        <div className={styles["invite-user"]}>
           <SeachBar
             onChangeEvent={handleSearch}
             placeholder="Search Sprints"
             borderColor="#155E75"
+          />
+          <Button
+            icon={<UserAddOutlined />}
+            onClick={() => handleOpenInviteUserModal()}
+            className={styles["button-invite"]}
           />
         </div>
         <CreateButton
@@ -173,8 +195,18 @@ const SprintsPage = () => {
                 </div>
               </div>
               <div className={styles.button}>
-                <p>Start Date: {data.startDate === null ? "" : dayjs(data.startDate).format("YYYY-MM-DD")}</p>
-                <p>End Date: {data.endDate === null ? "" : dayjs(data.endDate).format("YYYY-MM-DD")}</p>
+                <p>
+                  Start Date:{" "}
+                  {data.startDate === null
+                    ? ""
+                    : dayjs(data.startDate).format("YYYY-MM-DD")}
+                </p>
+                <p>
+                  End Date:{" "}
+                  {data.endDate === null
+                    ? ""
+                    : dayjs(data.endDate).format("YYYY-MM-DD")}
+                </p>
               </div>
             </Card>
           ))}
@@ -191,9 +223,14 @@ const SprintsPage = () => {
           />
         </div>
       )}
-      <NewSprint ref={refAddModal} userDetail={userDetail}/>
-      <UpdateSprint ref={refEditModal} sprintId={sprintId} userDetail={userDetail}/>
+      <NewSprint ref={refAddModal} userDetail={userDetail} />
+      <UpdateSprint
+        ref={refEditModal}
+        sprintId={sprintId}
+        userDetail={userDetail}
+      />
       <DeleteSprint ref={refDeleteModal} sprintId={sprintId} />
+      <InviteUser ref={refInviteUser} projectName={projectName}/>
     </div>
   );
 };

@@ -5,12 +5,18 @@ import { postComment } from "../../../../api/comment-api";
 import { useDispatch } from "react-redux";
 import { getIssueDetailAction } from "../../../../redux/action/issue-action";
 import { useState } from "react";
+import { getSubIssueDetailAction } from "../../../../redux/action/subIssue-action";
 
-const NewCommentForm = ({ userDetail, issueDetail }) => {
+const NewCommentForm = ({
+  userDetail,
+  issueDetail,
+  subIssueDetail,
+  isSubIssue,
+}) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [disabledSave, setDisabledSave] = useState(true);
-  const [commentContent, setCommentContent] = useState('');
+  const [commentContent, setCommentContent] = useState("");
 
   const handleFormChange = () => {
     const hasErrors = form.getFieldsError().some(({ errors }) => errors.length);
@@ -18,21 +24,41 @@ const NewCommentForm = ({ userDetail, issueDetail }) => {
   };
 
   const onFinish = async (item) => {
-    const postCommentData = {
-      content: item.content === undefined ? "" : item.content,
-      issueId: Number(issueDetail.id),
-      createdBy: `${userDetail.email === null ? "" : userDetail.email}`,
-    };
-    await postComment(postCommentData)
-      .then((res) => {
-        message.success(MESSAGE.CREATE_COMMENT_SUCCESS);
-        setCommentContent('');
-        form.resetFields();
-        dispatch(getIssueDetailAction(issueDetail.id));
-      })
-      .catch((error) => {
-        message.error(MESSAGE.CREATE_FAIL);
-      });
+    if (isSubIssue) {
+      const postCommentData = {
+        content: item.content === undefined ? "" : item.content,
+        userId: Number(userDetail.id),
+        subIssueId: Number(subIssueDetail.id),
+        createdBy: `${userDetail.email === null ? "" : userDetail.email}`,
+      };
+      await postComment(postCommentData)
+        .then((res) => {
+          message.success(MESSAGE.CREATE_COMMENT_SUCCESS);
+          setCommentContent("");
+          form.resetFields();
+          dispatch(getSubIssueDetailAction(subIssueDetail.id));
+        })
+        .catch((error) => {
+          message.error(MESSAGE.CREATE_FAIL);
+        });
+    } else {
+      const postCommentData = {
+        content: item.content === undefined ? "" : item.content,
+        userId: Number(userDetail.id),
+        issueId: Number(issueDetail.id),
+        createdBy: `${userDetail.email === null ? "" : userDetail.email}`,
+      };
+      await postComment(postCommentData)
+        .then((res) => {
+          message.success(MESSAGE.CREATE_COMMENT_SUCCESS);
+          setCommentContent("");
+          form.resetFields();
+          dispatch(getIssueDetailAction(issueDetail.id));
+        })
+        .catch((error) => {
+          message.error(MESSAGE.CREATE_FAIL);
+        });
+    }
   };
   return (
     <>

@@ -96,18 +96,20 @@ const UserForm = ({ userDetail }) => {
         char.charCodeAt(0)
       );
       const byteArray = new Uint8Array(byteCharacters);
-      const blob = new Blob([byteArray], { type: ["image/png", "image/jpeg", "image/jpg"] });
+      const blob = new Blob([byteArray], {
+        type: ["image/png", "image/jpeg", "image/jpg"],
+      });
       const fileLink = new File([blob], fileName);
       return fileLink;
     }
   };
   const onFinish = async (item) => {
     const file = await convertToFormFile(item.image);
-    
+
     const formData = new FormData();
     formData.append("id", userDetail.id === null ? "" : userDetail.id);
     formData.append("name", item.name === null ? "" : item.name);
-    
+
     if (image === null) {
       formData.append("image", file, file.name);
     } else {
@@ -164,7 +166,64 @@ const UserForm = ({ userDetail }) => {
         form={form}
         onFieldsChange={handleFormChange}
       >
-        {INFO_FORM.map((form) => {
+        <div className={styles["infor-container"]}>
+          <div className={styles["w-25"]}>
+            <Form.Item
+              label=""
+              name="image"
+              shouldUpdate
+              rules={[
+                {
+                  validator: validateImage
+                },
+              ]}
+              className={styles["form-item"]}
+              validateTrigger="onBlur"
+            >
+              <div className={styles.flex}>
+                <label className={styles.image} htmlFor="imgUpload">
+                  <img
+                    src={imageUrl}
+                    alt="avatar"
+                    className={styles["avatar-image"]}
+                  />
+                </label>
+                <input
+                  id="imgUpload"
+                  className={styles.hidden}
+                  type="file"
+                  accept="image/png,image/jpeg,image/jpg"
+                  onChange={handleImageChange}
+                />
+              </div>
+            </Form.Item>
+          </div>
+          <div className={styles["w-75"]}>
+            <Form.Item
+              label="Email"
+              name="email"
+              className={styles["form-item"]}
+              validateTrigger="onBlur"
+            >
+              <Input className={styles.inline} disabled={true} />
+            </Form.Item>
+            <Form.Item
+              label="Name"
+              name="name"
+              rules={[
+                {
+                  validator: validateName,
+                },
+              ]}
+              className={styles["form-item"]}
+              validateTrigger="onBlur"
+            >
+              <Input className={styles.inline} />
+            </Form.Item>
+          </div>
+        </div>
+
+        {/* {INFO_FORM.map((form) => {
           return (
             <Form.Item
               key={form.id}
@@ -187,24 +246,31 @@ const UserForm = ({ userDetail }) => {
               
             >
                 {form.type === "image" ? (
-                  <div>
+                  <div className={styles.flex}>
+                    <label htmlFor="imgUpload">
                     <img
                       src={imageUrl}
                       alt="avatar"
                       className={styles["avatar-image"]}
                     />
+                    </label>
+                    
                     <input
+                    id="imgUpload"
+                    className={styles.hidden}
                       type="file"
                       accept="image/png,image/jpeg,image/jpg"
                       onChange={handleImageChange}
                     />
                   </div>
                 ) : (
-                  <Input disabled={form.name === "email"} />
+                 
+                   <Input className={styles.inline} disabled={form.name === "email"} />
+                 
                 )}
             </Form.Item>
           );
-        })}
+        })} */}
         <Form.Item {...tailLayout}>
           <Button
             className={styles["button-submit"]}

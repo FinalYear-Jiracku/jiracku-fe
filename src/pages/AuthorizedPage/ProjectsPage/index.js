@@ -21,6 +21,7 @@ import { getProjectListAction } from "../../../redux/action/project-action";
 import { getSprintListAction } from "../../../redux/action/sprint-action";
 import Loading from "../../../components/Atoms/Loading/Loading";
 import { getUserDetailAction } from "../../../redux/action/user-action";
+import { joinRoom } from "../../../signalR/signalRService";
 
 const ProjectsPage = () => {
   const refAddModal = useRef(null);
@@ -35,7 +36,7 @@ const ProjectsPage = () => {
   const header = useContext(HeaderContext);
   const projectList = useSelector((state) => state.projectReducer.projectList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
-  
+
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -69,7 +70,7 @@ const ProjectsPage = () => {
     setProjectId(projectId);
     refDeleteModal.current.openModalHandle();
   };
-  
+
   useEffect(() => {
     header.setHeader({
       title: "PROJECTS MANAGEMENT",
@@ -91,7 +92,7 @@ const ProjectsPage = () => {
           currentPage: params.page,
           searchKey: params.searchKey,
         })
-        )
+      )
         .then((response) => response)
         .finally(() => {
           setLoading(false);
@@ -154,6 +155,7 @@ const ProjectsPage = () => {
                   key={data?.id}
                   to={`/projects/${data?.id}?page=1`}
                   className={styles.link}
+                  onClick={() => joinRoom(data.id)}
                 >
                   <p>{data.name}</p>
                 </Link>
@@ -183,8 +185,12 @@ const ProjectsPage = () => {
           />
         </div>
       )}
-      <NewProject ref={refAddModal} userDetail={userDetail}/>
-      <UpdateProject ref={refEditModal} projectId={projectId} userDetail={userDetail}/>
+      <NewProject ref={refAddModal} userDetail={userDetail} />
+      <UpdateProject
+        ref={refEditModal}
+        projectId={projectId}
+        userDetail={userDetail}
+      />
       <DeleteProject ref={refDeleteModal} projectId={projectId} />
     </div>
   );

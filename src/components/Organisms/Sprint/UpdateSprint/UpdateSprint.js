@@ -6,6 +6,7 @@ import { updateSprint } from "../../../../api/sprint-api";
 import SprintForm from "../../../Molecules/Sprint/SprintForm";
 import { useDispatch, useSelector } from "react-redux";
 import { getSprintDetailAction, getSprintListAction } from "../../../../redux/action/sprint-action";
+import { sendMessage } from "../../../../signalR/signalRService";
 
 const UpdateSprint = forwardRef((props, ref) => {
   const { projectId } = useParams();
@@ -56,6 +57,7 @@ const UpdateSprint = forwardRef((props, ref) => {
             searchKey: "",
           })
         )
+        sendMessage(projectId.toString(),"3","hehehehehehehehe")
       })
       .catch((error) => {
         if (error.response.status === 400) {

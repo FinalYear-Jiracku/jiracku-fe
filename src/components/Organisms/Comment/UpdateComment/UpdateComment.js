@@ -6,6 +6,7 @@ import { getCommentDetailAction } from "../../../../redux/action/comment-action"
 import UpdateCommentForm from "../../../Molecules/Comment/UpdateCommentForm/UpdateCommentForm";
 import { updateComment } from "../../../../api/comment-api";
 import { getIssueDetailAction } from "../../../../redux/action/issue-action";
+import { getSubIssueDetailAction } from "../../../../redux/action/subIssue-action";
 
 const UpdateComment = forwardRef((props, ref) => {
   const dispatch = useDispatch();
@@ -34,22 +35,45 @@ const UpdateComment = forwardRef((props, ref) => {
   });
 
   const onSubmitForm = async (item) => {
-    const updateCommentData = {
+    if (props.isSubIssue) {
+      const updateCommentData = {
         id: props.commentId === undefined ? "" : props.commentId,
         content: item.content === undefined ? "" : item.content,
-        updatedBy: `${props.userDetail.email === null ? "" : props.userDetail.email}`,
+        subIssueId: Number(props.subIssueDetail.id),
+        updatedBy: `${
+          props.userDetail.email === null ? "" : props.userDetail.email
+        }`,
       };
-    await updateComment(updateCommentData)
-      .then((res) => {
-        message.success(MESSAGE.UPDATE_COMMENT_SUCCESS);
-        setOpenModal(false);
-        dispatch(getIssueDetailAction(props.issueDetail.id));
-      })
-      .catch((error) => {
-        if (error.response.status === 500) {
+      await updateComment(updateCommentData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_COMMENT_SUCCESS);
+          setOpenModal(false);
+          dispatch(getSubIssueDetailAction(props.subIssueDetail.id));
+        })
+        .catch((error) => {
+          message.error(MESSAGE.UPDATE_FAIL);
+        });
+    } else {
+      const updateCommentData = {
+        id: props.commentId === undefined ? "" : props.commentId,
+        content: item.content === undefined ? "" : item.content,
+        issueId: Number(props.issueDetail.id),
+        updatedBy: `${
+          props.userDetail.email === null ? "" : props.userDetail.email
+        }`,
+      };
+      await updateComment(updateCommentData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_COMMENT_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
             message.error(MESSAGE.UPDATE_FAIL);
-        }
-      });
+          }
+        });
+    }
   };
 
   useEffect(() => {

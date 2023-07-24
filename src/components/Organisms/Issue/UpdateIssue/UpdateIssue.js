@@ -108,7 +108,11 @@ const UpdateIssue = forwardRef((props, ref) => {
   };
 
   const onSubmitForm = async (item) => {
-    messageApi.open({type:'loading',content:"Action In Progress",duration:5000})
+    messageApi.open({
+      type: "loading",
+      content: "Action In Progress",
+      duration: 5000,
+    });
     const filePromises = item?.files?.map(async (file) => {
       return await convertToFormFile(file);
     });
@@ -142,11 +146,18 @@ const UpdateIssue = forwardRef((props, ref) => {
       "sprintId",
       Number(item.sprintId) === 0 ? null : Number(item.sprintId)
     );
-    formData.append("updatedBy", `${props.userDetail.email === null ? "" : props.userDetail.email}`);
+    formData.append(
+      "userId",
+      item.userId === undefined ? 0 : Number(item.userId)
+    );
+    formData.append(
+      "updatedBy",
+      `${props.userDetail.email === null ? "" : props.userDetail.email}`
+    );
     for (let i = 0; i < files.length; i++) {
       formData.append("files", files[i], files[i].name);
     }
-    
+
     await updateIssue(formData)
       .then((res) => {
         message.success(MESSAGE.UPDATE_ISSUE_SUCCESS);

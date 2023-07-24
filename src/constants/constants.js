@@ -4,6 +4,7 @@ export const MESSAGE = {
   INVALID_REQUEST : "Invalid client request",
   FPT_FE: "Email must be end @fpt.edu.vn or @fe.edu.vn",
   AUTHORIZATION: "Don't have permission to access this page",
+  INVITE_USER: "Invite User Success",
   GET_DATA_FAIL: "Server down",
   CREATE_FAIL: "Create Fail",
   UPDATE_FAIL: "Update Fail",

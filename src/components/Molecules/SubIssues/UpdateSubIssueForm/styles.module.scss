@@ -36,13 +36,11 @@
 }
 
 .comment{
-    margin-top: 5px;
     width: 650px;
 }
 
 .image-comment{
     display: flex;
-    align-items: center;
     justify-content: space-between;
 }
 
@@ -64,7 +62,7 @@
 }
 
 .scroll{
-    max-height: 150px;
+    max-height: 400px;
     overflow-y: auto;
 }
 

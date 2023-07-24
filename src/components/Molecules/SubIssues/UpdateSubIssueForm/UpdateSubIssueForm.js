@@ -22,15 +22,18 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getDropdownStatusListAction } from "../../../../redux/action/status-action";
 import NewCommentForm from "../../Comment/NewCommentForm/NewCommentForm";
+import UpdateComment from "../../../Organisms/Comment/UpdateComment/UpdateComment";
+import DeleteComment from "../../../Organisms/Comment/DeleteComment/DeleteComment";
+import { getUserProjectListAction } from "../../../../redux/action/user-action";
 const { TextArea } = Input;
 
-const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) => {
+const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, userDetail }) => {
   const { sprintId, projectId } = useParams();
   const dispatch = useDispatch();
-  const refEditModal = useRef(null);
-  const refDeleteModal = useRef(null);
+  const refEditModalComment = useRef(null);
+  const refDeleteModalComment = useRef(null);
   const [form] = Form.useForm();
-  const [subIssueId, setSubIssueId] = useState(null);
+  const [commentId, setCommentId] = useState(null);
   const [renderAttachment, setRenderAttachment] = useState([]);
   const handleChange = ({ target }) => {
     const files = target.files;
@@ -58,23 +61,30 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
     }
   };
 
-  const dropdownStatusList = useSelector(
-    (state) => state.statusReducer.dropdownStatusList
-  );
   const tailLayout = {
     wrapperCol: { offset: 8, span: 16 },
   };
+  const dropdownStatusList = useSelector(
+    (state) => state.statusReducer.dropdownStatusList
+  );
+  const userProjectList = useSelector(
+    (state) => state.userReducer.userProjectList
+  );
   const renderStatus = dropdownStatusList.map((data) => ({
     value: data.id,
     label: data.name,
   }));
- 
+  const renderUserProject = userProjectList.map((data) => ({
+    value: data.id,
+    label: data.email,
+  }));
   
   const onFinish = (values) => {
     const data = {
       ...values,
       statusId: values.statusId,
       sprintId: values.sprintId,
+      userId: values.userId,
       files: renderAttachment.map((attachment) => attachment),
     };
     onSubmit(data);
@@ -109,10 +119,6 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
     return Promise.resolve();
   };
 
-  const handleOpenEditModal = (subIssueId) => {
-    setSubIssueId(subIssueId);
-    refEditModal.current.openModalHandle();
-  };
 
   const handleDelete = (id) => {
     const updatedRenderAttachment = renderAttachment.filter(
@@ -121,9 +127,14 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
     setRenderAttachment(updatedRenderAttachment);
   };
 
-  const handleOpenDeleteModal = (subIssueId) => {
-    setSubIssueId(subIssueId);
-    refDeleteModal.current.openModalHandle();
+  const handleOpenEditModalComment = (commentId) => {
+    setCommentId(commentId);
+    refEditModalComment.current.openModalHandle();
+  };
+
+  const handleOpenDeleteModalComment = (commentId) => {
+    setCommentId(commentId);
+    refDeleteModalComment.current.openModalHandle();
   };
 
   useEffect(() => {
@@ -151,8 +162,9 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
           label: subIssueDetail?.status?.name,
         },
         {
-          name: "userIssues",
-          value: subIssueDetail.userIssues,
+          name: "userId",
+          value: subIssueDetail.user?.id,
+          label: subIssueDetail?.user?.name,
         },
         {
           name: "startDate",
@@ -168,7 +180,7 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
           value: subIssueDetail.description === null ? "" : subIssueDetail.description,
         },
         {
-          name: "atachments",
+          name: "attachments",
           value:
           subIssueDetail.attachments === null ? [] : subIssueDetail.attachments,
         },
@@ -179,6 +191,7 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
     });
     setRenderAttachment(updatedRenderAttachment);
     dispatch(getDropdownStatusListAction(`${sprintId}`));
+    dispatch(getUserProjectListAction(`${projectId}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editMode, form, subIssueDetail, sprintId, projectId]);
 
@@ -238,8 +251,11 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
                           options={
                             form.name === "type" || form.name === "priority"
                               ? dataSelectOption(form.name)
-                              : renderStatus
+                              : form.name === "statusId"
+                              ? renderStatus
+                              : renderUserProject
                           }
+                          allowClear={form.name === "userId" ? true : false}
                         />
                       ) : form.type === "files" ? (
                         <div className={styles["file-list-container"]}>
@@ -302,8 +318,8 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
       <div className={styles["table-comment"]}>
         <div className={styles.comment}>
           <div className={styles["image-comment"]}>
-            <Image src={icon} alt="icon" className={styles.avatar} />
-            <NewCommentForm subIssueDetail={subIssueDetail}  isSubIssue={true}/>
+            <img src={userDetail.image} alt="icon" className={styles.avatar} />
+            <NewCommentForm subIssueDetail={subIssueDetail} userDetail={userDetail} isSubIssue={true}/>
           </div>
           <div className={styles.scroll}>
             {subIssueDetail?.comments?.map((data, index) => (
@@ -318,12 +334,12 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
                       <Button
                         type="text"
                         icon={<FormOutlined />}
-                        onClick={() => handleOpenEditModal(data.id)}
+                        onClick={() => handleOpenEditModalComment(data.id)}
                       ></Button>
                       <Button
                         type="text"
                         icon={<DeleteOutlined />}
-                        onClick={() => handleOpenDeleteModal(data.id)}
+                        onClick={() => handleOpenDeleteModalComment(data.id)}
                       ></Button>
                     </div>
                   </div>
@@ -336,6 +352,19 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail }) =>
           </div>
         </div>
       </div>
+      <UpdateComment
+        ref={refEditModalComment}
+        commentId={commentId}
+        subIssueDetail={subIssueDetail}
+        userDetail={userDetail}
+        isSubIssue={true}
+      />
+      <DeleteComment
+        ref={refDeleteModalComment}
+        commentId={commentId}
+        subIssueDetail={subIssueDetail}
+        isSubIssue={true}
+      />
     </div>
   );
 };
