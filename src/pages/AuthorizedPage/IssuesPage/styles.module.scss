@@ -1,0 +1,30 @@
+.common-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 20px 0px;
+}
+.status{
+    border: 1px solid black;
+    border-radius: 3px;
+}
+      
+.table{
+    width: auto; 
+    margin: 10px 20px 0;
+    :global{
+        .ant-table-thead{
+            .ant-table-cell{
+                background-color: #0597c4;
+                color: white;
+            }
+        }
+        
+    }
+}
+.avatar{
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 20px !important;
+}
+

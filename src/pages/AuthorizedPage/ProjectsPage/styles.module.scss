@@ -1,0 +1,38 @@
+.common-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 20px 0px;
+}
+.projects{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); // Hiển thị 2 card trên một hàng
+    grid-gap: 30px; // Khoảng cách giữa các card
+    margin: 10px 20px 0px;
+    @media screen and (max-width: 768px) {
+        grid-template-columns: 1fr; // Khi màn hình nhỏ hơn hoặc bằng 768px, hiển thị 1 card trên một hàng
+    }
+    .link {
+        text-decoration: none; /* Loại bỏ gạch chân */
+        color: inherit; /* Kế thừa màu sắc từ phần tử cha */
+        display: block; /* Thay đổi kiểu hiển thị thành block để chiếm toàn bộ chiều ngang của Card */
+    }
+    .card{
+        border: 1px solid #155E75;
+    }
+    .button{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+.pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+      
+      
+
