@@ -1,37 +1,64 @@
 import { useState, useContext, useEffect } from "react";
-import { Breadcrumb, Layout, Image } from "antd";
+import { Breadcrumb, Layout, Image, Button } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
-import icon from "../../assets/anh.jpg";
 import HeaderContext from "../../context/HeaderProvider";
 import styles from "./styles.module.scss";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import GoogleAuthContext from "../../context/AuthProvider";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants/constants";
+import Cookies from "js-cookie";
 const { Header } = Layout;
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const { header } = useContext(HeaderContext);
+  const { auth, setAuth } = useContext(GoogleAuthContext);
   const [breadCrumb, setBreadCrumb] = useState({ title: "", data: [] });
 
+  const logOut = () => {
+    window.localStorage.removeItem(ACCESS_TOKEN);
+    window.localStorage.removeItem(REFRESH_TOKEN);
+    // Cookies.remove(ACCESS_TOKEN);
+    // Cookies.remove(REFRESH_TOKEN);
+    setAuth({});
+    navigate("/home");
+  };
   useEffect(() => {
     setBreadCrumb({
       title: header.title.toUpperCase(),
       data: header.breadCrumb,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [header]);
   return (
     <Layout className={styles.layout}>
       <Header className={styles.header}>{breadCrumb.title}</Header>
       <div className={styles.breadcrumb}>
-        <Breadcrumb className={styles["breadcrumb-item"]} items={breadCrumb.data.map((item, index) => ({
-            title: index === breadCrumb.data.length - 1 ? item.name : <Link to={item.url}>{item.name}</Link>,
-            key: index
-        }))} />
+        <Breadcrumb
+          className={styles["breadcrumb-item"]}
+          items={breadCrumb.data.map((item, index) => ({
+            title:
+              index === breadCrumb.data.length - 1 ? (
+                item.name
+              ) : (
+                <Link to={item.url}>{item.name}</Link>
+              ),
+            key: index,
+          }))}
+        />
         <div className={styles["image-logout"]}>
-          <Image src={icon} alt="icon" className={styles.icon} />
-          <div>Gia Bao</div>
-          <button className={styles["button-logout"]}>
-            <LogoutOutlined className={styles.logout} />
-          </button>
+          {Object.keys(auth).length === 0 ? (
+            <div></div>
+          ) : (
+            <>
+              <Link to={"/user"} className={styles.link}>
+                <Button>Profile</Button>
+              </Link>
+              <Button className={styles["button-logout"]} onClick={logOut}>
+                <LogoutOutlined className={styles.logout} />
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </Layout>

@@ -3,10 +3,15 @@ import { Modal, message } from "antd";
 import { deleteProject } from "../../../../api/project-api";
 import { MESSAGE } from "../../../../constants/constants";
 import styles from "./styles.module.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { getProjectListAction } from "../../../../redux/action/project-action";
 
 const DeleteProject = forwardRef((props, ref) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get("page")) || 1;
   const [openModal, setOpenModal] = useState(false);
 
   const openModalHandle = () => {
@@ -33,7 +38,13 @@ const DeleteProject = forwardRef((props, ref) => {
       .then((res) => {
         message.success(MESSAGE.DELETE_PROJECT_SUCCESS);
         setOpenModal(false);
-        navigate("/projects");
+        navigate(`/projects?page=${currentPage}`);
+        dispatch(
+          getProjectListAction({
+            currentPage: currentPage,
+            searchKey: "",
+          })
+        );
       })
       .catch((error) => {
         message.success(MESSAGE.DELETE_FAIL);

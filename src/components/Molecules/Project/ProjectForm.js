@@ -67,6 +67,7 @@ const ProjectForm = ({
             validator: validateName
           },
         ]}
+        className={styles["form-item"]}
         validateTrigger="onBlur"
       >
         <Input />
