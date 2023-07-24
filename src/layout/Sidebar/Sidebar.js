@@ -52,11 +52,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     if (isSprintsPage) {
       menuItems.push(
         {
-          key: "/projects",
-          icon: <ReadOutlined />,
-          label: "Project",
-        },
-        {
           key: `/projects/${projectId}`,
           icon: <BookOutlined />,
           label: "Sprint",

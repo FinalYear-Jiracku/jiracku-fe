@@ -1,23 +1,36 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+// const initialState = {
+//   connection: false,
+//   messages: []
+// };
+
+// const signalRReducer = createSlice({
+//   name: "signalRReducer",
+//   initialState,
+//   reducers: {
+//     setConnected: (state, action) => {
+//       state.connection = action.payload;
+//     },
+//     addMessageReducer(state, action) {
+//       state.messages.push(action.payload);
+//     },
+//   },
+// });
 const initialState = {
-  userDetail: {},
-  userProjectList: [],
+  connection: null,
 };
 
-const signalrReducer = createSlice({
-  name: "signalrReducer",
+const signalRReducer = createSlice({
+  name: "signalRReducer",
   initialState,
   reducers: {
-    getUserDetailReducer: (state, action) => {
-      state.userDetail = action.payload;
-    },
-    getUserProjectListReducer: (state, action) => {
-      state.userProjectList = action.payload;
+    setSignalRConnection(state, action) {
+      state.connection = action.payload;
     },
   },
 });
 
-export const { getUserDetailReducer, getUserProjectListReducer } = signalrReducer.actions;
+export const { setSignalRConnection } = signalRReducer.actions;
 
-export default signalrReducer.reducer;
+export default signalRReducer.reducer;

@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import { Button, Card } from "antd";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import {
   FormOutlined,
   DatabaseOutlined,
@@ -21,7 +26,7 @@ import { getProjectListAction } from "../../../redux/action/project-action";
 import { getSprintListAction } from "../../../redux/action/sprint-action";
 import Loading from "../../../components/Atoms/Loading/Loading";
 import { getUserDetailAction } from "../../../redux/action/user-action";
-import { joinRoom } from "../../../signalR/signalRService";
+import SignalRContext from "../../../context/SignalRContext";
 
 const ProjectsPage = () => {
   const refAddModal = useRef(null);
@@ -34,9 +39,28 @@ const ProjectsPage = () => {
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
+  const connection = useContext(SignalRContext);
   const projectList = useSelector((state) => state.projectReducer.projectList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
 
+  const joinRoom = (projectId) => {
+    if (!connection) {
+      console.error("Connection not established.");
+      return;
+    }
+    connection
+      .start()
+      .then(() => {
+        console.log("Connected to SignalR Hub");
+        connection
+          .invoke("OnConnectedAsync", projectId.toString())
+          .then((response) => response)
+          .catch((error) => console.error("Error sending request:", error));
+      })
+      .catch((error) =>
+        console.error("Error connecting to SignalR Hub:", error)
+      );
+  };
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),

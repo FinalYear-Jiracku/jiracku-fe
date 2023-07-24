@@ -5,9 +5,10 @@ import SprintsPage from "./pages/AuthorizedPage/SprintsPage";
 import IssuesPage from "./pages/AuthorizedPage/IssuesPage";
 import HomePage from "./pages/UnAuthorizedPage/HomePage/HomePage";
 import UsersPage from "./pages/AuthorizedPage/UsersPage";
-import AcceptInvite from "./pages/UnAuthorizedPage/AcceptInvite/Acceptinvite";
+import AcceptInvite from "./pages/UnAuthorizedPage/AcceptInvite/Acceptinvite";;
 
-function App() {  
+function App() { 
+  
   return (
     <div className="App">
         <MainLayout>

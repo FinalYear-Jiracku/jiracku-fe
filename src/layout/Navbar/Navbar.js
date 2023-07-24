@@ -7,11 +7,13 @@ import { Link, useNavigate } from "react-router-dom";
 import GoogleAuthContext from "../../context/AuthProvider";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants/constants";
 import Cookies from "js-cookie";
+import SignalRContext from "../../context/SignalRContext";
 const { Header } = Layout;
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { header } = useContext(HeaderContext);
+  const connection = useContext(SignalRContext);
   const { auth, setAuth } = useContext(GoogleAuthContext);
   const [breadCrumb, setBreadCrumb] = useState({ title: "", data: [] });
 
@@ -21,6 +23,7 @@ const Navbar = () => {
     // Cookies.remove(ACCESS_TOKEN);
     // Cookies.remove(REFRESH_TOKEN);
     setAuth({});
+    connection.stop();
     navigate("/home");
   };
   useEffect(() => {
@@ -37,12 +40,7 @@ const Navbar = () => {
         <Breadcrumb
           className={styles["breadcrumb-item"]}
           items={breadCrumb.data.map((item, index) => ({
-            title:
-              index === breadCrumb.data.length - 1 ? (
-                item.name
-              ) : (
-                <Link to={item.url}>{item.name}</Link>
-              ),
+            title:item.name,
             key: index,
           }))}
         />

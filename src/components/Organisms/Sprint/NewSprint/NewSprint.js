@@ -33,7 +33,6 @@ const NewSprint = forwardRef((props, ref) => {
       endDate: item.endDate === undefined ? null : item.endDate,
       createdBy: `${props.userDetail.email === null ? "" : props.userDetail.email}`,
     };
-    console.log(postSprintData);
     await postSprint(postSprintData)
       .then((res) => {
         message.success(MESSAGE.CREATE_SPRINT_SUCCESS);
