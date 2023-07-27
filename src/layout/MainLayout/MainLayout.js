@@ -13,7 +13,7 @@ const MainLayout = ({ children }) => {
   const handleOnCollapse = () => {
     setCollapsed(!collapsed);
   };
-  return auth?.name && window.localStorage.getItem(ACCESS_TOKEN) ? (
+  return auth.name && window.localStorage.getItem(ACCESS_TOKEN) ? (
     <div>
       <div className={styles.container}>
         <SideBar collapsed={collapsed} handleOnCollapse={handleOnCollapse} />

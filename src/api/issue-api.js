@@ -23,3 +23,11 @@ export const updateIssue = (data) => {
 export const deleteIssue = (id) => {
   return api.patch(`/issues/${id}`)
 }
+
+export const updateOrder = (data) => {
+  return api.put('/issues/order',data)
+}
+
+export const updateDnd = (data) => {
+  return api.put('/issues/dnd',data)
+}

@@ -10,6 +10,7 @@ import {
   Table,
   Image,
   Card,
+  message,
 } from "antd";
 import styles from "./styles.module.scss";
 import { INFO_FORM, dataSelectOption } from "./UpdateFormField";
@@ -34,6 +35,8 @@ import NewCommentForm from "../../Comment/NewCommentForm/NewCommentForm";
 import UpdateComment from "../../../Organisms/Comment/UpdateComment/UpdateComment";
 import DeleteComment from "../../../Organisms/Comment/DeleteComment/DeleteComment";
 import { getUserProjectListAction } from "../../../../redux/action/user-action";
+import { deleteAttachment } from "../../../../api/attachment-api";
+import { MESSAGE } from "../../../../constants/constants";
 const { TextArea } = Input;
 
 const UpdateIssueForm = ({
@@ -41,6 +44,7 @@ const UpdateIssueForm = ({
   onCancel,
   editMode,
   issueDetail,
+  setChangedFieldName,
   userDetail,
 }) => {
   const { sprintId, projectId } = useParams();
@@ -53,6 +57,9 @@ const UpdateIssueForm = ({
   const [form] = Form.useForm();
   const [subIssueId, setSubIssueId] = useState(null);
   const [commentId, setCommentId] = useState(null);
+  const [isFormEdited, setIsFormEdited] = useState(false);
+  const [imageSelected, setImageSelected] = useState(false);
+  const [start, setStart] = useState(true);
   const [renderAttachment, setRenderAttachment] = useState([]);
   const handleChange = ({ target }) => {
     const files = target.files;
@@ -71,14 +78,33 @@ const UpdateIssueForm = ({
         updatedRenderAttachment.push(newAttachment); // Thêm tệp tin mới vào mảng
 
         // Tối đa hiển thị 5 tệp tin trên giao diện
-        // if (updatedRenderAttachment.length > 5) {
-        //   updatedRenderAttachment.shift(); // Xóa tệp tin đầu tiên nếu vượt quá giới hạn
-        // }
+        if (updatedRenderAttachment.length > 5) {
+          updatedRenderAttachment.shift(); // Xóa tệp tin đầu tiên nếu vượt quá giới hạn
+        }
         setRenderAttachment(updatedRenderAttachment);
+        setImageSelected(true);
       };
       reader.readAsDataURL(file); // Đọc tệp tin và chuyển đổi thành Base64
     }
   };
+
+  const handleFormChange = (name) => {
+    setChangedFieldName(name);
+  };
+  
+  const handleFormBlur = () => {
+    if (start) {
+      setIsFormEdited(true);
+    }
+  };
+
+  const handleFormBlurImage = () => {
+    if (imageSelected && start === false) {
+      setIsFormEdited(true);
+      setImageSelected(false);
+      setStart(true);
+    }
+  }
 
   const dropdownStatusList = useSelector(
     (state) => state.statusReducer.dropdownStatusList
@@ -89,9 +115,6 @@ const UpdateIssueForm = ({
   const userProjectList = useSelector(
     (state) => state.userReducer.userProjectList
   );
-  const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 },
-  };
   const renderStatus = dropdownStatusList.map((data) => ({
     value: data.id,
     label: data.name,
@@ -148,6 +171,16 @@ const UpdateIssueForm = ({
   };
 
   const handleDelete = (id) => {
+    deleteAttachment(id).then((res) => {
+      message.success(MESSAGE.DELETE_ATTACHMENT_SUCCESS);
+    })
+    .catch((error) => {
+      if (error.response.status === 400) {
+        if (error.response.data === "Attachment Does Not Exist") {
+          message.error(MESSAGE.ATTACHMENT_NOT_EXIST);
+        }
+      }
+    });
     const updatedRenderAttachment = renderAttachment.filter(
       (data) => data.id !== id
     );
@@ -251,7 +284,15 @@ const UpdateIssueForm = ({
       width: "100px",
       align: "center",
       render: (_, record) => {
-        return record?.user === null ? "" : <Image src={record?.user.image} alt="icon" className={styles.avatar} />;
+        return record?.user === null ? (
+          ""
+        ) : (
+          <Image
+            src={record?.user.image}
+            alt="icon"
+            className={styles.avatar}
+          />
+        );
       },
     },
     {
@@ -300,6 +341,13 @@ const UpdateIssueForm = ({
       },
     },
   ];
+
+  useEffect(() => {
+    if (isFormEdited) {
+      form.submit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFormEdited]);
 
   useEffect(() => {
     if (editMode && issueDetail) {
@@ -376,6 +424,14 @@ const UpdateIssueForm = ({
         onFinish={onFinish}
         autoComplete="off"
         form={form}
+        onFieldsChange={handleFormChange}
+        onBlur={()=>{
+          if (imageSelected) {
+            handleFormBlurImage() 
+          } else {
+            handleFormBlur()
+          }
+        }}
       >
         {INFO_FORM.map((forms) => {
           return (
@@ -428,6 +484,7 @@ const UpdateIssueForm = ({
                               ? renderSprint
                               : renderUserProject
                           }
+                          labelInValue
                           allowClear={form.name === "userId" ? true : false}
                         />
                       ) : form.type === "files" ? (
@@ -436,7 +493,10 @@ const UpdateIssueForm = ({
                             type="file"
                             accept="image/png, image/jpg, image/jpeg"
                             multiple
-                            onChange={handleChange}
+                             onChange={handleChange}
+                            onClick={()=>{
+                              setStart(false)
+                            }}
                           />
                           {renderAttachment?.map((data) => (
                             <div key={data.id} className={styles.file}>
@@ -460,33 +520,6 @@ const UpdateIssueForm = ({
             </Row>
           );
         })}
-
-        <Form.Item {...tailLayout}>
-          {editMode ? (
-            <Button
-              className={styles["button-submit"]}
-              type="primary"
-              htmlType="submit"
-            >
-              Save
-            </Button>
-          ) : (
-            <Button
-              className={styles["button-submit"]}
-              type="primary"
-              htmlType="submit"
-            >
-              Submit
-            </Button>
-          )}
-          <Button
-            className={styles["button-cancel"]}
-            htmlType="button"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-        </Form.Item>
       </Form>
       <div className={styles["table-comment"]}>
         <div className={styles.button}>

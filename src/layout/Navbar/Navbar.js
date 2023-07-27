@@ -13,7 +13,8 @@ const { Header } = Layout;
 const Navbar = () => {
   const navigate = useNavigate();
   const { header } = useContext(HeaderContext);
-  const connection = useContext(SignalRContext);
+  const {connection} = useContext(SignalRContext);
+  //const connection = useSelector((state) => state.signalRReducer.connection);
   const { auth, setAuth } = useContext(GoogleAuthContext);
   const [breadCrumb, setBreadCrumb] = useState({ title: "", data: [] });
 
@@ -24,7 +25,7 @@ const Navbar = () => {
     // Cookies.remove(REFRESH_TOKEN);
     setAuth({});
     connection.stop();
-    navigate("/home");
+    navigate("/login");
   };
   useEffect(() => {
     setBreadCrumb({

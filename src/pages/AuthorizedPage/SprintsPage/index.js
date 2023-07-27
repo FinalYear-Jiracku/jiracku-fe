@@ -10,7 +10,7 @@ import {
   FormOutlined,
   DeleteOutlined,
   UserAddOutlined,
-  LeftCircleOutlined
+  LeftCircleOutlined,
 } from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
@@ -30,9 +30,6 @@ import { setProjectId } from "../../../redux/reducer/project-reducer";
 import { getUserDetailAction } from "../../../redux/action/user-action";
 import InviteUser from "../../../components/Organisms/InviteUser/InviteUser";
 import SignalRContext from "../../../context/SignalRContext";
-import { HubConnectionBuilder } from "@microsoft/signalr";
-import { ACCESS_TOKEN } from "../../../constants/constants";
-import { setSignalRConnection } from "../../../redux/reducer/signalR-reducer";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
@@ -44,14 +41,14 @@ const SprintsPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
-  //const connection = useContext(SignalRContext);
+  const {connection} = useContext(SignalRContext);
   const [projectName, setProjectName] = useState();
   const [sprintId, setSprintId] = useState(null);
   const [totalRecord, setTotalRecord] = useState(0);
   const [loading, setLoading] = useState(false);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
-  const connection = useSelector((state) => state.signalRReducer.connection);
+  //const connection = useSelector((state) => state.signalRReducer.connection);
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -143,57 +140,9 @@ const SprintsPage = () => {
     projectId,
   ]);
 
-  useEffect(() => {
-    if(connection) {
-      connection.on("ReceiveMessage", (message) => {
-        console.log(`Received message: ${message}`);
-      });
-    }else {
-      // Nếu chưa có kết nối SignalR trong Redux, tiến hành kết nối bình thường
-      const token = window.localStorage.getItem(ACCESS_TOKEN);
-      const newConnection = new HubConnectionBuilder()
-        .withUrl("http://localhost:4204/notification", {
-          accessTokenFactory: () => token,
-        })
-        .build();
+  
 
-      newConnection
-        .start()
-        .then(() => {
-          console.log("Connected to SignalR Hub");
-          newConnection
-            .invoke("OnConnectedAsync", projectId.toString())
-            .then((response) => response)
-            .catch((error) => console.error("Error sending request:", error));
-
-          // Cập nhật kết nối SignalR vào Redux
-          dispatch(setSignalRConnection(newConnection));
-        })
-        .catch((error) =>
-          console.error("Error connecting to SignalR Hub:", error)
-        );
-
-      // ...
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connection]);
-
-  // useEffect(() => {
-  //   if (!connection) {
-  //     console.error("Connection not established.");
-  //     return;
-  //   }
-  //   if (connection.state === "Disconnected") {
-  //     try {
-  //       connection.start();
-  //       console.log("Reconnected to SignalR Hub");
-  //     } catch (error) {
-  //       console.error("Error connecting to SignalR Hub:", error);
-  //       return;
-  //     }
-  //   }
-  // }, [connection]);
-
+ 
   return (
     <div>
       <div className={styles["common-bar"]}>

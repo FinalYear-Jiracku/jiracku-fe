@@ -19,7 +19,7 @@ export const getSprintListAction = ({ projectId, currentPage, searchKey }) => {
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);
-        window.location.href = '/home';
+        window.location.href = '/login';
       })
       .finally(() => {});
   };
@@ -33,7 +33,7 @@ export const getSprintDetailAction = (sprintId) => {
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);
-        window.location.href = '/home';
+        window.location.href = '/login';
       })
       .finally(() => {});
   };
@@ -47,7 +47,7 @@ export const getDropdownSprintListAction = (projectId) => {
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);
-        //window.location.href = '/home';
+        //window.location.href = '/login';
       })
       .finally(() => {});
   };
