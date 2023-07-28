@@ -18,10 +18,10 @@ export const GoogleAuthProvider = ({ children }) => {
       !window.localStorage.getItem(REFRESH_TOKEN) &&
       // !Cookies.get(ACCESS_TOKEN) &&
       // !Cookies.get(REFRESH_TOKEN) &&
-      location.pathname !== "/home"
+      location.pathname !== "/login"
     ) {
       setAuth({});
-      navigate("/home");
+      navigate("/login");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, location.pathname]);
@@ -47,9 +47,9 @@ export const GoogleAuthProvider = ({ children }) => {
         message.error(MESSAGE.AUTHORIZATION_FAIL);
       }
     } else {
-      if (location.pathname !== "/home") {
+      if (location.pathname !== "/login") {
         setAuth({});
-        navigate("/home");
+        navigate("/login");
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

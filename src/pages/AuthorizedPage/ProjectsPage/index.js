@@ -1,6 +1,11 @@
 import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import { Button, Card } from "antd";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import {
   FormOutlined,
   DatabaseOutlined,
@@ -21,7 +26,9 @@ import { getProjectListAction } from "../../../redux/action/project-action";
 import { getSprintListAction } from "../../../redux/action/sprint-action";
 import Loading from "../../../components/Atoms/Loading/Loading";
 import { getUserDetailAction } from "../../../redux/action/user-action";
-import { joinRoom } from "../../../signalR/signalRService";
+import SignalRContext from "../../../context/SignalRContext";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../../constants/constants";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const ProjectsPage = () => {
   const refAddModal = useRef(null);
@@ -34,9 +41,29 @@ const ProjectsPage = () => {
   const [loading, setLoading] = useState(false);
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
+  const { connection, setConnection } = useContext(SignalRContext);
+  //const connection = useSelector((state) => state.signalRReducer.connection);
   const projectList = useSelector((state) => state.projectReducer.projectList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
 
+  const joinRoom = (projectId) => {
+    if (!connection) {
+      console.error("Connection not established.");
+      return;
+    }
+    connection
+      .start()
+      .then(() => {
+        console.log("Connected to SignalR Hub");
+        connection
+          .invoke("OnConnectedAsync", projectId.toString())
+          .then((response) => response)
+          .catch((error) => console.error("Error sending request:", error));
+      })
+      .catch((error) =>
+        console.error("Error connecting to SignalR Hub:", error)
+      );
+  };
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -70,6 +97,23 @@ const ProjectsPage = () => {
     setProjectId(projectId);
     refDeleteModal.current.openModalHandle();
   };
+  useEffect(() => {
+    if (
+      window.localStorage.getItem(ACCESS_TOKEN) &&
+      window.localStorage.getItem(REFRESH_TOKEN) &&
+      connection !== null &&
+      connection.state !== "Connected"
+    ) {
+      const token = window.localStorage.getItem(ACCESS_TOKEN);
+      const newConnection = new HubConnectionBuilder()
+        .withUrl("http://localhost:4204/notification", {
+          accessTokenFactory: () => token,
+        })
+        .build();
+      setConnection(newConnection);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId]);
 
   useEffect(() => {
     header.setHeader({
@@ -84,7 +128,11 @@ const ProjectsPage = () => {
         }`,
       });
     }
-    if (params.page) {
+    if (
+      params.page &&
+      window.localStorage.getItem(ACCESS_TOKEN) &&
+      window.localStorage.getItem(REFRESH_TOKEN)
+    ) {
       setLoading(true);
       dispatch(getUserDetailAction());
       dispatch(

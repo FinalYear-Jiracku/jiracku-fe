@@ -12,8 +12,8 @@ export const INFO_FORM = [
       name: "type",
       label: "Type",
       type: "select",
-      require: false,
-      error: "",
+      require: true,
+      error: "Please Select Type",
       children: [
         {
           id: 1,
@@ -30,8 +30,8 @@ export const INFO_FORM = [
       name: "priority",
       label: "Priority",
       type: "select",
-      require: false,
-      error: "",
+      require: true,
+      error: "Please Select Priority",
       children: [
         {
           id: 1,

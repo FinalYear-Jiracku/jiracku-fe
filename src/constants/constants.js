@@ -28,6 +28,8 @@ export const MESSAGE = {
   CREATE_COMMENT_SUCCESS: "Comment has been created",
   UPDATE_COMMENT_SUCCESS: "Comment has been updated",
   DELETE_COMMENT_SUCCESS: "Comment has been deleted",
+  DELETE_ATTACHMENT_SUCCESS: "Attach has been deleted",
+  ATTACHMENT_NOT_EXIST: "Attachment does not Exist",
 }
 export const ACCESS_TOKEN = "access_token";
 export const REFRESH_TOKEN = "refresh_token";

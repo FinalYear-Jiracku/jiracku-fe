@@ -1,12 +1,14 @@
-import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
+import { useState, forwardRef, useImperativeHandle, useEffect, useContext } from "react";
 import { Modal, message } from "antd";
 import { MESSAGE } from "../../../../constants/constants";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { updateSprint } from "../../../../api/sprint-api";
 import SprintForm from "../../../Molecules/Sprint/SprintForm";
 import { useDispatch, useSelector } from "react-redux";
-import { getSprintDetailAction, getSprintListAction } from "../../../../redux/action/sprint-action";
-import { sendMessage } from "../../../../signalR/signalRService";
+import {
+  getSprintDetailAction,
+  getSprintListAction,
+} from "../../../../redux/action/sprint-action";
 
 const UpdateSprint = forwardRef((props, ref) => {
   const { projectId } = useParams();
@@ -16,7 +18,6 @@ const UpdateSprint = forwardRef((props, ref) => {
   const currentPage = parseInt(searchParams.get("page")) || 1;
   const [openModal, setOpenModal] = useState(false);
   const sprintDetail = useSelector((state) => state.sprintReducer.sprintDetail);
-
   const openModalHandle = () => {
     setOpenModal(true);
   };
@@ -43,7 +44,9 @@ const UpdateSprint = forwardRef((props, ref) => {
       projectId: Number(projectId) === undefined ? "" : Number(projectId),
       startDate: item.startDate === undefined ? null : item.startDate,
       endDate: item.endDate === undefined ? null : item.endDate,
-      updatedBy: `${props.userDetail.email === null ? "" : props.userDetail.email}`,
+      updatedBy: `${
+        props.userDetail.email === null ? "" : props.userDetail.email
+      }`,
     };
     await updateSprint(updateSprintData)
       .then((res) => {
@@ -56,8 +59,7 @@ const UpdateSprint = forwardRef((props, ref) => {
             currentPage: currentPage,
             searchKey: "",
           })
-        )
-        sendMessage(projectId.toString(),"3","hehehehehehehehe")
+        );
       })
       .catch((error) => {
         if (error.response.status === 400) {

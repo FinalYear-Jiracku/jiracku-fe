@@ -7,6 +7,7 @@ import statusReducer from "./reducer/status-reducer";
 import userReducer from "./reducer/user-reducer";
 import subIssueReducer from "./reducer/subIssue-reducer";
 import commentReducer from "./reducer/comment-reducer";
+import notificationReducer from "./reducer/notification-reducer";
 
 export const store = configureStore({
     reducer: {
@@ -16,7 +17,8 @@ export const store = configureStore({
         statusReducer,
         userReducer,
         subIssueReducer,
-        commentReducer
+        commentReducer,
+        notificationReducer
     },
     middleware:[thunk]
 })

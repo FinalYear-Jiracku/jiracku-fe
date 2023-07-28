@@ -1,10 +1,12 @@
-
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { ACCESS_TOKEN } from "../constants/constants";
 
 let connection = null;
 
 export const joinRoom = (projectId) => {
+  if (connection) {
+    return Promise.resolve(connection);
+  }
   const token = window.localStorage.getItem(ACCESS_TOKEN);
   connection = new HubConnectionBuilder()
     .withUrl("http://localhost:4204/notification", {

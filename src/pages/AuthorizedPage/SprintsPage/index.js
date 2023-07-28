@@ -10,6 +10,7 @@ import {
   FormOutlined,
   DeleteOutlined,
   UserAddOutlined,
+  LeftCircleOutlined,
 } from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
@@ -28,7 +29,7 @@ import Loading from "../../../components/Atoms/Loading/Loading";
 import { setProjectId } from "../../../redux/reducer/project-reducer";
 import { getUserDetailAction } from "../../../redux/action/user-action";
 import InviteUser from "../../../components/Organisms/InviteUser/InviteUser";
-import { receiveMessage } from "../../../signalR/signalRService";
+import SignalRContext from "../../../context/SignalRContext";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
@@ -40,13 +41,13 @@ const SprintsPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
+  const {connection} = useContext(SignalRContext);
   const [projectName, setProjectName] = useState();
   const [sprintId, setSprintId] = useState(null);
   const [totalRecord, setTotalRecord] = useState(0);
   const [loading, setLoading] = useState(false);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
-
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -70,7 +71,7 @@ const SprintsPage = () => {
       search: `?page=1${value !== "" ? `&search=${value}` : ""}`,
     });
   };
-
+  
   const handleOpenEditModal = (sprintId) => {
     setSprintId(sprintId);
     refEditModal.current.openModalHandle();
@@ -85,11 +86,14 @@ const SprintsPage = () => {
     refInviteUser.current.openModalHandle();
   };
 
-  useEffect(() => {
-    receiveMessage((message) => {
-      console.log("Received message", message);
-    });
-  }, []);
+  const closeConnection = () => {
+    try {
+      connection.stop();
+      navigate("/projects")
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   useEffect(() => {
     dispatch(setProjectId(projectId));
@@ -138,6 +142,11 @@ const SprintsPage = () => {
     <div>
       <div className={styles["common-bar"]}>
         <div className={styles["invite-user"]}>
+        <Button
+            icon={<LeftCircleOutlined />}
+            onClick={() => closeConnection()}
+            className={styles["button-left"]}
+          />
           <SeachBar
             onChangeEvent={handleSearch}
             placeholder="Search Sprints"
@@ -230,7 +239,7 @@ const SprintsPage = () => {
         userDetail={userDetail}
       />
       <DeleteSprint ref={refDeleteModal} sprintId={sprintId} />
-      <InviteUser ref={refInviteUser} projectName={projectName}/>
+      <InviteUser ref={refInviteUser} projectName={projectName} />
     </div>
   );
 };

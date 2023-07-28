@@ -9,6 +9,7 @@ import {
   Select,
   Image,
   Card,
+  message,
 } from "antd";
 import styles from "./styles.module.scss";
 import { INFO_FORM, dataSelectOption } from "./UpdateFormField";
@@ -25,15 +26,20 @@ import NewCommentForm from "../../Comment/NewCommentForm/NewCommentForm";
 import UpdateComment from "../../../Organisms/Comment/UpdateComment/UpdateComment";
 import DeleteComment from "../../../Organisms/Comment/DeleteComment/DeleteComment";
 import { getUserProjectListAction } from "../../../../redux/action/user-action";
+import { deleteAttachment } from "../../../../api/attachment-api";
+import { MESSAGE } from "../../../../constants/constants";
 const { TextArea } = Input;
 
-const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, userDetail }) => {
+const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode, subIssueDetail, userDetail }) => {
   const { sprintId, projectId } = useParams();
   const dispatch = useDispatch();
   const refEditModalComment = useRef(null);
   const refDeleteModalComment = useRef(null);
   const [form] = Form.useForm();
   const [commentId, setCommentId] = useState(null);
+  const [isFormEdited, setIsFormEdited] = useState(false);
+  const [imageSelected, setImageSelected] = useState(false);
+  const [start, setStart] = useState(true);
   const [renderAttachment, setRenderAttachment] = useState([]);
   const handleChange = ({ target }) => {
     const files = target.files;
@@ -56,14 +62,30 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
         //   updatedRenderAttachment.shift(); // Xóa tệp tin đầu tiên nếu vượt quá giới hạn
         // }
         setRenderAttachment(updatedRenderAttachment);
+        setImageSelected(true);
       };
       reader.readAsDataURL(file); // Đọc tệp tin và chuyển đổi thành Base64
     }
   };
 
-  const tailLayout = {
-    wrapperCol: { offset: 8, span: 16 },
+  const handleFormChange = (name) => {
+    setChangedFieldName(name);
   };
+  
+  const handleFormBlur = () => {
+    if (start) {
+      setIsFormEdited(true);
+    }
+  };
+
+  const handleFormBlurImage = () => {
+    if (imageSelected && start === false) {
+      setIsFormEdited(true);
+      setImageSelected(false);
+      setStart(true);
+    }
+  }
+
   const dropdownStatusList = useSelector(
     (state) => state.statusReducer.dropdownStatusList
   );
@@ -119,8 +141,17 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
     return Promise.resolve();
   };
 
-
   const handleDelete = (id) => {
+    deleteAttachment(id).then((res) => {
+      message.success(MESSAGE.DELETE_ATTACHMENT_SUCCESS);
+    })
+    .catch((error) => {
+      if (error.response.status === 400) {
+        if (error.response.data === "Attachment Does Not Exist") {
+          message.error(MESSAGE.ATTACHMENT_NOT_EXIST);
+        }
+      }
+    });
     const updatedRenderAttachment = renderAttachment.filter(
       (data) => data.id !== id
     );
@@ -136,6 +167,13 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
     setCommentId(commentId);
     refDeleteModalComment.current.openModalHandle();
   };
+
+  useEffect(() => {
+    if (isFormEdited) {
+      form.submit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFormEdited]);
 
   useEffect(() => {
     if (editMode && subIssueDetail) {
@@ -205,6 +243,14 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
         onFinish={onFinish}
         autoComplete="off"
         form={form}
+        onFieldsChange={handleFormChange}
+        onBlur={()=>{
+          if (imageSelected) {
+            handleFormBlurImage() 
+          } else {
+            handleFormBlur()
+          }
+        }}
       >
         {INFO_FORM.map((forms) => {
           return (
@@ -255,6 +301,7 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
                               ? renderStatus
                               : renderUserProject
                           }
+                          labelInValue
                           allowClear={form.name === "userId" ? true : false}
                         />
                       ) : form.type === "files" ? (
@@ -264,6 +311,9 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
                             accept="image/png, image/jpg, image/jpeg"
                             multiple
                             onChange={handleChange}
+                            onClick={()=>{
+                              setStart(false)
+                            }}
                           />
                           {renderAttachment?.map((data) => (
                             <div key={data.id} className={styles.file}>
@@ -287,33 +337,6 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
             </Row>
           );
         })}
-
-        <Form.Item {...tailLayout}>
-          {editMode ? (
-            <Button
-              className={styles["button-submit"]}
-              type="primary"
-              htmlType="submit"
-            >
-              Save
-            </Button>
-          ) : (
-            <Button
-              className={styles["button-submit"]}
-              type="primary"
-              htmlType="submit"
-            >
-              Submit
-            </Button>
-          )}
-          <Button
-            className={styles["button-cancel"]}
-            htmlType="button"
-            onClick={onCancel}
-          >
-            Cancel
-          </Button>
-        </Form.Item>
       </Form>
       <div className={styles["table-comment"]}>
         <div className={styles.comment}>
@@ -326,20 +349,22 @@ const UpdateSubIssueForm = ({ onSubmit, onCancel, editMode, subIssueDetail, user
               <Card key={index} className={styles.card}>
                 <div className={styles["image-button"]}>
                   <div>
-                    <Image src={icon} alt="icon" className={styles.avatar} />
+                    <Image src={data?.user?.image} alt="icon" className={styles.avatar} />
                   </div>
                   <div className={styles["name-button"]}>
-                    <div>Dinh Gia Bao</div>
+                    <div>{data?.user?.email}</div>
                     <div>
                       <Button
                         type="text"
                         icon={<FormOutlined />}
                         onClick={() => handleOpenEditModalComment(data.id)}
+                        disabled={data?.user?.email === userDetail.email ? false : true }
                       ></Button>
                       <Button
                         type="text"
                         icon={<DeleteOutlined />}
                         onClick={() => handleOpenDeleteModalComment(data.id)}
+                        disabled={data?.user?.email === userDetail.email ? false : true }
                       ></Button>
                     </div>
                   </div>
