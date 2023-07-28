@@ -3,15 +3,13 @@ import { Modal, message } from "antd";
 import { deleteProject } from "../../../../api/project-api";
 import { MESSAGE } from "../../../../constants/constants";
 import styles from "./styles.module.scss";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { getProjectListAction } from "../../../../redux/action/project-action";
+import { deleteStatus } from "../../../../api/status-api";
 
-const DeleteProject = forwardRef((props, ref) => {
+const DeleteStatus = forwardRef((props, ref) => {
+  const {projectId,sprintId} = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [searchParams] = useSearchParams();
-  const currentPage = parseInt(searchParams.get("page")) || 1;
   const [openModal, setOpenModal] = useState(false);
 
   const openModalHandle = () => {
@@ -34,17 +32,11 @@ const DeleteProject = forwardRef((props, ref) => {
   });
 
   const handleDelete = async () => {
-    await deleteProject(props.projectId)
+    await deleteStatus(props.statusId)
       .then((res) => {
         message.success(MESSAGE.DELETE_PROJECT_SUCCESS);
         setOpenModal(false);
-        navigate(`/projects?page=${currentPage}`);
-        dispatch(
-          getProjectListAction({
-            currentPage: currentPage,
-            searchKey: "",
-          })
-        );
+        navigate(`/projects/${projectId}/${sprintId}`);
       })
       .catch((error) => {
         message.error(MESSAGE.DELETE_FAIL);
@@ -52,7 +44,7 @@ const DeleteProject = forwardRef((props, ref) => {
   };
   return (
     <Modal
-      title="Delete Project"
+      title="Delete Status"
       open={openModal}
       onOk={handleDelete}
       onCancel={handleCancel}
@@ -65,4 +57,4 @@ const DeleteProject = forwardRef((props, ref) => {
   );
 });
 
-export default DeleteProject;
+export default DeleteStatus;

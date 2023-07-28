@@ -1,17 +1,8 @@
-import { useState, useEffect, useMemo, useRef, useContext } from "react";
-import { Button, Card, Pagination } from "antd";
+import { useState, useEffect,useContext } from "react";
+import { Card, Pagination } from "antd";
 import {
-  Link,
-  useNavigate,
-  useSearchParams,
   useParams,
 } from "react-router-dom";
-import {
-  FormOutlined,
-  DeleteOutlined,
-  UserAddOutlined,
-  LeftCircleOutlined,
-} from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
 import dayjs from "dayjs";
@@ -23,7 +14,6 @@ import SignalRContext from "../../../context/SignalRContext";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../../constants/constants";
 import { getNotificationListAction } from "../../../redux/action/notification-action";
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import Paginate from "../../../components/Atoms/Paginate/Paginate";
 
 const ITEMS_PER_PAGE = 8;
 

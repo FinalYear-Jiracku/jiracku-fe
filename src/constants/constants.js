@@ -30,6 +30,10 @@ export const MESSAGE = {
   DELETE_COMMENT_SUCCESS: "Comment has been deleted",
   DELETE_ATTACHMENT_SUCCESS: "Attach has been deleted",
   ATTACHMENT_NOT_EXIST: "Attachment does not Exist",
+  CREATE_STATUS_SUCCESS: "Status has been created",
+  UPDATE_STATUS_SUCCESS: "Status has been updated",
+  DELETE_STATUS_SUCCESS: "Status has been deleted",
+  STATUS_NAME_EXIST: "Status Name already Exist",
 }
 export const ACCESS_TOKEN = "access_token";
 export const REFRESH_TOKEN = "refresh_token";

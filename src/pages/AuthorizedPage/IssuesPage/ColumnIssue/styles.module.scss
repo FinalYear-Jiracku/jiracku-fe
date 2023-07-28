@@ -71,3 +71,28 @@
 .button-left{
     margin-right: 5px;
 }
+
+.scrollable-container {
+    max-height: 400px; /* Adjust the height as per your requirement */
+    overflow-y: auto;
+  }
+
+.status-button{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.filter{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.text{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.select{
+    width: 100px;
+}
