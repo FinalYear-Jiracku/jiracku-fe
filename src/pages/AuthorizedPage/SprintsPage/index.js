@@ -48,7 +48,6 @@ const SprintsPage = () => {
   const [loading, setLoading] = useState(false);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
-  //const connection = useSelector((state) => state.signalRReducer.connection);
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -130,7 +129,6 @@ const SprintsPage = () => {
         });
     }
     setTotalRecord(sprintList?.sprints?.totalRecords);
-    //dispatch(startListeningForMessages());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     params,
@@ -140,9 +138,6 @@ const SprintsPage = () => {
     projectId,
   ]);
 
-  
-
- 
   return (
     <div>
       <div className={styles["common-bar"]}>

@@ -47,7 +47,6 @@ const UpdateIssue = forwardRef((props, ref) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { connection } = useContext(SignalRContext);
-  //const connection = useSelector((state) => state.signalRReducer.connection);
   const [openModal, setOpenModal] = useState(false);
   const [changedFieldName, setChangedFieldName] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
@@ -157,6 +156,7 @@ const UpdateIssue = forwardRef((props, ref) => {
       return await convertToFormFile(file);
     });
     const files = await Promise.all(filePromises);
+   
     if (field === "type") {
       const formData = new FormData();
       formData.append("id", props.issueId === undefined ? "" : props.issueId);
@@ -212,7 +212,7 @@ const UpdateIssue = forwardRef((props, ref) => {
           navigate(`/projects/${projectId}/${sprintId}`);
           sendMessage(
             projectId.toString(),
-            `${props.userDetail.email} changed type of ${item.name} to ${item.type.label} of Sprint: ${props.sprintName}`
+            `${props.userDetail.email} changed type of Issue: ${item.name} to ${item.type.label} of Sprint: ${props.sprintName}`
           );
         })
         .catch((error) => {
@@ -278,7 +278,7 @@ const UpdateIssue = forwardRef((props, ref) => {
           navigate(`/projects/${projectId}/${sprintId}`);
           sendMessage(
             projectId.toString(),
-            `${props.userDetail.email} changed priority of ${item.name} to ${item.priority.label} of Sprint: ${props.sprintName}`
+            `${props.userDetail.email} changed priority of Issue: ${item.name} to ${item.priority.label} of Sprint: ${props.sprintName}`
           );
         })
         .catch((error) => {
@@ -344,7 +344,7 @@ const UpdateIssue = forwardRef((props, ref) => {
           navigate(`/projects/${projectId}/${sprintId}`);
           sendMessage(
             projectId.toString(),
-            `${props.userDetail.email} changed status of ${item.name} to ${item.statusId.label} of Sprint: ${props.sprintName}`
+            `${props.userDetail.email} changed status of Issue: ${item.name} to ${item.statusId.label} of Sprint: ${props.sprintName}`
           );
         })
         .catch((error) => {
@@ -410,7 +410,7 @@ const UpdateIssue = forwardRef((props, ref) => {
           navigate(`/projects/${projectId}/${sprintId}`);
           sendMessage(
             projectId.toString(),
-            `${props.userDetail.email} moved ${item.name} to Sprint: ${item.sprintId.label}`
+            `${props.userDetail.email} moved Issue: ${item.name} to Sprint: ${item.sprintId.label}`
           );
         })
         .catch((error) => {
@@ -476,7 +476,7 @@ const UpdateIssue = forwardRef((props, ref) => {
           navigate(`/projects/${projectId}/${sprintId}`);
           sendMessage(
             projectId.toString(),
-            `${props.userDetail.email} assigned ${item.userId.label} to ${item.name} of Sprint: ${props.sprintName}`
+            `${props.userDetail.email} assigned ${item.userId.label} to Issue: ${item.name} of Sprint: ${props.sprintName}`
           );
         })
         .catch((error) => {
@@ -542,7 +542,7 @@ const UpdateIssue = forwardRef((props, ref) => {
           navigate(`/projects/${projectId}/${sprintId}`);
           sendMessage(
             projectId.toString(),
-            `${props.userDetail.email} changed startDate of ${
+            `${props.userDetail.email} changed startDate of Issue: ${
               item.name
             } to ${dayjs(item.startDate).format("YYYY-MM-DD")} of Sprint: ${
               props.sprintName
@@ -612,7 +612,7 @@ const UpdateIssue = forwardRef((props, ref) => {
           navigate(`/projects/${projectId}/${sprintId}`);
           sendMessage(
             projectId.toString(),
-            `${props.userDetail.email} changed dueDate of ${
+            `${props.userDetail.email} changed dueDate of Issue: ${
               item.name
             } to ${dayjs(item.dueDate).format("YYYY-MM-DD")} of Sprint: ${
               props.sprintName
@@ -634,7 +634,7 @@ const UpdateIssue = forwardRef((props, ref) => {
       field !== "sprintId" &&
       field !== "userId" &&
       field !== "startDate" &&
-      field !== "dueDate") || 
+      field !== "dueDate") ||
       item.userId === undefined
     ) {
       const formData = new FormData();
@@ -723,6 +723,7 @@ const UpdateIssue = forwardRef((props, ref) => {
         onSubmit={onSubmitForm}
         setChangedFieldName={setChangedFieldName}
         issueDetail={issueDetail}
+        sprintName={props.sprintName}
         userDetail={props.userDetail}
       />
     </Modal>

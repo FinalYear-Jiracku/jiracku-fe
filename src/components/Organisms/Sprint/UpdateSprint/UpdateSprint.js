@@ -9,42 +9,15 @@ import {
   getSprintDetailAction,
   getSprintListAction,
 } from "../../../../redux/action/sprint-action";
-import SignalRContext from "../../../../context/SignalRContext";
 
 const UpdateSprint = forwardRef((props, ref) => {
   const { projectId } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
-  const connection = useContext(SignalRContext);
   const currentPage = parseInt(searchParams.get("page")) || 1;
-  
   const [openModal, setOpenModal] = useState(false);
   const sprintDetail = useSelector((state) => state.sprintReducer.sprintDetail);
-
-  const sendMessage = async (projectId,  message) => {
-    if (!connection) {
-      console.error("Connection not established.");
-      return;
-    }
-
-    if (connection.state !== "Connected") {
-      // Thực hiện kết nối lại nếu kết nối không ở trạng thái "Connected"
-      try {
-        await connection.start();
-        console.log("Reconnected to SignalR Hub");
-      } catch (error) {
-        console.error("Error connecting to SignalR Hub:", error);
-        return;
-      }
-    }
-  
-    try {
-      await connection.invoke("SendMessage", projectId,  message);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
   const openModalHandle = () => {
     setOpenModal(true);
   };
@@ -87,7 +60,6 @@ const UpdateSprint = forwardRef((props, ref) => {
             searchKey: "",
           })
         );
-        sendMessage(projectId.toString(), "hehehehehehehehe")
       })
       .catch((error) => {
         if (error.response.status === 400) {

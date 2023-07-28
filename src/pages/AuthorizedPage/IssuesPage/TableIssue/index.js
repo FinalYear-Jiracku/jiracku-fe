@@ -6,6 +6,7 @@ import {
   FlagOutlined,
   PlusSquareOutlined,
   CloseCircleOutlined,
+  UserAddOutlined
 } from "@ant-design/icons";
 import styles from "./styles.module.scss";
 import dayjs from "dayjs";
@@ -22,15 +23,14 @@ import { getIssueListAction } from "../../../../redux/action/issue-action";
 import { setProjectId } from "../../../../redux/reducer/project-reducer";
 import { setSprintId } from "../../../../redux/reducer/sprint-reducer";
 import { getSprintListAction } from "../../../../redux/action/sprint-action";
-import SignalRContext from "../../../../context/SignalRContext";
-import { ACCESS_TOKEN } from "../../../../constants/constants";
-import { HubConnectionBuilder } from "@microsoft/signalr";
-import { setSignalRConnection } from "../../../../redux/reducer/signalR-reducer";
+import InviteUser from "../../../../components/Organisms/InviteUser/InviteUser";
+
 const TableIssue = () => {
   const { projectId, sprintId } = useParams();
   const refAddModal = useRef(null);
   const refEditModal = useRef(null);
   const refDeleteModal = useRef(null);
+  const refInviteUser = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [projectName, setProjectName] = useState();
@@ -38,8 +38,6 @@ const TableIssue = () => {
   const [issueId, setIssueId] = useState(null);
   const [loading, setLoading] = useState(false);
   const header = useContext(HeaderContext);
-  const {connection,setConnection} = useContext(SignalRContext);
-  //const connection = useSelector((state) => state.signalRReducer.connection);
   const [searchParams] = useSearchParams();
   const issueList = useSelector((state) => state.issueReducer.issueList);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
@@ -68,6 +66,10 @@ const TableIssue = () => {
   const handleOpenDeleteModal = (issueId) => {
     setIssueId(issueId);
     refDeleteModal.current.openModalHandle();
+  };
+
+  const handleOpenInviteUserModal = () => {
+    refInviteUser.current.openModalHandle();
   };
 
   const defaultColumns = [
@@ -256,6 +258,11 @@ const TableIssue = () => {
             placeholder="Search Issues"
             borderColor="#155E75"
           />
+          <Button
+            icon={<UserAddOutlined />}
+            onClick={() => handleOpenInviteUserModal()}
+            className={styles["button-invite"]}
+          />
         </div>
         <CreateButton
           content="Create New Issue"
@@ -281,6 +288,7 @@ const TableIssue = () => {
       <NewIssue ref={refAddModal} userDetail={userDetail}/>
       <UpdateIssue ref={refEditModal} issueId={issueId} userDetail={userDetail} sprintName={sprintName}/>
       <DeleteIssue ref={refDeleteModal} issueId={issueId} />
+      <InviteUser ref={refInviteUser} projectName={projectName} />
     </div>
   );
 };

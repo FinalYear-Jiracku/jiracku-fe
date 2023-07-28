@@ -47,7 +47,6 @@ export const getDropdownSprintListAction = (projectId) => {
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);
-        //window.location.href = '/login';
       })
       .finally(() => {});
   };

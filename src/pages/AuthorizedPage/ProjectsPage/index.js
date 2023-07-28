@@ -29,7 +29,6 @@ import { getUserDetailAction } from "../../../redux/action/user-action";
 import SignalRContext from "../../../context/SignalRContext";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../../constants/constants";
 import { HubConnectionBuilder } from "@microsoft/signalr";
-import { setSignalRConnection } from "../../../redux/reducer/signalR-reducer";
 
 const ProjectsPage = () => {
   const refAddModal = useRef(null);

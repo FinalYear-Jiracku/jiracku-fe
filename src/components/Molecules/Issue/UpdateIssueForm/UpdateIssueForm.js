@@ -46,6 +46,7 @@ const UpdateIssueForm = ({
   issueDetail,
   setChangedFieldName,
   userDetail,
+  sprintName
 }) => {
   const { sprintId, projectId } = useParams();
   const dispatch = useDispatch();
@@ -462,7 +463,7 @@ const UpdateIssueForm = ({
                               ? validateEndDate
                               : form.name === "storyPoint"
                               ? validateStoryPoint
-                              : ignore,
+                              : ignore
                         },
                       ]}
                       labelWrap={true}
@@ -493,7 +494,7 @@ const UpdateIssueForm = ({
                             type="file"
                             accept="image/png, image/jpg, image/jpeg"
                             multiple
-                             onChange={handleChange}
+                            onChange={handleChange}
                             onClick={()=>{
                               setStart(false)
                             }}
@@ -549,20 +550,22 @@ const UpdateIssueForm = ({
               <Card key={index} className={styles.card}>
                 <div className={styles["image-button"]}>
                   <div>
-                    <img src={icon} alt="icon" className={styles.avatar} />
+                    <img src={data?.user?.image} alt="icon" className={styles.avatar} />
                   </div>
                   <div className={styles["name-button"]}>
-                    <div>Dinh Gia Bao</div>
+                    <div>{data?.user?.email}</div>
                     <div>
                       <Button
                         type="text"
                         icon={<FormOutlined />}
                         onClick={() => handleOpenEditModalComment(data.id)}
+                        disabled={data?.user?.email === userDetail.email ? false : true }
                       ></Button>
                       <Button
                         type="text"
                         icon={<DeleteOutlined />}
                         onClick={() => handleOpenDeleteModalComment(data.id)}
+                        disabled={data?.user?.email === userDetail.email ? false : true }
                       ></Button>
                     </div>
                   </div>
@@ -585,6 +588,7 @@ const UpdateIssueForm = ({
         subIssueId={subIssueId}
         issueDetail={issueDetail}
         userDetail={userDetail}
+        sprintName={sprintName}
       />
       <DeleteSubIssue
         ref={refDeleteModal}

@@ -35,11 +35,15 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const isNotificationPage = location.pathname === `/notifications/${projectId}`;
   const isIssuesPage = location.pathname === `/projects/${projectId}/${sprintId}`;
 
+  const clearNotificationCount = () => {
+    setNotificationCount(0);
+  };
+
   const bellIconWithBadge = (
-    <span>
+    <span onClick={clearNotificationCount}> {/* Add onClick event handler */}
       <BellOutlined />
-      <span> Notification</span>
-      {notificationCount > 0 && <span className={styles.badge}>{notificationCount}</span>}
+      <span>Notification</span>
+      {notificationCount > 0 && <span className={styles.badge}> {notificationCount}</span>}
     </span>
   );
 
@@ -73,9 +77,8 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         },
         {
           key: `/notifications/${projectId}`,
-          icon: <BellOutlined />,
-          label: "Notification",
-          badge: notificationCount
+          //icon: <BellOutlined />,
+          label: bellIconWithBadge,
         },
       );
     } 
@@ -98,9 +101,8 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         },
         {
           key: `/notifications/${projectId}`,
-          icon: <BellOutlined />,
-          label: "Notification",
-          badge: notificationCount
+          //icon: <BellOutlined />,
+          label: bellIconWithBadge,
         },
       );
     }if(isNotificationPage){
@@ -127,6 +129,10 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
 
   const onClickMenu = ({ key }) => {
     if (key) {
+      // If the Notification menu item is clicked, reset the notification count
+      if (key === `/notifications/${projectId}`) {
+        clearNotificationCount();
+      }
       navigate(key);
     }
   };

@@ -1,4 +1,10 @@
-import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
+import {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+  useContext,
+} from "react";
 import { Modal, message } from "antd";
 import styles from "./styles.module.scss";
 import { MESSAGE } from "../../../../constants/constants";
@@ -10,6 +16,9 @@ import { firebaseConfig } from "../../../../configs/firebaseConfig";
 import UpdateSubIssueForm from "../../../Molecules/SubIssues/UpdateSubIssueForm/UpdateSubIssueForm";
 import { getSubIssueDetailAction } from "../../../../redux/action/subIssue-action";
 import { updateSubIssue } from "../../../../api/subIssue-api";
+import SignalRContext from "../../../../context/SignalRContext";
+import { useParams } from "react-router-dom";
+import dayjs from "dayjs";
 
 const firebase = initializeApp(firebaseConfig);
 const storage = getStorage(firebase);
@@ -36,9 +45,37 @@ const getFileFromFirebase = async (fileUrl) => {
 
 const UpdateSubIssue = forwardRef((props, ref) => {
   const dispatch = useDispatch();
+  const { projectId, sprintId } = useParams();
   const [openModal, setOpenModal] = useState(false);
+  const { connection } = useContext(SignalRContext);
   const [messageApi, contextHolder] = message.useMessage();
-  const subIssueDetail = useSelector((state) => state.subIssueReducer.subIssueDetail);
+  const [changedFieldName, setChangedFieldName] = useState(null);
+  const subIssueDetail = useSelector(
+    (state) => state.subIssueReducer.subIssueDetail
+  );
+
+  const sendMessage = async (projectId, message) => {
+    if (!connection) {
+      console.error("Connection not established.");
+      return;
+    }
+
+    if (connection.state !== "Connected") {
+      try {
+        await connection.start();
+        console.log("Reconnected to SignalR Hub");
+      } catch (error) {
+        console.error("Error connecting to SignalR Hub:", error);
+        return;
+      }
+    }
+
+    try {
+      await connection.invoke("SendMessage", projectId, message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
 
   const openModalHandle = () => {
     setOpenModal(true);
@@ -105,59 +142,489 @@ const UpdateSubIssue = forwardRef((props, ref) => {
     }
   };
 
+  const changedField = changedFieldName?.find(
+    (field) => field.touched === true
+  );
+
+  const field = changedField ? changedField.name[0] : null;
+
   const onSubmitForm = async (item) => {
-    messageApi.open({type:'loading',content:"Action In Progress",duration:5000})
+    messageApi.open({
+      type: "loading",
+      content: "Action In Progress",
+      duration: 5000,
+    });
     const filePromises = item?.files?.map(async (file) => {
       return await convertToFormFile(file);
     });
     const files = await Promise.all(filePromises);
-    const formData = new FormData();
-    formData.append("id", props.subIssueId === undefined ? "" : props.subIssueId);
-    formData.append("name", item.name === undefined ? "" : item.name);
-    formData.append(
-      "description",
-      item.description === undefined ? "" : item.description
-    );
-    formData.append("type", Number(item.type) === 0 ? null : Number(item.type));
-    formData.append(
-      "priority",
-      Number(item.priority) === 0 ? null : Number(item.priority)
-    );
-    formData.append(
-      "storyPoint",
-      item.storyPoint === undefined ? null : item.storyPoint
-    );
-    formData.append(
-      "startDate",
-      item.startDate === undefined ? "" : item.startDate
-    );
-    formData.append("dueDate", item.dueDate === undefined ? "" : item.dueDate);
-    formData.append(
-      "statusId",
-      Number(item.statusId) === 0 ? null : Number(item.statusId)
-    );
-    formData.append(
-      "userId",
-      item.userId === undefined ? 0 : Number(item.userId)
-    );
-    formData.append("updatedBy", `${props.userDetail.email === null ? "" : props.userDetail.email}`);
-    for (let i = 0; i < files.length; i++) {
-      formData.append("files", files[i], files[i].name);
-    }
-    
-    await updateSubIssue(formData)
-      .then((res) => {
-        message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
-        setOpenModal(false);
-        dispatch(getIssueDetailAction(props.issueDetail.id));
-      })
-      .catch((error) => {
-        if (error.response.status === 500) {
-          if (error.response.data === "Internal Server Error") {
-            message.error(MESSAGE.CREATE_FAIL);
+    if (field === "type") {
+      const formData = new FormData();
+      formData.append(
+        "id",
+        props.subIssueId === undefined ? "" : props.subIssueId
+      );
+      formData.append("name", item.name === undefined ? "" : item.name);
+      formData.append(
+        "description",
+        item.description === undefined ? "" : item.description
+      );
+      formData.append(
+        "type",
+        Number(item.type.key) === 0 ? null : Number(item.type.key)
+      );
+      formData.append(
+        "priority",
+        Number(item.priority) === 0 ? null : Number(item.priority)
+      );
+      formData.append(
+        "storyPoint",
+        item.storyPoint === undefined ? null : item.storyPoint
+      );
+      formData.append(
+        "startDate",
+        item.startDate === undefined ? "" : item.startDate
+      );
+      formData.append(
+        "dueDate",
+        item.dueDate === undefined ? "" : item.dueDate
+      );
+      formData.append(
+        "statusId",
+        Number(item.statusId) === 0 ? null : Number(item.statusId)
+      );
+      formData.append(
+        "userId",
+        item.userId === undefined ? 0 : Number(item.userId)
+      );
+      formData.append(
+        "updatedBy",
+        `${props.userDetail.email === null ? "" : props.userDetail.email}`
+      );
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name);
+      }
+
+      await updateSubIssue(formData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+          sendMessage(
+            projectId.toString(),
+            `${props.userDetail.email} changed type of SubIssue: ${item.name} to ${item.type.label} of Issue: ${props.issueDetail.name} Sprint: ${props.sprintName}`
+          );
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            if (error.response.data === "Internal Server Error") {
+              message.error(MESSAGE.CREATE_FAIL);
+            }
           }
-        }
-      });
+        });
+    }
+    if (field === "priority") {
+      const formData = new FormData();
+      formData.append(
+        "id",
+        props.subIssueId === undefined ? "" : props.subIssueId
+      );
+      formData.append("name", item.name === undefined ? "" : item.name);
+      formData.append(
+        "description",
+        item.description === undefined ? "" : item.description
+      );
+      formData.append(
+        "type",
+        Number(item.type) === 0 ? null : Number(item.type)
+      );
+      formData.append(
+        "priority",
+        Number(item.priority.key) === 0 ? null : Number(item.priority.key)
+      );
+      formData.append(
+        "storyPoint",
+        item.storyPoint === undefined ? null : item.storyPoint
+      );
+      formData.append(
+        "startDate",
+        item.startDate === undefined ? "" : item.startDate
+      );
+      formData.append(
+        "dueDate",
+        item.dueDate === undefined ? "" : item.dueDate
+      );
+      formData.append(
+        "statusId",
+        Number(item.statusId) === 0 ? null : Number(item.statusId)
+      );
+      formData.append(
+        "userId",
+        item.userId === undefined ? 0 : Number(item.userId)
+      );
+      formData.append(
+        "updatedBy",
+        `${props.userDetail.email === null ? "" : props.userDetail.email}`
+      );
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name);
+      }
+
+      await updateSubIssue(formData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+          sendMessage(
+            projectId.toString(),
+            `${props.userDetail.email} changed priority of SubIssue: ${item.name} to ${item.priority.label} of Issue: ${props.issueDetail.name} in Sprint: ${props.sprintName}`
+          );
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            if (error.response.data === "Internal Server Error") {
+              message.error(MESSAGE.CREATE_FAIL);
+            }
+          }
+        });
+    }
+    if (field === "statusId") {
+      const formData = new FormData();
+      formData.append(
+        "id",
+        props.subIssueId === undefined ? "" : props.subIssueId
+      );
+      formData.append("name", item.name === undefined ? "" : item.name);
+      formData.append(
+        "description",
+        item.description === undefined ? "" : item.description
+      );
+      formData.append(
+        "type",
+        Number(item.type) === 0 ? null : Number(item.type)
+      );
+      formData.append(
+        "priority",
+        Number(item.priority) === 0 ? null : Number(item.priority)
+      );
+      formData.append(
+        "storyPoint",
+        item.storyPoint === undefined ? null : item.storyPoint
+      );
+      formData.append(
+        "startDate",
+        item.startDate === undefined ? "" : item.startDate
+      );
+      formData.append(
+        "dueDate",
+        item.dueDate === undefined ? "" : item.dueDate
+      );
+      formData.append(
+        "statusId",
+        Number(item.statusId.key) === 0 ? null : Number(item.statusId.key)
+      );
+      formData.append(
+        "userId",
+        item.userId === undefined ? 0 : Number(item.userId)
+      );
+      formData.append(
+        "updatedBy",
+        `${props.userDetail.email === null ? "" : props.userDetail.email}`
+      );
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name);
+      }
+
+      await updateSubIssue(formData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+          sendMessage(
+            projectId.toString(),
+            `${props.userDetail.email} changed status of SubIssue: ${item.name} to ${item.statusId.label} of Issue: ${props.issueDetail.name} in Sprint: ${props.sprintName}`
+          );
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            if (error.response.data === "Internal Server Error") {
+              message.error(MESSAGE.CREATE_FAIL);
+            }
+          }
+        });
+    }
+    if (field === "userId" && item.userId !== undefined) {
+      const formData = new FormData();
+      formData.append(
+        "id",
+        props.subIssueId === undefined ? "" : props.subIssueId
+      );
+      formData.append("name", item.name === undefined ? "" : item.name);
+      formData.append(
+        "description",
+        item.description === undefined ? "" : item.description
+      );
+      formData.append(
+        "type",
+        Number(item.type) === 0 ? null : Number(item.type)
+      );
+      formData.append(
+        "priority",
+        Number(item.priority) === 0 ? null : Number(item.priority)
+      );
+      formData.append(
+        "storyPoint",
+        item.storyPoint === undefined ? null : item.storyPoint
+      );
+      formData.append(
+        "startDate",
+        item.startDate === undefined ? "" : item.startDate
+      );
+      formData.append(
+        "dueDate",
+        item.dueDate === undefined ? "" : item.dueDate
+      );
+      formData.append(
+        "statusId",
+        Number(item.statusId) === 0 ? null : Number(item.statusId)
+      );
+      formData.append(
+        "userId",
+        item.userId.key === undefined ? 0 : Number(item.userId.key)
+      );
+      formData.append(
+        "updatedBy",
+        `${props.userDetail.email === null ? "" : props.userDetail.email}`
+      );
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name);
+      }
+
+      await updateSubIssue(formData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+          sendMessage(
+            projectId.toString(),
+            `${props.userDetail.email} assigned ${item.userId.label} to SubIssue: ${item.name} of Issue: ${props.issueDetail.name} in Sprint: ${props.sprintName}`
+          );
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            if (error.response.data === "Internal Server Error") {
+              message.error(MESSAGE.CREATE_FAIL);
+            }
+          }
+        });
+    }
+    if (field === "startDate") {
+      const formData = new FormData();
+      formData.append(
+        "id",
+        props.subIssueId === undefined ? "" : props.subIssueId
+      );
+      formData.append("name", item.name === undefined ? "" : item.name);
+      formData.append(
+        "description",
+        item.description === undefined ? "" : item.description
+      );
+      formData.append(
+        "type",
+        Number(item.type) === 0 ? null : Number(item.type)
+      );
+      formData.append(
+        "priority",
+        Number(item.priority) === 0 ? null : Number(item.priority)
+      );
+      formData.append(
+        "storyPoint",
+        item.storyPoint === undefined ? null : item.storyPoint
+      );
+      formData.append(
+        "startDate",
+        item.startDate === undefined ? "" : item.startDate
+      );
+      formData.append(
+        "dueDate",
+        item.dueDate === undefined ? "" : item.dueDate
+      );
+      formData.append(
+        "statusId",
+        Number(item.statusId) === 0 ? null : Number(item.statusId)
+      );
+      formData.append(
+        "userId",
+        item.userId === undefined ? 0 : Number(item.userId)
+      );
+      formData.append(
+        "updatedBy",
+        `${props.userDetail.email === null ? "" : props.userDetail.email}`
+      );
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name);
+      }
+
+      await updateSubIssue(formData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+          sendMessage(
+            projectId.toString(),
+            `${props.userDetail.email} changed startDate of SubIssue: ${
+              item.name
+            } to ${dayjs(item.startDate).format("YYYY-MM-DD")} of Issue: ${
+              props.issueDetail.name
+            } in Sprint: ${props.sprintName}`
+          );
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            if (error.response.data === "Internal Server Error") {
+              message.error(MESSAGE.CREATE_FAIL);
+            }
+          }
+        });
+    }
+    if (field === "dueDate") {
+      const formData = new FormData();
+      formData.append(
+        "id",
+        props.subIssueId === undefined ? "" : props.subIssueId
+      );
+      formData.append("name", item.name === undefined ? "" : item.name);
+      formData.append(
+        "description",
+        item.description === undefined ? "" : item.description
+      );
+      formData.append(
+        "type",
+        Number(item.type) === 0 ? null : Number(item.type)
+      );
+      formData.append(
+        "priority",
+        Number(item.priority) === 0 ? null : Number(item.priority)
+      );
+      formData.append(
+        "storyPoint",
+        item.storyPoint === undefined ? null : item.storyPoint
+      );
+      formData.append(
+        "startDate",
+        item.startDate === undefined ? "" : item.startDate
+      );
+      formData.append(
+        "dueDate",
+        item.dueDate === undefined ? "" : item.dueDate
+      );
+      formData.append(
+        "statusId",
+        Number(item.statusId) === 0 ? null : Number(item.statusId)
+      );
+      formData.append(
+        "userId",
+        item.userId === undefined ? 0 : Number(item.userId)
+      );
+      formData.append(
+        "updatedBy",
+        `${props.userDetail.email === null ? "" : props.userDetail.email}`
+      );
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name);
+      }
+
+      await updateSubIssue(formData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+          sendMessage(
+            projectId.toString(),
+            `${props.userDetail.email} changed dueDate of SubIssue: ${
+              item.name
+            } to ${dayjs(item.dueDate).format("YYYY-MM-DD")} of Issue: ${
+              props.issueDetail.name
+            } in Sprint: ${props.sprintName}`
+          );
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            if (error.response.data === "Internal Server Error") {
+              message.error(MESSAGE.CREATE_FAIL);
+            }
+          }
+        });
+    }
+    if (
+      (field !== "type" &&
+        field !== "priority" &&
+        field !== "statusId" &&
+        field !== "userId" &&
+        field !== "startDate" &&
+        field !== "dueDate") ||
+      item.userId === undefined
+    ) {
+      const formData = new FormData();
+      formData.append(
+        "id",
+        props.subIssueId === undefined ? "" : props.subIssueId
+      );
+      formData.append("name", item.name === undefined ? "" : item.name);
+      formData.append(
+        "description",
+        item.description === undefined ? "" : item.description
+      );
+      formData.append(
+        "type",
+        Number(item.type) === 0 ? null : Number(item.type)
+      );
+      formData.append(
+        "priority",
+        Number(item.priority) === 0 ? null : Number(item.priority)
+      );
+      formData.append(
+        "storyPoint",
+        item.storyPoint === undefined ? null : item.storyPoint
+      );
+      formData.append(
+        "startDate",
+        item.startDate === undefined ? "" : item.startDate
+      );
+      formData.append(
+        "dueDate",
+        item.dueDate === undefined ? "" : item.dueDate
+      );
+      formData.append(
+        "statusId",
+        Number(item.statusId) === 0 ? null : Number(item.statusId)
+      );
+      formData.append(
+        "userId",
+        item.userId === undefined ? 0 : Number(item.userId)
+      );
+      formData.append(
+        "updatedBy",
+        `${props.userDetail.email === null ? "" : props.userDetail.email}`
+      );
+      for (let i = 0; i < files.length; i++) {
+        formData.append("files", files[i], files[i].name);
+      }
+
+      await updateSubIssue(formData)
+        .then((res) => {
+          message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
+          setOpenModal(false);
+          dispatch(getIssueDetailAction(props.issueDetail.id));
+        })
+        .catch((error) => {
+          if (error.response.status === 500) {
+            if (error.response.data === "Internal Server Error") {
+              message.error(MESSAGE.CREATE_FAIL);
+            }
+          }
+        });
+    }
   };
 
   useEffect(() => {
@@ -181,6 +648,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         editMode={true}
         onCancel={closeModalHandle}
         onSubmit={onSubmitForm}
+        setChangedFieldName={setChangedFieldName}
         subIssueDetail={subIssueDetail}
         userDetail={props.userDetail}
       />
