@@ -23,3 +23,4 @@ export const getStatusDetail = (id) => {
 export const updateStatus = (data) => {
   return api.put('/statuses',data)
 }
+

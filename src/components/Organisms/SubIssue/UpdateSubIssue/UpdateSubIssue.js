@@ -45,7 +45,7 @@ const getFileFromFirebase = async (fileUrl) => {
 
 const UpdateSubIssue = forwardRef((props, ref) => {
   const dispatch = useDispatch();
-  const { projectId, sprintId } = useParams();
+  const { projectId } = useParams();
   const [openModal, setOpenModal] = useState(false);
   const { connection } = useContext(SignalRContext);
   const [messageApi, contextHolder] = message.useMessage();
@@ -191,7 +191,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
       );
       formData.append(
         "statusId",
-        Number(item.statusId) === 0 ? null : Number(item.statusId)
+        item.statusId === undefined ? 0 : Number(item.statusId)
       );
       formData.append(
         "userId",
@@ -205,7 +205,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         formData.append("files", files[i], files[i].name);
       }
 
-      await updateSubIssue(formData)
+      return await updateSubIssue(formData)
         .then((res) => {
           message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
           setOpenModal(false);
@@ -256,7 +256,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
       );
       formData.append(
         "statusId",
-        Number(item.statusId) === 0 ? null : Number(item.statusId)
+        item.statusId === undefined ? 0 : Number(item.statusId)
       );
       formData.append(
         "userId",
@@ -270,7 +270,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         formData.append("files", files[i], files[i].name);
       }
 
-      await updateSubIssue(formData)
+      return await updateSubIssue(formData)
         .then((res) => {
           message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
           setOpenModal(false);
@@ -335,7 +335,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         formData.append("files", files[i], files[i].name);
       }
 
-      await updateSubIssue(formData)
+      return await updateSubIssue(formData)
         .then((res) => {
           message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
           setOpenModal(false);
@@ -386,7 +386,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
       );
       formData.append(
         "statusId",
-        Number(item.statusId) === 0 ? null : Number(item.statusId)
+        item.statusId === undefined ? 0 : Number(item.statusId)
       );
       formData.append(
         "userId",
@@ -400,7 +400,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         formData.append("files", files[i], files[i].name);
       }
 
-      await updateSubIssue(formData)
+      return await updateSubIssue(formData)
         .then((res) => {
           message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
           setOpenModal(false);
@@ -451,7 +451,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
       );
       formData.append(
         "statusId",
-        Number(item.statusId) === 0 ? null : Number(item.statusId)
+        item.statusId === undefined ? 0 : Number(item.statusId)
       );
       formData.append(
         "userId",
@@ -465,7 +465,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         formData.append("files", files[i], files[i].name);
       }
 
-      await updateSubIssue(formData)
+      return await updateSubIssue(formData)
         .then((res) => {
           message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
           setOpenModal(false);
@@ -520,7 +520,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
       );
       formData.append(
         "statusId",
-        Number(item.statusId) === 0 ? null : Number(item.statusId)
+        item.statusId === undefined ? 0 : Number(item.statusId)
       );
       formData.append(
         "userId",
@@ -534,7 +534,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         formData.append("files", files[i], files[i].name);
       }
 
-      await updateSubIssue(formData)
+      return await updateSubIssue(formData)
         .then((res) => {
           message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
           setOpenModal(false);
@@ -563,7 +563,12 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         field !== "userId" &&
         field !== "startDate" &&
         field !== "dueDate") ||
-      item.userId === undefined
+        item.userId === undefined ||
+        item.type === undefined ||
+        item.priority === undefined ||
+        item.statusId === undefined ||
+        item.startDate === undefined ||
+        item.dueDate === undefined
     ) {
       const formData = new FormData();
       formData.append(
@@ -597,7 +602,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
       );
       formData.append(
         "statusId",
-        Number(item.statusId) === 0 ? null : Number(item.statusId)
+        item.statusId === undefined ? 0 : Number(item.statusId)
       );
       formData.append(
         "userId",
@@ -611,7 +616,7 @@ const UpdateSubIssue = forwardRef((props, ref) => {
         formData.append("files", files[i], files[i].name);
       }
 
-      await updateSubIssue(formData)
+      return await updateSubIssue(formData)
         .then((res) => {
           message.success(MESSAGE.UPDATE_SUB_ISSUE_SUCCESS);
           setOpenModal(false);

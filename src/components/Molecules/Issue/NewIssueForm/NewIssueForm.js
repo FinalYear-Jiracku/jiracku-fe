@@ -139,6 +139,7 @@ const NewIssueForm = ({ onSubmit, onCancel }) => {
                         ? dataSelectOption(form.name)
                         : renderStatus
                     }
+                    allowClear={form.name === "statusId" ? true : false}
                   />
                 ) : (
                   <DatePicker

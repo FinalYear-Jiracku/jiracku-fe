@@ -23,3 +23,8 @@ export const updateSprint = (data) => {
 export const deleteSprint = (id) => {
   return api.patch(`/sprints/${id}`)
 }
+
+export const sprintListForComplete = (type) => {
+  return api.get(`/${type}`);
+};
+

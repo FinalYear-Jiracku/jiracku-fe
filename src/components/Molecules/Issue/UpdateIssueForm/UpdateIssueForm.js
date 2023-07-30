@@ -22,7 +22,6 @@ import {
   PlusSquareOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import icon from "../../../../assets/anh.jpg";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getDropdownStatusListAction } from "../../../../redux/action/status-action";
@@ -486,7 +485,7 @@ const UpdateIssueForm = ({
                               : renderUserProject
                           }
                           labelInValue
-                          allowClear={form.name === "userId" ? true : false}
+                          allowClear={form.name === "userId" || form.name === "statusId" ? true : false}
                         />
                       ) : form.type === "files" ? (
                         <div className={styles["file-list-container"]}>

@@ -177,11 +177,13 @@ const ProjectsPage = () => {
                     type="text"
                     icon={<FormOutlined />}
                     onClick={() => handleOpenEditModal(data.id)}
+                    disabled={data?.createdBy !== userDetail?.email ? true : false}
                   ></Button>
                   <Button
                     type="text"
                     icon={<DeleteOutlined />}
                     onClick={() => handleOpenDeleteModal(data.id)}
+                    disabled={data?.createdBy !== userDetail?.email ? true : false}
                   ></Button>
                 </div>
               </div>

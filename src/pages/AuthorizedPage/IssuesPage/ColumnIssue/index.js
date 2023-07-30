@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import styles from "./styles.module.scss";
 import { useDispatch } from "react-redux";
@@ -17,6 +17,8 @@ import {
   PlusSquareOutlined,
   FormOutlined,
   DeleteOutlined,
+  CloseCircleOutlined,
+  FlagOutlined,
 } from "@ant-design/icons";
 import InviteUser from "../../../../components/Organisms/InviteUser/InviteUser";
 import { setProjectId } from "../../../../redux/reducer/project-reducer";
@@ -25,12 +27,20 @@ import {
   getUserDetailAction,
   getUserProjectListAction,
 } from "../../../../redux/action/user-action";
-import { getSprintListAction } from "../../../../redux/action/sprint-action";
+import {
+  getSprintDetailAction,
+  getSprintListAction,
+} from "../../../../redux/action/sprint-action";
 import EmptyData from "../../../../components/Atoms/EmptyData/EmptyData";
 import Loading from "../../../../components/Atoms/Loading/Loading";
 import NewStatus from "../../../../components/Organisms/Status/NewStatus/NewStatus";
 import DeleteStatus from "../../../../components/Organisms/Status/DeleteStatus/DeleteStatus";
 import UpdateStatus from "../../../../components/Organisms/Status/UpdateStatus/UpdateStatus";
+import CompleteIssue from "../../../../components/Organisms/Issue/CompleteIssue/CompleteIssue";
+import { getProjectDetailAction } from "../../../../redux/action/project-action";
+import SignalRContext from "../../../../context/SignalRContext";
+import { ACCESS_TOKEN } from "../../../../constants/constants";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const typeList = [
   { value: 1, label: "Task" },
@@ -55,6 +65,7 @@ const ColumnIssue = () => {
   const refDeleteColumn = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { connection, setConnection } = useContext(SignalRContext);
   const [loading, setLoading] = useState(false);
   const [type, setType] = useState();
   const [priority, setPriority] = useState();
@@ -69,6 +80,10 @@ const ColumnIssue = () => {
   );
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
+  const projectDetail = useSelector(
+    (state) => state.projectReducer.projectDetail
+  );
+  const sprintDetail = useSelector((state) => state.sprintReducer.sprintDetail);
   const dropdownStatusList = useSelector(
     (state) => state.statusReducer.dropdownStatusList
   );
@@ -153,11 +168,51 @@ const ColumnIssue = () => {
       search: `?page=1${value !== "" ? `&search=${value}` : ""}`,
     });
   };
+  
   const check = () => {
-    return dataStatusList?.data?.some((column) => column.name === "Completed");
+    return dataStatusList?.data?.some((column) => column.name === "Completed" && projectDetail?.createdBy === userDetail?.email);
   };
 
-  const onDragEnd = (result) => {
+  const sendMessage = async (projectId, message) => {
+    if (!connection) {
+      console.error("Connection not established.");
+      return;
+    }
+
+    if (connection.state !== "Connected") {
+      try {
+        await connection.start();
+        console.log("Reconnected to SignalR Hub");
+        connection
+          .invoke("OnConnectedAsync", projectId.toString())
+          .then((response) => response)
+          .catch((error) => console.error("Error sending request:", error));
+      } catch (error) {
+        console.error("Error connecting to SignalR Hub:", error);
+        return;
+      }
+    }
+
+    try {
+      await connection.invoke("SendMessage", projectId, message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
+  const findIssueById = (issueId) => {
+    for (const column of dataStatusList?.data) {
+      const foundIssue = column.issues.find(
+        (issue) => issue.id.toString() === issueId
+      );
+      if (foundIssue) {
+        return foundIssue;
+      }
+    }
+    return null;
+  };
+
+  const onDragEnd = async (result) => {
     if (!result.destination) return;
 
     const startLocation = result.source.droppableId;
@@ -180,21 +235,33 @@ const ColumnIssue = () => {
         statusId: result.destination.droppableId,
         order: result.destination.index + 1,
       };
-      updateOrder(updateOrderData)
+      await updateOrder(updateOrderData)
         .then((response) => {
-          dispatch(getDataStatusListAction({ sprintId: `${sprintId}` }));
+          //dispatch(getDataStatusListAction({ sprintId: `${sprintId}` }));
         })
         .catch((error) => {});
     } else {
+      const foundColumn = dataStatusList?.data?.find((obj) => {
+        return obj.id.toString() === result.destination.droppableId;
+      });
+
+      // Get the issue and column names
+      const issue = findIssueById(result.draggableId);
+      const statusName = foundColumn?.name;
+
       const updateDndData = {
         id: result.draggableId,
         statusId: result.destination.droppableId,
         order: result.destination.index + 1,
       };
 
-      updateDnd(updateDndData)
+      await updateDnd(updateDndData)
         .then((response) => {
-          dispatch(getDataStatusListAction({ sprintId: `${sprintId}` }));
+          //dispatch(getDataStatusListAction({ sprintId: `${sprintId}` }));
+          sendMessage(
+            `${projectId.toString()}`,
+            `${userDetail?.email} changed status of Issue: ${issue.name} to ${statusName} of Sprint: ${sprintDetail.name}`
+          );
         })
         .catch((error) => {});
     }
@@ -215,7 +282,7 @@ const ColumnIssue = () => {
     if (params.page) {
       setLoading(true);
       fetchFilteredData();
-      dispatch(getUserDetailAction());
+
       dispatch(
         getDataStatusListAction({
           sprintId: `${sprintId}`,
@@ -231,12 +298,61 @@ const ColumnIssue = () => {
         .finally(() => {
           setLoading(false);
         });
+      dispatch(getUserDetailAction());
       dispatch(getSprintListAction({ projectId: projectId }));
+      dispatch(getProjectDetailAction(`${projectId}`));
       dispatch(getDropdownStatusListAction(`${sprintId}`));
       dispatch(getUserProjectListAction(`${projectId}`));
+      dispatch(getSprintDetailAction(`${sprintId}`));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params, projectId, sprintId, projectName, type, priority, status, user]);
+
+  useEffect(() => {
+    if (connection) {
+      connection.on("ReceiveMessage", (message) => {
+        console.log(`Received message: ${message}`);
+
+        // Fetch the updated notification list when a message is received
+        dispatch(getDataStatusListAction({ sprintId: `${sprintId}` }))
+          .then((response) => response)
+          .finally(() => {
+            setLoading(false);
+          });
+      });
+
+      // Fetch the initial notification list after the SignalR connection is established
+      dispatch(getDataStatusListAction({ sprintId: `${sprintId}` }))
+        .then((response) => response)
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      const token = window.localStorage.getItem(ACCESS_TOKEN);
+      const newConnection = new HubConnectionBuilder()
+        .withUrl("http://localhost:4204/notification", {
+          accessTokenFactory: () => token,
+        })
+        .build();
+
+      newConnection
+        .start()
+        .then(() => {
+          console.log("Connected to SignalR Hub");
+          newConnection
+            .invoke("OnConnectedAsync", projectId.toString())
+            .then((response) => response)
+            .catch((error) => console.error("Error sending request:", error));
+
+          // Cập nhật kết nối SignalR vào Redux
+          setConnection(newConnection);
+        })
+        .catch((error) =>
+          console.error("Error connecting to SignalR Hub:", error)
+        );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connection]);
 
   return (
     <div>
@@ -307,23 +423,34 @@ const ColumnIssue = () => {
             color="#155E75"
             action={() => refComplete?.current?.openModalHandle()}
           />
-        ) : (
-          <div onMouseEnter={() => setTooltipVisible(true)} onMouseLeave={() => setTooltipVisible(false)}>
-          <Tooltip title={tooltipTitle} visible={isTooltipVisible}>
+        ) : projectDetail?.createdBy !== userDetail?.email ? (
             <CreateButton
               content="Complete Sprint"
               color="#155E75"
               action={() => refComplete?.current?.openModalHandle()}
-              disabled={!check()}
+              disabled={true}
             />
-          </Tooltip>
-        </div>
+        ) : (
+          <div
+            onMouseEnter={() => setTooltipVisible(true)}
+            onMouseLeave={() => setTooltipVisible(false)}
+          >
+            <Tooltip title={tooltipTitle} visible={isTooltipVisible}>
+              <CreateButton
+                content="Complete Sprint"
+                color="#155E75"
+                action={() => refComplete?.current?.openModalHandle()}
+                disabled={!check()}
+              />
+            </Tooltip>
+          </div>
         )}
-        
       </div>
       {dataStatusList?.data?.length === 0 && <EmptyData />}
       {loading ? (
+        <div className={styles["loading-container"]}>
         <Loading />
+        </div>
       ) : (
         <div className={styles.container}>
           <DragDropContext onDragEnd={onDragEnd}>
@@ -345,11 +472,21 @@ const ColumnIssue = () => {
                           type="text"
                           icon={<FormOutlined />}
                           onClick={() => handleOpenEditModal(column.id)}
+                          disabled={
+                            projectDetail?.createdBy === userDetail?.email
+                              ? false
+                              : true
+                          }
                         ></Button>
                         <Button
                           type="text"
                           icon={<DeleteOutlined />}
                           onClick={() => handleOpenDeleteModal(column.id)}
+                          disabled={
+                            projectDetail?.createdBy === userDetail?.email
+                              ? false
+                              : true
+                          }
                         ></Button>
                       </div>
                     </div>
@@ -367,7 +504,43 @@ const ColumnIssue = () => {
                             {...provided.dragHandleProps}
                             className={styles.item}
                           >
-                            {item.name}
+                            <div>
+                              <div className={styles.card}>
+                                <div>{item.name}</div>
+                                <div className={styles.card}>
+                                  <div>
+                                    {item.type === 1 ? (
+                                      <PlusSquareOutlined
+                                        style={{ color: "green" }}
+                                      />
+                                    ) : item.type === 2 ? (
+                                      <CloseCircleOutlined
+                                        style={{ color: "red" }}
+                                      />
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                  <div className={styles["type-priority"]}>
+                                    {" "}
+                                    {item.priority === 1 ? (
+                                      <FlagOutlined style={{ color: "red" }} />
+                                    ) : item.priority === 2 ? (
+                                      <FlagOutlined
+                                        style={{ color: "yellow" }}
+                                      />
+                                    ) : item.priority === 3 ? (
+                                      <FlagOutlined style={{ color: "blue" }} />
+                                    ) : item.priority === 4 ? (
+                                      <FlagOutlined style={{ color: "grey" }} />
+                                    ) : (
+                                      ""
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              {item.user?.email ? item.user?.email : ""}
+                            </div>
                           </div>
                         )}
                       </Draggable>
@@ -383,6 +556,9 @@ const ColumnIssue = () => {
               content={<PlusSquareOutlined />}
               color="#155E75"
               action={() => refCreateColumn?.current?.openModalHandle()}
+              disabled={
+                projectDetail?.createdBy === userDetail?.email ? false : true
+              }
             />
           </div>
         </div>
@@ -395,6 +571,7 @@ const ColumnIssue = () => {
         userDetail={userDetail}
       />
       <DeleteStatus ref={refDeleteColumn} statusId={statusId} />
+      <CompleteIssue ref={refComplete} />
     </div>
   );
 };

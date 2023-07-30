@@ -1,7 +1,7 @@
 import { message } from "antd";
 import { MESSAGE } from "../../constants/constants";
-import { getIssueDetail, getIssueList } from "../../api/issue-api";
-import { getIssueDetailReducer, getListIssueReducer } from "../reducer/issue-reducer";
+import { getIssueDetail, getIssueList, getNumberIssueComplete, getNumberIssueNotComplete } from "../../api/issue-api";
+import { getCompleteIssueReducer, getIssueDetailReducer, getListIssueReducer, getUnCompleteIssueReducer } from "../reducer/issue-reducer";
 
 export const getIssueListAction = ({ sprintId, currentPage, searchKey }) => {
   return async (dispatch) => {
@@ -25,6 +25,32 @@ export const getIssueDetailAction = (issueId) => {
     await getIssueDetail(issueId)
       .then((response) => {
         dispatch(getIssueDetailReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
+export const getCompleteIssueAction = (sprintId) => {
+  return async (dispatch) => {
+    await getNumberIssueComplete(sprintId)
+      .then((response) => {
+        dispatch(getCompleteIssueReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
+export const getUnCompleteIssueAction = (sprintId) => {
+  return async (dispatch) => {
+    await getNumberIssueNotComplete(sprintId)
+      .then((response) => {
+        dispatch(getUnCompleteIssueReducer(response));
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);

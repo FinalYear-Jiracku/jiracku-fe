@@ -1,4 +1,4 @@
-import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
+import { useState, forwardRef, useImperativeHandle, useEffect, useContext } from "react";
 import { Modal, message } from "antd";
 import { MESSAGE } from "../../../../constants/constants";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,15 +6,21 @@ import { useDispatch, useSelector } from "react-redux";
 import StatusForm from "../../../Molecules/Status/StatusForm";
 import { getStatusDetailAction } from "../../../../redux/action/status-action";
 import { updateStatus } from "../../../../api/status-api";
+import SignalRContext from "../../../../context/SignalRContext";
+import { getUserDetailAction } from "../../../../redux/action/user-action";
+import { getSprintDetailAction } from "../../../../redux/action/sprint-action";
 
 const UpdateStatus = forwardRef((props, ref) => {
   const {projectId,sprintId} = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { connection } = useContext(SignalRContext);
   const [openModal, setOpenModal] = useState(false);
   const statusDetail = useSelector(
     (state) => state.statusReducer.statusDetail
   );
+  const userDetail = useSelector((state) => state.userReducer.userDetail);
+  const sprintDetail = useSelector((state) => state.sprintReducer.sprintDetail);
 
   const openModalHandle = () => {
     setOpenModal(true);
@@ -35,6 +41,33 @@ const UpdateStatus = forwardRef((props, ref) => {
     };
   });
 
+  const sendMessage = async (projectId, message) => {
+    if (!connection) {
+      console.error("Connection not established.");
+      return;
+    }
+
+    if (connection.state !== "Connected") {
+      try {
+        await connection.start();
+        console.log("Reconnected to SignalR Hub");
+        connection
+          .invoke("OnConnectedAsync", projectId.toString())
+          .then((response) => response)
+          .catch((error) => console.error("Error sending request:", error));
+      } catch (error) {
+        console.error("Error connecting to SignalR Hub:", error);
+        return;
+      }
+    }
+
+    try {
+      await connection.invoke("SendMessage", projectId, message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
   const onSubmitForm = async (item) => {
     const updateStatusData = {
       id: props.statusId === undefined ? "" : props.statusId,
@@ -47,6 +80,10 @@ const UpdateStatus = forwardRef((props, ref) => {
         message.success(MESSAGE.UPDATE_STATUS_SUCCESS);
         setOpenModal(false);
         navigate(`/projects/${projectId}/${sprintId}`);
+        sendMessage(
+          `${projectId.toString()}`,
+          `${userDetail?.email} has updated Status name: ${item.name} of Sprint: ${sprintDetail.name}`
+        );
       })
       .catch((error) => {
         if (error.response.status === 400) {
@@ -56,6 +93,14 @@ const UpdateStatus = forwardRef((props, ref) => {
         }
       });
   };
+
+  useEffect(() => {
+    if(sprintId){
+      dispatch(getUserDetailAction());
+      dispatch(getSprintDetailAction(`${sprintId}`));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[sprintId])
 
   useEffect(() => {
     if (props.statusId && openModal) {

@@ -302,7 +302,7 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
                               : renderUserProject
                           }
                           labelInValue
-                          allowClear={form.name === "userId" ? true : false}
+                          allowClear={form.name === "userId" || form.name === "statusId" ? true : false}
                         />
                       ) : form.type === "files" ? (
                         <div className={styles["file-list-container"]}>

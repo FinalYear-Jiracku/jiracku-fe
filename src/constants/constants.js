@@ -34,6 +34,8 @@ export const MESSAGE = {
   UPDATE_STATUS_SUCCESS: "Status has been updated",
   DELETE_STATUS_SUCCESS: "Status has been deleted",
   STATUS_NAME_EXIST: "Status Name already Exist",
+  COMPLETE_SPRINT_SUCCESS: "Complete Sprint Success",
+  COMPLETE_SPRINT_FAIL: "Complete Sprint Fail",
 }
 export const ACCESS_TOKEN = "access_token";
 export const REFRESH_TOKEN = "refresh_token";
