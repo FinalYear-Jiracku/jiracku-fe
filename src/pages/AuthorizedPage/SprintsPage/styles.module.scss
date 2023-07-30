@@ -47,6 +47,12 @@
     margin-right: 5px;
 }
 
+.disabled-card {
+    opacity: 0.7; /* or any other styling to indicate the Card is disabled */
+    pointer-events: none; /* This will prevent any interactions with the Card */
+    /* Add any other styles you want for the disabled state */
+  }
+
       
       
 

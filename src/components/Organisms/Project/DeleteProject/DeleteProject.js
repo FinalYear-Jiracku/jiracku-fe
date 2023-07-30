@@ -47,7 +47,7 @@ const DeleteProject = forwardRef((props, ref) => {
         );
       })
       .catch((error) => {
-        message.success(MESSAGE.DELETE_FAIL);
+        message.error(MESSAGE.DELETE_FAIL);
       });
   };
   return (

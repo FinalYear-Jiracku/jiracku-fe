@@ -39,6 +39,18 @@
     border: 1px solid black;
     border-radius: 3px;
 }
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Set the container height to fill the entire viewport */
+    position: fixed; /* Use fixed positioning to keep it centered even when scrolling */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0; /* Add a semi-transparent background */
+  }
       
 .table{
     width: auto; 
@@ -70,4 +82,39 @@
 
 .button-left{
     margin-right: 5px;
+}
+
+.scrollable-container {
+    max-height: 400px; /* Adjust the height as per your requirement */
+    overflow-y: auto;
+  }
+
+.status-button{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.filter{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.type-priority{
+    margin-left: 5px;
+}
+
+.text{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.select{
+    width: 100px;
 }

@@ -6,7 +6,7 @@ import {
   LineChartOutlined,
   CarryOutOutlined,
   BellOutlined,
-  ProfileOutlined
+  ProfileOutlined,
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Menu, Button, Image } from "antd";
@@ -17,7 +17,7 @@ import { useContext, useEffect, useState } from "react";
 import SignalRContext from "../../context/SignalRContext";
 import { useDispatch } from "react-redux";
 import { getNotificationListAction } from "../../redux/action/notification-action";
-import { ACCESS_TOKEN } from "../../constants/constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants/constants";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const { Sider } = Layout;
@@ -32,31 +32,37 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const isUsersPage = location.pathname === "/user";
   const isProjectsPage = location.pathname === "/projects";
   const isSprintsPage = location.pathname === `/projects/${projectId}`;
-  const isNotificationPage = location.pathname === `/notifications/${projectId}`;
-  const isIssuesPage = location.pathname === `/projects/${projectId}/${sprintId}`;
+  const isNotificationPage =
+    location.pathname === `/notifications/${projectId}`;
+  const isIssuesPage =
+    location.pathname === `/projects/${projectId}/${sprintId}`;
 
   const clearNotificationCount = () => {
     setNotificationCount(0);
   };
 
   const bellIconWithBadge = (
-    <span onClick={clearNotificationCount}> {/* Add onClick event handler */}
+    <span onClick={clearNotificationCount}>
+      {" "}
+      {/* Add onClick event handler */}
       <BellOutlined />
       <span>Notification</span>
-      {notificationCount > 0 && <span className={styles.badge}> {notificationCount}</span>}
+      {notificationCount > 0 && (
+        <span className={styles.badge}> {notificationCount}</span>
+      )}
     </span>
   );
 
   const getMenuItems = () => {
     let menuItems = [];
-    if(isUsersPage) {
+    if (isUsersPage) {
       menuItems.push({
         key: "/user",
         icon: <ProfileOutlined />,
         label: "Profile",
       });
     }
-    if(isProjectsPage) {
+    if (isProjectsPage) {
       menuItems.push({
         key: "/projects",
         icon: <ReadOutlined />,
@@ -77,11 +83,10 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         },
         {
           key: `/notifications/${projectId}`,
-          //icon: <BellOutlined />,
           label: bellIconWithBadge,
-        },
+        }
       );
-    } 
+    }
     if (isIssuesPage) {
       menuItems.push(
         {
@@ -101,11 +106,11 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         },
         {
           key: `/notifications/${projectId}`,
-          //icon: <BellOutlined />,
           label: bellIconWithBadge,
-        },
+        }
       );
-    }if(isNotificationPage){
+    }
+    if (isNotificationPage) {
       menuItems.push(
         {
           key: `/projects/${projectId}`,
@@ -119,9 +124,8 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         },
         {
           key: `/notifications/${projectId}`,
-          //icon: <BellOutlined />,
           label: bellIconWithBadge,
-        },
+        }
       );
     }
     return menuItems;
@@ -138,7 +142,12 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   };
 
   useEffect(() => {
-    if (connection && projectId !== null) {
+    if (
+      connection &&
+      projectId !== null &&
+      window.localStorage.getItem(ACCESS_TOKEN) &&
+      window.localStorage.getItem(REFRESH_TOKEN)
+    ) {
       connection.on("ReceiveMessage", (message) => {
         console.log(`Received message: ${message}`);
         setNotificationCount((prevCount) => prevCount + 1);

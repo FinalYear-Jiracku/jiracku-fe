@@ -11,6 +11,7 @@ import {
   DeleteOutlined,
   UserAddOutlined,
   LeftCircleOutlined,
+  CheckSquareOutlined
 } from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
@@ -30,6 +31,7 @@ import { setProjectId } from "../../../redux/reducer/project-reducer";
 import { getUserDetailAction } from "../../../redux/action/user-action";
 import InviteUser from "../../../components/Organisms/InviteUser/InviteUser";
 import SignalRContext from "../../../context/SignalRContext";
+import { getProjectDetailAction } from "../../../redux/action/project-action";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
@@ -48,6 +50,7 @@ const SprintsPage = () => {
   const [loading, setLoading] = useState(false);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
+  const projectDetail = useSelector((state) => state.projectReducer.projectDetail);
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -96,6 +99,29 @@ const SprintsPage = () => {
   }
 
   useEffect(() => {
+    if (!connection) {
+      console.error("Connection not established.");
+      return;
+    }
+    else{
+      connection
+      .start()
+      .then(() => {
+        console.log("Connected to SignalR Hub");
+        connection
+          .invoke("OnConnectedAsync", projectId.toString())
+          .then((response) => response)
+          .catch((error) => console.error("Error sending request:", error));
+      })
+      .catch((error) =>
+        console.error("Error connecting to SignalR Hub:", error)
+      );
+    }
+    }    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+, [projectId]);
+
+  useEffect(() => {
     dispatch(setProjectId(projectId));
     setProjectName(sprintList.name);
     header.setHeader({
@@ -116,6 +142,7 @@ const SprintsPage = () => {
     if (params.page) {
       setLoading(true);
       dispatch(getUserDetailAction());
+     
       dispatch(
         getSprintListAction({
           projectId: projectId,
@@ -128,6 +155,7 @@ const SprintsPage = () => {
           setLoading(false);
         });
     }
+    dispatch(getProjectDetailAction(projectId));
     setTotalRecord(sprintList?.sprints?.totalRecords);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -162,6 +190,7 @@ const SprintsPage = () => {
           content="Create New Sprint"
           color="#155E75"
           action={() => refAddModal?.current?.openModalHandle()}
+          disabled={projectDetail?.createdBy !== userDetail?.email ? true : false}
         />
       </div>
       {loading ? (
@@ -169,7 +198,7 @@ const SprintsPage = () => {
       ) : (
         <div className={styles.sprints}>
           {sprintList?.sprints?.data?.map((data, index) => (
-            <Card key={index} className={styles.card}>
+              <Card key={index} className={`${styles.card} ${data.isCompleted ? styles["disabled-card"] : ""}`}>
               <div className={styles.button}>
                 <div
                   className={styles.button}
@@ -191,15 +220,27 @@ const SprintsPage = () => {
                   </Link>
                 </div>
                 <div>
+                  {
+                    data.isCompleted === true ? (
+                      <Button
+                        type="text"
+                        icon={<CheckSquareOutlined />}
+                        style={{ color: 'green' }}
+                      ></Button>
+                      ) : ""
+                  }
+                  
                   <Button
                     type="text"
                     icon={<FormOutlined />}
                     onClick={() => handleOpenEditModal(data.id)}
+                    disabled={projectDetail?.createdBy !== userDetail?.email ? true : false}
                   ></Button>
                   <Button
                     type="text"
                     icon={<DeleteOutlined />}
                     onClick={() => handleOpenDeleteModal(data.id)}
+                    disabled={projectDetail?.createdBy !== userDetail?.email ? true : false}
                   ></Button>
                 </div>
               </div>

@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useRef, useContext } from "react";
 import { Button, Card } from "antd";
 import {
   Link,
-  useLocation,
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
@@ -42,7 +41,6 @@ const ProjectsPage = () => {
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
   const { connection, setConnection } = useContext(SignalRContext);
-  //const connection = useSelector((state) => state.signalRReducer.connection);
   const projectList = useSelector((state) => state.projectReducer.projectList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
 
@@ -179,11 +177,13 @@ const ProjectsPage = () => {
                     type="text"
                     icon={<FormOutlined />}
                     onClick={() => handleOpenEditModal(data.id)}
+                    disabled={data?.createdBy !== userDetail?.email ? true : false}
                   ></Button>
                   <Button
                     type="text"
                     icon={<DeleteOutlined />}
                     onClick={() => handleOpenDeleteModal(data.id)}
+                    disabled={data?.createdBy !== userDetail?.email ? true : false}
                   ></Button>
                 </div>
               </div>

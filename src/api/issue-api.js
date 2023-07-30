@@ -31,3 +31,15 @@ export const updateOrder = (data) => {
 export const updateDnd = (data) => {
   return api.put('/issues/dnd',data)
 }
+
+export const completeIssue = (id,sprintId) => {
+  return api.put(`/issues/sprints/${id}?sprintToUpdate=${sprintId}`)
+}
+
+export const getNumberIssueComplete = (id) => {
+  return api.get(`/issues/complete/sprints/${id}`)
+}
+
+export const getNumberIssueNotComplete = (id) => {
+  return api.get(`/issues/uncomplete/sprints/${id}`)
+}

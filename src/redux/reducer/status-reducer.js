@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
 dropdownStatusList:[],
-dataStatusList:[]
+dataStatusList:[],
+statusDetail:{}
 }
 
 const statusReducer = createSlice({
@@ -14,10 +15,13 @@ const statusReducer = createSlice({
     },
     getDataStatusListReducer: (state,action) =>{
       state.dataStatusList = action.payload
-  },
+    },
+    getStatusDetailReducer: (state,action) =>{
+      state.statusDetail = action.payload
+    },
   }
 });
 
-export const {getDropdownListStatusReducer,getDataStatusListReducer} = statusReducer.actions
+export const {getDropdownListStatusReducer,getDataStatusListReducer, getStatusDetailReducer} = statusReducer.actions
 
 export default statusReducer.reducer

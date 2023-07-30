@@ -5,6 +5,7 @@ const initialState = {
   sprintDetail: {},
   sprintId: null,
   dropdownSprintList: [],
+  sprintListComplete: []
 };
 
 const sprintReducer = createSlice({
@@ -23,6 +24,9 @@ const sprintReducer = createSlice({
     getDropdownListSprintReducer: (state, action) => {
       state.dropdownSprintList = action.payload;
     },
+    getSprintListCompleteReducer: (state, action) => {
+      state.sprintListComplete = action.payload;
+    },
   },
 });
 
@@ -31,6 +35,7 @@ export const {
   getSprintDetailReducer,
   setSprintId,
   getDropdownListSprintReducer,
+  getSprintListCompleteReducer
 } = sprintReducer.actions;
 
 export default sprintReducer.reducer;

@@ -24,6 +24,7 @@ import { setProjectId } from "../../../../redux/reducer/project-reducer";
 import { setSprintId } from "../../../../redux/reducer/sprint-reducer";
 import { getSprintListAction } from "../../../../redux/action/sprint-action";
 import InviteUser from "../../../../components/Organisms/InviteUser/InviteUser";
+import SignalRContext from "../../../../context/SignalRContext";
 
 const TableIssue = () => {
   const { projectId, sprintId } = useParams();
@@ -38,6 +39,7 @@ const TableIssue = () => {
   const [issueId, setIssueId] = useState(null);
   const [loading, setLoading] = useState(false);
   const header = useContext(HeaderContext);
+  const {connection} = useContext(SignalRContext);
   const [searchParams] = useSearchParams();
   const issueList = useSelector((state) => state.issueReducer.issueList);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
@@ -249,6 +251,29 @@ const TableIssue = () => {
     sprintName,
   ]);
 
+  useEffect(() => {
+    if (!connection) {
+      console.error("Connection not established.");
+      return;
+    }
+    else{
+      connection
+      .start()
+      .then(() => {
+        console.log("Connected to SignalR Hub");
+        connection
+          .invoke("OnConnectedAsync", projectId.toString())
+          .then((response) => response)
+          .catch((error) => console.error("Error sending request:", error));
+      })
+      .catch((error) =>
+        console.error("Error connecting to SignalR Hub:", error)
+      );
+    }
+    }    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+, [projectId]);
+
   return (
     <div>
       <div className={styles["common-bar"]}>
@@ -271,7 +296,9 @@ const TableIssue = () => {
         />
       </div>
       {loading ? (
+        <div className={styles["loading-container"]}>
         <Loading />
+        </div>
       ) : (
         <div>
           <Table
