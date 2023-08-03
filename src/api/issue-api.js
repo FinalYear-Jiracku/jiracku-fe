@@ -43,3 +43,19 @@ export const getNumberIssueComplete = (id) => {
 export const getNumberIssueNotComplete = (id) => {
   return api.get(`/issues/uncomplete/sprints/${id}`)
 }
+
+export const getStatisTypeIssue = (id) => {
+  return api.get(`/issues/type/sprints/${id}`)
+}
+
+export const getStatisPriorityIssue = (id) => {
+  return api.get(`/issues/priority/sprints/${id}`)
+}
+
+export const getStatisStatusIssue = (id) => {
+  return api.get(`/issues/status/sprints/${id}`)
+}
+
+export const getStatisDeadlineIssue = (id) => {
+  return api.get(`/issues/deadline/sprints/${id}`)
+}

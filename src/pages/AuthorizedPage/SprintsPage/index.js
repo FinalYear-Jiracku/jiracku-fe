@@ -11,7 +11,7 @@ import {
   DeleteOutlined,
   UserAddOutlined,
   LeftCircleOutlined,
-  CheckSquareOutlined
+  CheckSquareOutlined,
 } from "@ant-design/icons";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
@@ -32,6 +32,7 @@ import { getUserDetailAction } from "../../../redux/action/user-action";
 import InviteUser from "../../../components/Organisms/InviteUser/InviteUser";
 import SignalRContext from "../../../context/SignalRContext";
 import { getProjectDetailAction } from "../../../redux/action/project-action";
+import StartSprint from "../../../components/Organisms/Sprint/StartSprint/StartSprint";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
@@ -39,18 +40,21 @@ const SprintsPage = () => {
   const refEditModal = useRef(null);
   const refDeleteModal = useRef(null);
   const refInviteUser = useRef(null);
+  const refStartSprint = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
-  const {connection} = useContext(SignalRContext);
+  const { connection, chatConnection } = useContext(SignalRContext);
   const [projectName, setProjectName] = useState();
   const [sprintId, setSprintId] = useState(null);
   const [totalRecord, setTotalRecord] = useState(0);
   const [loading, setLoading] = useState(false);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
-  const projectDetail = useSelector((state) => state.projectReducer.projectDetail);
+  const projectDetail = useSelector(
+    (state) => state.projectReducer.projectDetail
+  );
   const params = useMemo(() => {
     return {
       page: searchParams.get("page"),
@@ -74,10 +78,15 @@ const SprintsPage = () => {
       search: `?page=1${value !== "" ? `&search=${value}` : ""}`,
     });
   };
-  
+
   const handleOpenEditModal = (sprintId) => {
     setSprintId(sprintId);
     refEditModal.current.openModalHandle();
+  };
+
+  const handleOpenStartSprintModal = (sprintId) => {
+    setSprintId(sprintId);
+    refStartSprint.current.openModalHandle();
   };
 
   const handleOpenDeleteModal = (sprintId) => {
@@ -92,34 +101,36 @@ const SprintsPage = () => {
   const closeConnection = () => {
     try {
       connection.stop();
-      navigate("/projects")
+      chatConnection.stop();
+      navigate("/projects");
     } catch (e) {
       console.log(e);
     }
-  }
+  };
 
-  useEffect(() => {
-    if (!connection) {
-      console.error("Connection not established.");
-      return;
-    }
-    else{
-      connection
-      .start()
-      .then(() => {
-        console.log("Connected to SignalR Hub");
+  useEffect(
+    () => {
+      if (!connection) {
+        console.error("Connection not established.");
+        return;
+      } else {
         connection
-          .invoke("OnConnectedAsync", projectId.toString())
-          .then((response) => response)
-          .catch((error) => console.error("Error sending request:", error));
-      })
-      .catch((error) =>
-        console.error("Error connecting to SignalR Hub:", error)
-      );
-    }
-    }    
+          .start()
+          .then(() => {
+            console.log("Connected to SignalR Hub");
+            connection
+              .invoke("OnConnectedAsync", projectId.toString())
+              .then((response) => response)
+              .catch((error) => console.error("Error sending request:", error));
+          })
+          .catch((error) =>
+            console.error("Error connecting to SignalR Hub:", error)
+          );
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-, [projectId]);
+    [projectId]
+  );
 
   useEffect(() => {
     dispatch(setProjectId(projectId));
@@ -142,7 +153,7 @@ const SprintsPage = () => {
     if (params.page) {
       setLoading(true);
       dispatch(getUserDetailAction());
-     
+
       dispatch(
         getSprintListAction({
           projectId: projectId,
@@ -170,7 +181,7 @@ const SprintsPage = () => {
     <div>
       <div className={styles["common-bar"]}>
         <div className={styles["invite-user"]}>
-        <Button
+          <Button
             icon={<LeftCircleOutlined />}
             onClick={() => closeConnection()}
             className={styles["button-left"]}
@@ -190,7 +201,9 @@ const SprintsPage = () => {
           content="Create New Sprint"
           color="#155E75"
           action={() => refAddModal?.current?.openModalHandle()}
-          disabled={projectDetail?.createdBy !== userDetail?.email ? true : false}
+          disabled={
+            projectDetail?.createdBy !== userDetail?.email ? true : false
+          }
         />
       </div>
       {loading ? (
@@ -198,7 +211,12 @@ const SprintsPage = () => {
       ) : (
         <div className={styles.sprints}>
           {sprintList?.sprints?.data?.map((data, index) => (
-              <Card key={index} className={`${styles.card} ${data.isCompleted ? styles["disabled-card"] : ""}`}>
+            <Card
+              key={index}
+              className={`${styles.card} ${
+                data.isCompleted ? styles["disabled-card"] : ""
+              }`}
+            >
               <div className={styles.button}>
                 <div
                   className={styles.button}
@@ -220,27 +238,45 @@ const SprintsPage = () => {
                   </Link>
                 </div>
                 <div>
-                  {
-                    data.isCompleted === true ? (
-                      <Button
-                        type="text"
-                        icon={<CheckSquareOutlined />}
-                        style={{ color: 'green' }}
-                      ></Button>
-                      ) : ""
-                  }
-                  
+                  {data.isStart === false ? (
+                    <CreateButton
+                      content="Start Sprint"
+                      color="#155E75"
+                      action={() => handleOpenStartSprintModal(data?.id)}
+                    />
+                  ) : (
+                    ""
+                  )}
+
+                  {data.isCompleted === true ? (
+                    <Button
+                      type="text"
+                      icon={<CheckSquareOutlined />}
+                      style={{ color: "green" }}
+                    ></Button>
+                  ) : (
+                    ""
+                  )}
+
                   <Button
                     type="text"
                     icon={<FormOutlined />}
                     onClick={() => handleOpenEditModal(data.id)}
-                    disabled={projectDetail?.createdBy !== userDetail?.email ? true : false}
+                    disabled={
+                      projectDetail?.createdBy !== userDetail?.email
+                        ? true
+                        : false
+                    }
                   ></Button>
                   <Button
                     type="text"
                     icon={<DeleteOutlined />}
                     onClick={() => handleOpenDeleteModal(data.id)}
-                    disabled={projectDetail?.createdBy !== userDetail?.email ? true : false}
+                    disabled={
+                      projectDetail?.createdBy !== userDetail?.email
+                        ? true
+                        : false
+                    }
                   ></Button>
                 </div>
               </div>
@@ -281,6 +317,11 @@ const SprintsPage = () => {
       />
       <DeleteSprint ref={refDeleteModal} sprintId={sprintId} />
       <InviteUser ref={refInviteUser} projectName={projectName} />
+      <StartSprint
+        ref={refStartSprint}
+        sprintId={sprintId}
+        userDetail={userDetail}
+      />
     </div>
   );
 };

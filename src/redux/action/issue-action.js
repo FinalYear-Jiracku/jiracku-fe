@@ -1,7 +1,7 @@
 import { message } from "antd";
 import { MESSAGE } from "../../constants/constants";
-import { getIssueDetail, getIssueList, getNumberIssueComplete, getNumberIssueNotComplete } from "../../api/issue-api";
-import { getCompleteIssueReducer, getIssueDetailReducer, getListIssueReducer, getUnCompleteIssueReducer } from "../reducer/issue-reducer";
+import { getIssueDetail, getIssueList, getNumberIssueComplete, getNumberIssueNotComplete, getStatisDeadlineIssue, getStatisPriorityIssue, getStatisStatusIssue, getStatisTypeIssue } from "../../api/issue-api";
+import { getCompleteIssueReducer, getIssueDetailReducer, getListIssueReducer, getStatisDealineReducer, getStatisPriorityReducer, getStatisStatusReducer, getStatisTypeReducer, getUnCompleteIssueReducer } from "../reducer/issue-reducer";
 
 export const getIssueListAction = ({ sprintId, currentPage, searchKey }) => {
   return async (dispatch) => {
@@ -58,3 +58,56 @@ export const getUnCompleteIssueAction = (sprintId) => {
       .finally(() => {});
   };
 };
+
+export const getStatisTypeAction = (sprintId) => {
+  return async (dispatch) => {
+    await getStatisTypeIssue(sprintId)
+      .then((response) => {
+        dispatch(getStatisTypeReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
+export const getStatisPriorityAction = (sprintId) => {
+  return async (dispatch) => {
+    await getStatisPriorityIssue(sprintId)
+      .then((response) => {
+        dispatch(getStatisPriorityReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
+export const getStatisStatusAction = (sprintId) => {
+  return async (dispatch) => {
+    await getStatisStatusIssue(sprintId)
+      .then((response) => {
+        dispatch(getStatisStatusReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
+export const getStatisDealineAction = (sprintId) => {
+  return async (dispatch) => {
+    await getStatisDeadlineIssue(sprintId)
+      .then((response) => {
+        dispatch(getStatisDealineReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+

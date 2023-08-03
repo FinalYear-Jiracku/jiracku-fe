@@ -1,16 +1,20 @@
 import { message } from "antd";
 import {
   dropdownSprintList,
+  getSprintBurndown,
   getSprintDetail,
   getSprintList,
+  getSprintStatisFirst,
   sprintListForComplete,
 } from "../../api/sprint-api";
 import { MESSAGE } from "../../constants/constants";
 import {
   getDropdownListSprintReducer,
+  getSprintBurndownReducer,
   getSprintDetailReducer,
   getSprintListCompleteReducer,
   getSprintListReducer,
+  getSprintStaticReducer,
 } from "../reducer/sprint-reducer";
 
 export const getSprintListAction = ({ projectId, currentPage, searchKey }) => {
@@ -40,6 +44,32 @@ export const getSprintDetailAction = (sprintId) => {
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);
         window.location.href = "/login";
+      })
+      .finally(() => {});
+  };
+};
+
+export const getSprintBurnAction = (sprintId) => {
+  return async (dispatch) => {
+    await getSprintBurndown(sprintId)
+      .then((response) => {
+        dispatch(getSprintBurndownReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
+export const getSprintStatisAction = (sprintId) => {
+  return async (dispatch) => {
+    await getSprintStatisFirst(sprintId)
+      .then((response) => {
+        dispatch(getSprintStaticReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
       })
       .finally(() => {});
   };

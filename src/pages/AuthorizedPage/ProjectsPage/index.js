@@ -41,6 +41,7 @@ const ProjectsPage = () => {
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
   const { connection, setConnection } = useContext(SignalRContext);
+  const { chatConnection, setChatConnection } = useContext(SignalRContext);
   const projectList = useSelector((state) => state.projectReducer.projectList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
 
@@ -54,6 +55,24 @@ const ProjectsPage = () => {
       .then(() => {
         console.log("Connected to SignalR Hub");
         connection
+          .invoke("OnConnectedAsync", projectId.toString())
+          .then((response) => response)
+          .catch((error) => console.error("Error sending request:", error));
+      })
+      .catch((error) =>
+        console.error("Error connecting to SignalR Hub:", error)
+      );
+  };
+  const joinChatRoom = (projectId) => {
+    if (!chatConnection) {
+      console.error("Connection not established.");
+      return;
+    }
+    chatConnection
+      .start()
+      .then(() => {
+        console.log("Connected to SignalR Hub");
+        chatConnection
           .invoke("OnConnectedAsync", projectId.toString())
           .then((response) => response)
           .catch((error) => console.error("Error sending request:", error));
@@ -100,7 +119,9 @@ const ProjectsPage = () => {
       window.localStorage.getItem(ACCESS_TOKEN) &&
       window.localStorage.getItem(REFRESH_TOKEN) &&
       connection !== null &&
-      connection.state !== "Connected"
+      connection.state !== "Connected" &&
+      chatConnection !== null &&
+      chatConnection.state !== "Connected"
     ) {
       const token = window.localStorage.getItem(ACCESS_TOKEN);
       const newConnection = new HubConnectionBuilder()
@@ -109,6 +130,12 @@ const ProjectsPage = () => {
         })
         .build();
       setConnection(newConnection);
+      const chatHub = new HubConnectionBuilder()
+        .withUrl("http://localhost:4204/chat", {
+          accessTokenFactory: () => token,
+        })
+        .build();
+      setChatConnection(chatHub);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
@@ -203,7 +230,10 @@ const ProjectsPage = () => {
                   key={data?.id}
                   to={`/projects/${data?.id}?page=1`}
                   className={styles.link}
-                  onClick={() => joinRoom(data.id)}
+                  onClick={() => {
+                    joinRoom(data.id);
+                    joinChatRoom(data.id);
+                  }}
                 >
                   <p>{data.name}</p>
                 </Link>

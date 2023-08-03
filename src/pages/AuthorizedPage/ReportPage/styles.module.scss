@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Đưa các biểu đồ vào giữa cả chiều ngang và chiều dọc */
+    height: 80vh; 
+  }
+  
+  .chart {
+    width: 360px;
+    height: 360px;
+    margin: 10px;
+}

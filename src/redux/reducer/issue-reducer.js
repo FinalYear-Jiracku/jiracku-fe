@@ -5,6 +5,10 @@ const initialState = {
   issueDetail: {},
   completeIssue: 0,
   unCompleteIssue: 0,
+  statisType:{},
+  statisPriority:{},
+  statisStatus:{},
+  statisDeadline:{}
 };
 
 const issueReducer = createSlice({
@@ -23,6 +27,18 @@ const issueReducer = createSlice({
     getUnCompleteIssueReducer: (state, action) => {
       state.unCompleteIssue = action.payload;
     },
+    getStatisTypeReducer: (state, action) => {
+      state.statisType = action.payload;
+    },
+    getStatisPriorityReducer: (state, action) => {
+      state.statisPriority = action.payload;
+    },
+    getStatisStatusReducer: (state, action) => {
+      state.statisStatus = action.payload;
+    },
+    getStatisDealineReducer: (state, action) => {
+      state.statisDeadline = action.payload;
+    },
   },
 });
 
@@ -31,6 +47,10 @@ export const {
   getIssueDetailReducer,
   getCompleteIssueReducer,
   getUnCompleteIssueReducer,
+  getStatisTypeReducer,
+  getStatisPriorityReducer,
+  getStatisStatusReducer,
+  getStatisDealineReducer
 } = issueReducer.actions;
 
 export default issueReducer.reducer;
