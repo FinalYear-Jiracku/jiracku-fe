@@ -1,7 +1,7 @@
 import { message } from "antd";
 import { MESSAGE } from "../../constants/constants";
-import { getIssueDetail, getIssueList, getNumberIssueComplete, getNumberIssueNotComplete, getStatisDeadlineIssue, getStatisPriorityIssue, getStatisStatusIssue, getStatisTypeIssue } from "../../api/issue-api";
-import { getCompleteIssueReducer, getIssueDetailReducer, getListIssueReducer, getStatisDealineReducer, getStatisPriorityReducer, getStatisStatusReducer, getStatisTypeReducer, getUnCompleteIssueReducer } from "../reducer/issue-reducer";
+import { getIssueDetail, getIssueList, getNumberIssueComplete, getNumberIssueNotComplete, getStatisPriorityIssue, getStatisStatusIssue, getStatisTypeIssue } from "../../api/issue-api";
+import { getCompleteIssueReducer, getIssueDetailReducer, getListIssueReducer, getStatisPriorityReducer, getStatisStatusReducer, getStatisTypeReducer, getStatisUserReducer, getUnCompleteIssueReducer } from "../reducer/issue-reducer";
 
 export const getIssueListAction = ({ sprintId, currentPage, searchKey }) => {
   return async (dispatch) => {
@@ -61,7 +61,7 @@ export const getUnCompleteIssueAction = (sprintId) => {
 
 export const getStatisTypeAction = (sprintId) => {
   return async (dispatch) => {
-    await getStatisTypeIssue(sprintId)
+    await getStatisTypeIssue(`issues/type/sprints?sprintId=${sprintId || ""}`)
       .then((response) => {
         dispatch(getStatisTypeReducer(response));
       })
@@ -74,7 +74,7 @@ export const getStatisTypeAction = (sprintId) => {
 
 export const getStatisPriorityAction = (sprintId) => {
   return async (dispatch) => {
-    await getStatisPriorityIssue(sprintId)
+    await getStatisPriorityIssue(`issues/priority/sprints?sprintId=${sprintId || ""}`)
       .then((response) => {
         dispatch(getStatisPriorityReducer(response));
       })
@@ -87,7 +87,7 @@ export const getStatisPriorityAction = (sprintId) => {
 
 export const getStatisStatusAction = (sprintId) => {
   return async (dispatch) => {
-    await getStatisStatusIssue(sprintId)
+    await getStatisStatusIssue(`issues/status/sprints?sprintId=${sprintId || ""}`)
       .then((response) => {
         dispatch(getStatisStatusReducer(response));
       })
@@ -98,11 +98,11 @@ export const getStatisStatusAction = (sprintId) => {
   };
 };
 
-export const getStatisDealineAction = (sprintId) => {
+export const getStatisUserAction = (sprintId) => {
   return async (dispatch) => {
-    await getStatisDeadlineIssue(sprintId)
+    await getStatisStatusIssue(`issues/user/sprints?sprintId=${sprintId || ""}`)
       .then((response) => {
-        dispatch(getStatisDealineReducer(response));
+        dispatch(getStatisUserReducer(response));
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);
@@ -110,4 +110,6 @@ export const getStatisDealineAction = (sprintId) => {
       .finally(() => {});
   };
 };
+
+
 

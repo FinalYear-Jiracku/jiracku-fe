@@ -41,7 +41,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const isIssuesPage =
     location.pathname === `/projects/${projectId}/${sprintId}`;
   const isReportPage =
-    location.pathname === `/report/${projectId}/${sprintId}`;
+    location.pathname === `/report/${projectId}`;
   const isChatPage =
     location.pathname === `/chat/${projectId}`;
 
@@ -101,6 +101,11 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Sprint",
         },
         {
+          key: `/report/${projectId}`,
+          icon: <LineChartOutlined />,
+          label: "Report",
+        },
+        {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
@@ -123,7 +128,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Issue",
         },
         {
-          key: `/report/${projectId}/${sprintId}`,
+          key: `/report/${projectId}`,
           icon: <LineChartOutlined />,
           label: "Report",
         },
@@ -146,7 +151,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Issue",
         },
         {
-          key: `/report/${projectId}/${sprintId}`,
+          key: `/report/${projectId}`,
           icon: <LineChartOutlined />,
           label: "Report",
         },
@@ -169,7 +174,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Issue",
         },
         {
-          key: `/report/${projectId}/${sprintId}`,
+          key: `/report/${projectId}`,
           icon: <LineChartOutlined />,
           label: "Report",
         },
@@ -185,6 +190,11 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/projects/${projectId}`,
           icon: <BookOutlined />,
           label: "Sprint",
+        },
+        {
+          key: `/report/${projectId}`,
+          icon: <LineChartOutlined />,
+          label: "Report",
         },
         {
           key: `/notifications/${projectId}`,

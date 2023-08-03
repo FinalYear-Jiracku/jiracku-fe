@@ -8,6 +8,10 @@ export const dropdownSprintList = (type) => {
   return api.get(`/${type}`);
 };
 
+export const getStartSprintList = (type) => {
+  return api.get(`/${type}`);
+};
+
 export const getSprintDetail = (id) => {
   return api.get(`/sprints/${id}`)
 }
@@ -32,11 +36,7 @@ export const sprintListForComplete = (type) => {
   return api.get(`/${type}`);
 };
 
-export const getSprintBurndown = (id) => {
-  return api.get(`/sprints/burndown/${id}`)
-}
-
-export const getSprintStatisFirst = (id) => {
-  return api.get(`/sprints/first/burndown/${id}`)
-}
+export const getStatisNumOfIssue = (type) => {
+  return api.get(`/${type}`);
+};
 

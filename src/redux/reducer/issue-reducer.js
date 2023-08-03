@@ -8,7 +8,8 @@ const initialState = {
   statisType:{},
   statisPriority:{},
   statisStatus:{},
-  statisDeadline:{}
+  statisDeadline:{},
+  statisUser: []
 };
 
 const issueReducer = createSlice({
@@ -39,6 +40,9 @@ const issueReducer = createSlice({
     getStatisDealineReducer: (state, action) => {
       state.statisDeadline = action.payload;
     },
+    getStatisUserReducer: (state, action) => {
+      state.statisUser = action.payload;
+    },
   },
 });
 
@@ -50,7 +54,8 @@ export const {
   getStatisTypeReducer,
   getStatisPriorityReducer,
   getStatisStatusReducer,
-  getStatisDealineReducer
+  getStatisDealineReducer,
+  getStatisUserReducer
 } = issueReducer.actions;
 
 export default issueReducer.reducer;

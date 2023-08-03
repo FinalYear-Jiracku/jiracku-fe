@@ -34,7 +34,11 @@ export const getDataStatusListAction = ({
 }) => {
   return async (dispatch) => {
     await getDataStatusList(
-      `statuses/data/sprints/${sprintId}?search=${searchKey || ""}&type=${type|| ""}&priority=${priority|| ""}&statusId=${status|| ""}&userId=${user|| ""}`
+      `statuses/data/sprints/${sprintId}?search=${searchKey || ""}&type=${
+        type || ""
+      }&priority=${priority || ""}&statusId=${status || ""}&userId=${
+        user || ""
+      }`
     )
       .then((response) => {
         dispatch(getDataStatusListReducer(response));

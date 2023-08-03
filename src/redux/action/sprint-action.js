@@ -1,20 +1,20 @@
 import { message } from "antd";
 import {
   dropdownSprintList,
-  getSprintBurndown,
   getSprintDetail,
   getSprintList,
-  getSprintStatisFirst,
+  getStartSprintList,
+  getStatisNumOfIssue,
   sprintListForComplete,
 } from "../../api/sprint-api";
 import { MESSAGE } from "../../constants/constants";
 import {
   getDropdownListSprintReducer,
-  getSprintBurndownReducer,
   getSprintDetailReducer,
   getSprintListCompleteReducer,
   getSprintListReducer,
-  getSprintStaticReducer,
+  getStartSprintListReducer,
+  getStatisNumOfIssueReducer,
 } from "../reducer/sprint-reducer";
 
 export const getSprintListAction = ({ projectId, currentPage, searchKey }) => {
@@ -43,33 +43,6 @@ export const getSprintDetailAction = (sprintId) => {
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);
-        window.location.href = "/login";
-      })
-      .finally(() => {});
-  };
-};
-
-export const getSprintBurnAction = (sprintId) => {
-  return async (dispatch) => {
-    await getSprintBurndown(sprintId)
-      .then((response) => {
-        dispatch(getSprintBurndownReducer(response));
-      })
-      .catch((err) => {
-        message.error(MESSAGE.GET_DATA_FAIL);
-      })
-      .finally(() => {});
-  };
-};
-
-export const getSprintStatisAction = (sprintId) => {
-  return async (dispatch) => {
-    await getSprintStatisFirst(sprintId)
-      .then((response) => {
-        dispatch(getSprintStaticReducer(response));
-      })
-      .catch((err) => {
-        message.error(MESSAGE.GET_DATA_FAIL);
       })
       .finally(() => {});
   };
@@ -88,6 +61,19 @@ export const getDropdownSprintListAction = (projectId) => {
   };
 };
 
+export const getStartSprintListAction = (projectId) => {
+  return async (dispatch) => {
+    await getStartSprintList(`sprints/start/${projectId}`)
+      .then((response) => {
+        dispatch(getStartSprintListReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
 export const getSprintListCompleteAction = ({ projectId, sprintId }) => {
   return async (dispatch) => {
     await sprintListForComplete(
@@ -95,6 +81,19 @@ export const getSprintListCompleteAction = ({ projectId, sprintId }) => {
     )
       .then((response) => {
         dispatch(getSprintListCompleteReducer(response));
+      })
+      .catch((err) => {
+        message.error(MESSAGE.GET_DATA_FAIL);
+      })
+      .finally(() => {});
+  };
+};
+
+export const getStatisNumOfIssueAction = (projectId) => {
+  return async (dispatch) => {
+    await getStatisNumOfIssue(`sprints/issue/projects?projectId=${projectId || ""}`)
+      .then((response) => {
+        dispatch(getStatisNumOfIssueReducer(response));
       })
       .catch((err) => {
         message.error(MESSAGE.GET_DATA_FAIL);

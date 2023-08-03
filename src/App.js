@@ -18,11 +18,11 @@ function App() {
             <Route path="/login" element={<LoginPage/>}/>
             <Route path="/user" element={<UsersPage/>}/>
             <Route path="/projects" element={<ProjectsPage/>}/>
+             <Route path="/report/:projectId" element={<ReportPage/>}/>
             <Route path="/projects/:projectId" element={<SprintsPage/>}/>
             <Route path="/chat/:projectId" element={<ChatPage/>}/>
             <Route path="/notifications/:projectId" element={<NotificationPage/>}/>
             <Route path="/projects/:projectId/:sprintId" element={<IssuesPage/>}/>
-            <Route path="/report/:projectId/:sprintId" element={<ReportPage/>}/>
             <Route path="/accept-invite/:inviteToken" element={<AcceptInvite/>}/>
           </Routes>
         </MainLayout>
