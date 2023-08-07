@@ -21,6 +21,7 @@ import { getNotificationListAction } from "../../redux/action/notification-actio
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants/constants";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import { getMessageListAction } from "../../redux/action/message-action";
+import { getProjectDetailAction } from "../../redux/action/project-action";
 
 const { Sider } = Layout;
 const SideBar = ({ collapsed, handleOnCollapse }) => {
@@ -33,6 +34,9 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const { chatConnection, setChatConnection } = useContext(SignalRContext);
   const projectId = useSelector((state) => state.projectReducer.projectId);
   const sprintId = useSelector((state) => state.sprintReducer.sprintId);
+  const projectDetail = useSelector(
+    (state) => state.projectReducer.projectDetail
+  );
   const isUsersPage = location.pathname === "/user";
   const isProjectsPage = location.pathname === "/projects";
   const isSprintsPage = location.pathname === `/projects/${projectId}`;
@@ -43,7 +47,9 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const isReportPage =
     location.pathname === `/report/${projectId}`;
   const isChatPage =
-    location.pathname === `/chat/${projectId}`;
+    location.pathname === `/chat/${projectId}`; 
+  const isUpgradePage =
+    location.pathname === `/projects/upgraded/${projectId}`;
 
   const clearNotificationCount = () => {
     setNotificationCount(0);
@@ -109,10 +115,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
-        {
-          key: `/chat/${projectId}`,
-          label: chatIconWithBadge,
-        }
       );
     }
     if (isIssuesPage) {
@@ -146,11 +148,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Sprint",
         },
         {
-          key: `/projects/${projectId}/${sprintId}`,
-          icon: <CarryOutOutlined />,
-          label: "Issue",
-        },
-        {
           key: `/report/${projectId}`,
           icon: <LineChartOutlined />,
           label: "Report",
@@ -167,11 +164,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/projects/${projectId}`,
           icon: <BookOutlined />,
           label: "Sprint",
-        },
-        {
-          key: `/projects/${projectId}/${sprintId}`,
-          icon: <CarryOutOutlined />,
-          label: "Issue",
         },
         {
           key: `/report/${projectId}`,
@@ -200,11 +192,14 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
-        {
-          key: `/chat/${projectId}`,
-          label: chatIconWithBadge,
-        }
       );
+    }
+    
+    if (projectDetail?.isUpgraded && !isProjectsPage && !isUpgradePage) {
+      menuItems.push({
+        key: `/chat/${projectId}`,
+        label: chatIconWithBadge,
+      });
     }
     return menuItems;
   };
@@ -315,6 +310,13 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatConnection]);
+
+  useEffect(() => {
+    if(projectId !== null && projectId !== undefined){
+      dispatch(getProjectDetailAction(projectId))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[projectId])
 
   return (
     <Layout className={styles.sidebar}>

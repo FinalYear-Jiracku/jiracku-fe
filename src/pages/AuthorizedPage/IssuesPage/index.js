@@ -1,6 +1,4 @@
-import { useContext } from 'react'
 import { Tabs } from 'antd'
-import { useNavigate } from 'react-router-dom'
 
 import styles from './styles.module.scss'
 import TableIssue from './TableIssue'
@@ -13,16 +11,10 @@ const SamplingPoint = () => {
             type="card"
             className={styles['table-sampling-point']}
         >
-            <TabPane
-                tab="List"
-                key={1}
-            >
+            <TabPane tab="List" key="1">
                 <TableIssue />
             </TabPane>
-            <TabPane
-                tab="Board"
-                key={2}
-            >
+            <TabPane tab="Board" key="2">
                 <ColumnIssue />
             </TabPane>
         </Tabs>

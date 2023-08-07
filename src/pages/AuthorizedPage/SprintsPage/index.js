@@ -33,6 +33,7 @@ import InviteUser from "../../../components/Organisms/InviteUser/InviteUser";
 import SignalRContext from "../../../context/SignalRContext";
 import { getProjectDetailAction } from "../../../redux/action/project-action";
 import StartSprint from "../../../components/Organisms/Sprint/StartSprint/StartSprint";
+import UpgradePlan from "../../../components/Organisms/Upgrade/UpgradePlan";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
@@ -41,6 +42,7 @@ const SprintsPage = () => {
   const refDeleteModal = useRef(null);
   const refInviteUser = useRef(null);
   const refStartSprint = useRef(null);
+  const refUpgrade = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -196,6 +198,15 @@ const SprintsPage = () => {
             onClick={() => handleOpenInviteUserModal()}
             className={styles["button-invite"]}
           />
+          {projectDetail?.isUpgraded === false ? (
+            <CreateButton
+              content=" Upgrade Now"
+              color="#155E75"
+              action={() => refUpgrade?.current?.openModalHandle()}
+            />
+          ) : (
+            ""
+          )}
         </div>
         <CreateButton
           content="Create New Sprint"
@@ -214,8 +225,7 @@ const SprintsPage = () => {
             <Card
               key={index}
               className={`${styles.card} 
-              // ${data.isCompleted ? styles["disabled-card"] : ""
-              }`}
+              // ${data.isCompleted ? styles["disabled-card"] : ""}`}
             >
               <div className={styles.button}>
                 <div
@@ -322,6 +332,7 @@ const SprintsPage = () => {
         sprintId={sprintId}
         userDetail={userDetail}
       />
+      <UpgradePlan ref={refUpgrade} projectId={projectId} />
     </div>
   );
 };

@@ -16,6 +16,10 @@ export const updateProject = (data) => {
   return api.put('/projects',data)
 }
 
+export const upgradeProject = (data) => {
+  return api.put('/projects/upgrade',data)
+}
+
 export const deleteProject = (id) => {
   return api.patch(`/projects/${id}`)
 }

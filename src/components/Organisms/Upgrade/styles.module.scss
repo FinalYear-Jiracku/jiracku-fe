@@ -1,0 +1,10 @@
+.upgrade-card-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .upgrade-card {
+    width: calc(50% - 10px);
+    padding: 16px;
+  }  

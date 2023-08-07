@@ -13,6 +13,7 @@ export const MESSAGE = {
   CREATE_PROJECT_SUCCESS: "Project has been created",
   PROJECT_NAME_EXIST: "Project Name already Exist",
   UPDATE_PROJECT_SUCCESS: "Project has been updated",
+  UPGRADE_PROJECT_SUCCESS: "Project has been upgraded",
   DELETE_PROJECT_SUCCESS: "Project has been deleted",
   CREATE_SPRINT_SUCCESS: "Sprint has been created",
   SPRINT_NAME_EXIST: "Sprint Name already Exist",

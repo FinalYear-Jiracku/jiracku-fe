@@ -440,7 +440,7 @@ const ColumnIssue = () => {
             onMouseEnter={() => setTooltipVisible(true)}
             onMouseLeave={() => setTooltipVisible(false)}
           >
-            <Tooltip title={tooltipTitle} visible={isTooltipVisible}>
+            <Tooltip title={tooltipTitle} open={isTooltipVisible}>
               <CreateButton
                 content="Complete Sprint"
                 color="#155E75"
