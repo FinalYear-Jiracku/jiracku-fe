@@ -7,6 +7,7 @@ import {
   CarryOutOutlined,
   BellOutlined,
   ProfileOutlined,
+  CommentOutlined
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Menu, Button, Image } from "antd";
@@ -19,6 +20,8 @@ import { useDispatch } from "react-redux";
 import { getNotificationListAction } from "../../redux/action/notification-action";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants/constants";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+import { getMessageListAction } from "../../redux/action/message-action";
+import { getProjectDetailAction } from "../../redux/action/project-action";
 
 const { Sider } = Layout;
 const SideBar = ({ collapsed, handleOnCollapse }) => {
@@ -26,9 +29,14 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const [notificationCount, setNotificationCount] = useState(0);
+  const [chatCount, setChatCount] = useState(0);
   const { connection, setConnection } = useContext(SignalRContext);
+  const { chatConnection, setChatConnection } = useContext(SignalRContext);
   const projectId = useSelector((state) => state.projectReducer.projectId);
   const sprintId = useSelector((state) => state.sprintReducer.sprintId);
+  const projectDetail = useSelector(
+    (state) => state.projectReducer.projectDetail
+  );
   const isUsersPage = location.pathname === "/user";
   const isProjectsPage = location.pathname === "/projects";
   const isSprintsPage = location.pathname === `/projects/${projectId}`;
@@ -36,9 +44,19 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     location.pathname === `/notifications/${projectId}`;
   const isIssuesPage =
     location.pathname === `/projects/${projectId}/${sprintId}`;
+  const isReportPage =
+    location.pathname === `/report/${projectId}`;
+  const isChatPage =
+    location.pathname === `/chat/${projectId}`; 
+  const isUpgradePage =
+    location.pathname === `/projects/upgraded/${projectId}`;
 
   const clearNotificationCount = () => {
     setNotificationCount(0);
+  };
+
+  const clearChatCount = () => {
+    setChatCount(0);
   };
 
   const bellIconWithBadge = (
@@ -53,6 +71,18 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     </span>
   );
 
+  const chatIconWithBadge = (
+    <span onClick={clearChatCount}>
+      {" "}
+      {/* Add onClick event handler */}
+      <CommentOutlined />
+      <span>Chat</span>
+      {chatCount > 0 && (
+        <span className={styles.badge}> {chatCount}</span>
+      )}
+    </span>
+  );
+  
   const getMenuItems = () => {
     let menuItems = [];
     if (isUsersPage) {
@@ -77,14 +107,14 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Sprint",
         },
         {
-          key: "/report",
+          key: `/report/${projectId}`,
           icon: <LineChartOutlined />,
           label: "Report",
         },
         {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
-        }
+        },
       );
     }
     if (isIssuesPage) {
@@ -100,7 +130,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Issue",
         },
         {
-          key: "/report",
+          key: `/report/${projectId}`,
           icon: <LineChartOutlined />,
           label: "Report",
         },
@@ -118,7 +148,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           label: "Sprint",
         },
         {
-          key: "/report",
+          key: `/report/${projectId}`,
           icon: <LineChartOutlined />,
           label: "Report",
         },
@@ -128,6 +158,49 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         }
       );
     }
+    if (isReportPage) {
+      menuItems.push(
+        {
+          key: `/projects/${projectId}`,
+          icon: <BookOutlined />,
+          label: "Sprint",
+        },
+        {
+          key: `/report/${projectId}`,
+          icon: <LineChartOutlined />,
+          label: "Report",
+        },
+        {
+          key: `/notifications/${projectId}`,
+          label: bellIconWithBadge,
+        }
+      );
+    }
+    if (isChatPage) {
+      menuItems.push(
+        {
+          key: `/projects/${projectId}`,
+          icon: <BookOutlined />,
+          label: "Sprint",
+        },
+        {
+          key: `/report/${projectId}`,
+          icon: <LineChartOutlined />,
+          label: "Report",
+        },
+        {
+          key: `/notifications/${projectId}`,
+          label: bellIconWithBadge,
+        },
+      );
+    }
+    
+    if (projectDetail?.isUpgraded && !isProjectsPage && !isUpgradePage) {
+      menuItems.push({
+        key: `/chat/${projectId}`,
+        label: chatIconWithBadge,
+      });
+    }
     return menuItems;
   };
 
@@ -136,6 +209,9 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
       // If the Notification menu item is clicked, reset the notification count
       if (key === `/notifications/${projectId}`) {
         clearNotificationCount();
+      }
+      if (key === `/chat/${projectId}`){
+        clearChatCount();
       }
       navigate(key);
     }
@@ -187,6 +263,60 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connection]);
+
+  useEffect(() => {
+    if (
+      chatConnection &&
+      projectId !== null &&
+      window.localStorage.getItem(ACCESS_TOKEN) &&
+      window.localStorage.getItem(REFRESH_TOKEN)
+    ) {
+      chatConnection.on("ReceiveMessage", (message) => {
+        console.log(`Received message: ${message}`);
+        setChatCount((prevCount) => prevCount + 1);
+        // Fetch the updated notification list when a message is received
+        dispatch(getMessageListAction(projectId))
+          .then((response) => response)
+          .finally(() => {});
+      });
+
+      // Fetch the initial notification list after the SignalR connection is established
+      dispatch(getMessageListAction(projectId))
+        .then((response) => response)
+        .finally(() => {});
+    } else {
+      const token = window.localStorage.getItem(ACCESS_TOKEN);
+      const newConnection = new HubConnectionBuilder()
+        .withUrl("http://localhost:4204/chat", {
+          accessTokenFactory: () => token,
+        })
+        .build();
+
+      newConnection
+        .start()
+        .then(() => {
+          console.log("Connected to SignalR Hub");
+          newConnection
+            .invoke("OnConnectedAsync", projectId.toString())
+            .then((response) => response)
+            .catch((error) => console.error("Error sending request:", error));
+
+          // Cập nhật kết nối SignalR vào Redux
+          setChatConnection(newConnection);
+        })
+        .catch((error) =>
+          console.error("Error connecting to SignalR Hub:", error)
+        );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatConnection]);
+
+  useEffect(() => {
+    if(projectId !== null && projectId !== undefined){
+      dispatch(getProjectDetailAction(projectId))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[projectId])
 
   return (
     <Layout className={styles.sidebar}>

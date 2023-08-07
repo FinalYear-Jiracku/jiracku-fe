@@ -17,8 +17,9 @@ const AcceptInvite = () => {
 
   useEffect(() => {
     acceptEmail();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  return <div>AcceptEmail</div>;
+  return <div>You have just accepted the invitation</div>;
 };
 
 export default AcceptInvite;

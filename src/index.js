@@ -15,11 +15,11 @@ root.render(
     <GoogleAuthProvider>
       <Provider store={store}>
         <SignalRProvider>
-          <HeaderProvider>
-            <Routes>
-              <Route path="/*" element={<App />} />
-            </Routes>
-          </HeaderProvider>
+            <HeaderProvider>
+              <Routes>
+                <Route path="/*" element={<App />} />
+              </Routes>
+            </HeaderProvider>
         </SignalRProvider>
       </Provider>
     </GoogleAuthProvider>

@@ -33,7 +33,7 @@ const NotificationPage = () => {
     header.setHeader({
       title: "NOTIFICATION MANAGEMENT",
       breadCrumb: [
-        { name: "Notification", url: `/notifications/${projectId}` },
+        { name: "Notification", url: `/notifications/${projectId}`},
       ],
     });
     if (

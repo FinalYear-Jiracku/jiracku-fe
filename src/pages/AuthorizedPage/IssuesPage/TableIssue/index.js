@@ -176,12 +176,16 @@ const TableIssue = () => {
       dataIndex: "dueDate",
       width: "105px",
       align: "center",
-      render: (_, record) => {
+      render: (dueDate, record) => {
+        const currentDate = dayjs(); // Lấy ngày hôm nay
+    
+        // Kiểm tra nếu dueDate không tồn tại hoặc nó bé hơn ngày hôm nay
+        const isPastDue = dueDate !== null && dayjs(dueDate).isBefore(currentDate, 'day');
+    
+        // Sử dụng className để thêm màu đỏ vào phần tử nếu isPastDue là true
         return (
-          <div>
-            {record.dueDate === null
-              ? ""
-              : dayjs(record.dueDate).format("YYYY-MM-DD")}
+          <div className={isPastDue ? "red-text" : ""}>
+            {dueDate === null ? "" : dayjs(dueDate).format("YYYY-MM-DD")}
           </div>
         );
       },

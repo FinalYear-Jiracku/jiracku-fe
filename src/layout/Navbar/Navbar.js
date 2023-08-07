@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from "react";
-import { Breadcrumb, Layout, Image, Button } from "antd";
+import { Breadcrumb, Layout, Button } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 import HeaderContext from "../../context/HeaderProvider";
 import styles from "./styles.module.scss";
@@ -13,7 +13,7 @@ const { Header } = Layout;
 const Navbar = () => {
   const navigate = useNavigate();
   const { header } = useContext(HeaderContext);
-  const {connection} = useContext(SignalRContext);
+  const {connection, chatConnection} = useContext(SignalRContext);
   //const connection = useSelector((state) => state.signalRReducer.connection);
   const { auth, setAuth } = useContext(GoogleAuthContext);
   const [breadCrumb, setBreadCrumb] = useState({ title: "", data: [] });
@@ -25,6 +25,7 @@ const Navbar = () => {
     // Cookies.remove(REFRESH_TOKEN);
     setAuth({});
     connection.stop();
+    chatConnection.stop();
     navigate("/login");
   };
   useEffect(() => {

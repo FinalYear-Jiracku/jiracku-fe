@@ -168,9 +168,14 @@ const ColumnIssue = () => {
       search: `?page=1${value !== "" ? `&search=${value}` : ""}`,
     });
   };
-  
+
   const check = () => {
-    return dataStatusList?.data?.some((column) => column.name === "Completed" && projectDetail?.createdBy === userDetail?.email);
+    return dataStatusList?.data?.some(
+      (column) =>
+        column.name === "Completed" &&
+        projectDetail?.createdBy === userDetail?.email &&
+        sprintDetail.isStart === true
+    );
   };
 
   const sendMessage = async (projectId, message) => {
@@ -424,18 +429,18 @@ const ColumnIssue = () => {
             action={() => refComplete?.current?.openModalHandle()}
           />
         ) : projectDetail?.createdBy !== userDetail?.email ? (
-            <CreateButton
-              content="Complete Sprint"
-              color="#155E75"
-              action={() => refComplete?.current?.openModalHandle()}
-              disabled={true}
-            />
+          <CreateButton
+            content="Complete Sprint"
+            color="#155E75"
+            action={() => refComplete?.current?.openModalHandle()}
+            disabled={true}
+          />
         ) : (
           <div
             onMouseEnter={() => setTooltipVisible(true)}
             onMouseLeave={() => setTooltipVisible(false)}
           >
-            <Tooltip title={tooltipTitle} visible={isTooltipVisible}>
+            <Tooltip title={tooltipTitle} open={isTooltipVisible}>
               <CreateButton
                 content="Complete Sprint"
                 color="#155E75"
@@ -449,7 +454,7 @@ const ColumnIssue = () => {
       {dataStatusList?.data?.length === 0 && <EmptyData />}
       {loading ? (
         <div className={styles["loading-container"]}>
-        <Loading />
+          <Loading />
         </div>
       ) : (
         <div className={styles.container}>
