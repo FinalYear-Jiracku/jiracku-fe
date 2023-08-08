@@ -34,6 +34,8 @@ import SignalRContext from "../../../context/SignalRContext";
 import { getProjectDetailAction } from "../../../redux/action/project-action";
 import StartSprint from "../../../components/Organisms/Sprint/StartSprint/StartSprint";
 import UpgradePlan from "../../../components/Organisms/Upgrade/UpgradePlan";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../../constants/constants";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const SprintsPage = () => {
   const { projectId } = useParams();
@@ -47,7 +49,7 @@ const SprintsPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const header = useContext(HeaderContext);
-  const { connection, chatConnection } = useContext(SignalRContext);
+  const { connection, chatConnection, setConnection } = useContext(SignalRContext);
   const [projectName, setProjectName] = useState();
   const [sprintId, setSprintId] = useState(null);
   const [totalRecord, setTotalRecord] = useState(0);
@@ -112,15 +114,24 @@ const SprintsPage = () => {
 
   useEffect(
     () => {
-      if (!connection) {
-        console.error("Connection not established.");
-        return;
-      } else {
-        connection
+      if (
+        window.localStorage.getItem(ACCESS_TOKEN) &&
+        window.localStorage.getItem(REFRESH_TOKEN) &&
+        connection !== null &&
+        connection.state !== "Connected"
+      ) {
+        const token = window.localStorage.getItem(ACCESS_TOKEN);
+        const newConnection = new HubConnectionBuilder()
+          .withUrl("http://localhost:4204/notification", {
+            accessTokenFactory: () => token,
+          })
+          .build();
+        setConnection(newConnection);
+        newConnection
           .start()
           .then(() => {
             console.log("Connected to SignalR Hub");
-            connection
+            newConnection
               .invoke("OnConnectedAsync", projectId.toString())
               .then((response) => response)
               .catch((error) => console.error("Error sending request:", error));

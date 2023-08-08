@@ -1,7 +1,7 @@
 import { message } from "antd";
 import { MESSAGE } from "../../constants/constants";
-import { getListMessage } from "../../api/message-api";
-import { getMessageListReducer } from "../reducer/message-reducer";
+import { getListMessage, getMessageDetail } from "../../api/message-api";
+import { getMessageDetailReducer, getMessageListReducer } from "../reducer/message-reducer";
 
 export const getMessageListAction = (projectId) => {
     return async (dispatch) => {
@@ -15,3 +15,16 @@ export const getMessageListAction = (projectId) => {
         .finally(() => {});
     };
   };
+
+  export const getMessageDetailAction = (messageId) => {
+    return async (dispatch) => {
+      await getMessageDetail(messageId)
+        .then((response) => {
+          dispatch(getMessageDetailReducer(response));
+        })
+        .catch((err) => {
+          message.error(MESSAGE.GET_DATA_FAIL);
+        })
+        .finally(() => {});
+    };
+  }
