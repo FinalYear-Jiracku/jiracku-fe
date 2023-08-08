@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 
 
 const CheckoutForm = (props) => {
-  const { projectId, sprintId } = useParams();
+  const { projectId } = useParams();
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState(null);

@@ -195,7 +195,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
       );
     }
     
-    if (projectDetail?.isUpgraded && !isProjectsPage && !isUpgradePage) {
+    if (projectDetail?.isUpgraded && !isProjectsPage && !isUpgradePage && !isUsersPage) {
       menuItems.push({
         key: `/chat/${projectId}`,
         label: chatIconWithBadge,

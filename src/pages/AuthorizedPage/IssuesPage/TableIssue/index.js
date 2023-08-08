@@ -25,6 +25,8 @@ import { setSprintId } from "../../../../redux/reducer/sprint-reducer";
 import { getSprintListAction } from "../../../../redux/action/sprint-action";
 import InviteUser from "../../../../components/Organisms/InviteUser/InviteUser";
 import SignalRContext from "../../../../context/SignalRContext";
+import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../../../constants/constants";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 const TableIssue = () => {
   const { projectId, sprintId } = useParams();
@@ -39,7 +41,7 @@ const TableIssue = () => {
   const [issueId, setIssueId] = useState(null);
   const [loading, setLoading] = useState(false);
   const header = useContext(HeaderContext);
-  const {connection} = useContext(SignalRContext);
+  const {connection, setConnection} = useContext(SignalRContext);
   const [searchParams] = useSearchParams();
   const issueList = useSelector((state) => state.issueReducer.issueList);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
@@ -255,28 +257,39 @@ const TableIssue = () => {
     sprintName,
   ]);
 
-  useEffect(() => {
-    if (!connection) {
-      console.error("Connection not established.");
-      return;
-    }
-    else{
-      connection
-      .start()
-      .then(() => {
-        console.log("Connected to SignalR Hub");
-        connection
-          .invoke("OnConnectedAsync", projectId.toString())
-          .then((response) => response)
-          .catch((error) => console.error("Error sending request:", error));
-      })
-      .catch((error) =>
-        console.error("Error connecting to SignalR Hub:", error)
-      );
-    }
-    }    
+  useEffect(
+    () => {
+      if (
+        window.localStorage.getItem(ACCESS_TOKEN) &&
+        window.localStorage.getItem(REFRESH_TOKEN) &&
+        connection !== null &&
+        connection.state !== "Connected"
+      ) {
+        const token = window.localStorage.getItem(ACCESS_TOKEN);
+        const newConnection = new HubConnectionBuilder()
+          .withUrl("http://localhost:4204/notification", {
+            accessTokenFactory: () => token,
+          })
+          .build();
+        setConnection(newConnection);
+        newConnection
+          .start()
+          .then(() => {
+            console.log("Connected to SignalR Hub");
+            newConnection
+              .invoke("OnConnectedAsync", projectId.toString())
+              .then((response) => response)
+              .catch((error) => console.error("Error sending request:", error));
+          })
+          .catch((error) =>
+            console.error("Error connecting to SignalR Hub:", error)
+          );
+      }
+    },
+   
     // eslint-disable-next-line react-hooks/exhaustive-deps
-, [projectId]);
+    [projectId,connection]
+  );
 
   return (
     <div>

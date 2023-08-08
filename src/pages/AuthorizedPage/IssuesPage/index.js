@@ -1,23 +1,28 @@
 import { Tabs } from 'antd'
-
 import styles from './styles.module.scss'
 import TableIssue from './TableIssue'
 import ColumnIssue from './ColumnIssue'
-const { TabPane } = Tabs
 
 const SamplingPoint = () => {
+    const items = [
+        {
+          key: '1',
+          label: `List`,
+          children: <TableIssue />,
+        },
+        {
+          key: '2',
+          label: `Board`,
+          children: <ColumnIssue />,
+        },
+      ];
+
     return (
         <Tabs
             type="card"
+            defaultActiveKey="1" items={items}
             className={styles['table-sampling-point']}
-        >
-            <TabPane tab="List" key="1">
-                <TableIssue />
-            </TabPane>
-            <TabPane tab="Board" key="2">
-                <ColumnIssue />
-            </TabPane>
-        </Tabs>
+        />
     )
 }
 
