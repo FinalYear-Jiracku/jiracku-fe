@@ -15,7 +15,7 @@ import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../../constants/constants";
 import { getNotificationListAction } from "../../../redux/action/notification-action";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 10;
 
 const NotificationPage = () => {
   const { projectId } = useParams();

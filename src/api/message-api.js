@@ -1,7 +1,7 @@
 import { api } from "../configs/axios"
 
-export const getListMessage = (id) => {
-    return api.get(`/messages/${id}`)
+export const getListMessage = (type) => {
+    return api.get(`/${type}`)
 }
 
 export const getMessageDetail = (id) => {

@@ -1,13 +1,12 @@
 import { useState, useEffect, useContext, useRef } from "react";
-import { Button, Card, Form, Input } from "antd";
+import { Button, Form, Input} from "antd";
 import { useParams } from "react-router-dom";
 import HeaderContext from "../../../context/HeaderProvider";
 import styles from "./styles.module.scss";
 import dayjs from "dayjs";
-import {
-  FormOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { FormOutlined, DeleteOutlined } from "@ant-design/icons";
+// import "mdb-react-ui-kit/dist/css/mdb.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import EmptyData from "../../../components/Atoms/EmptyData/EmptyData";
 import { useDispatch, useSelector } from "react-redux";
 import Loading from "../../../components/Atoms/Loading/Loading";
@@ -19,6 +18,7 @@ import SignalRContext from "../../../context/SignalRContext";
 import UpdateMessage from "../../../components/Organisms/Message/UpdateMessage/UpdateMessage";
 import DeleteMessage from "../../../components/Organisms/Message/DeleteMessage/DeleteMessage";
 import { getUserDetailAction } from "../../../redux/action/user-action";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 const ChatPage = () => {
   const { projectId } = useParams();
@@ -32,9 +32,10 @@ const ChatPage = () => {
   const [commentContent, setCommentContent] = useState("");
   const { chatConnection, setChatConnection } = useContext(SignalRContext);
   const [loading, setLoading] = useState(false);
+  const [visibleMessages, setVisibleMessages] = useState(10);
   const messageList = useSelector((state) => state.messageReducer.messageList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
-
+  const reversedMessageList = [...messageList].reverse();
   const handleFormChange = () => {
     const hasErrors = form.getFieldsError().some(({ errors }) => errors.length);
     setDisabledSave(hasErrors);
@@ -48,6 +49,11 @@ const ChatPage = () => {
   const handleOpenDeleteModal = (messageId) => {
     setMessageId(messageId);
     refDeleteMessage.current.openModalHandle();
+  };
+
+  const loadMore = () => {
+    // Tăng số lượng tin nhắn hiển thị thêm khi người dùng cuộn đến cuối danh sách
+    setVisibleMessages(prevVisibleMessages => prevVisibleMessages + 10); // Ví dụ tăng thêm 10 tin nhắn
   };
 
   const sendMessage = async (projectId, message) => {
@@ -85,6 +91,7 @@ const ChatPage = () => {
       })
       .catch((err) => console.log(err));
   };
+  
 
   useEffect(() => {
     dispatch(setProjectId(projectId));
@@ -154,74 +161,122 @@ const ChatPage = () => {
   }, [chatConnection]);
 
   return (
-    <div className={styles.chatPage}>
-      <div className={styles.messageContainer}>
-        <div className={styles.messageList}>
-          {loading ? (
-            <Loading />
-          ) : (
-            <div className={styles.sprints}>
-              {messageList?.map((data, index) => (
-                <Card key={index} className={styles.card}>
-                  <div className={styles.content}>
-                    <div>
-                      <div>{data.content}</div>
-                      <div>{data.user.userName}</div>
-                    </div>
-                    <div>
-                        <Button
-                          type="text"
-                          icon={<FormOutlined />}
-                          onClick={() => handleOpenEditModal(data.id)}
-                          disabled={userDetail.email === data.user.userName ? false : true}
-                        ></Button>
-                        <Button
-                          type="text"
-                          icon={<DeleteOutlined />}
-                          onClick={() => handleOpenDeleteModal(data.id)}
-                          disabled={userDetail.email === data.user.userName ? false : true}
-                        ></Button>
-                        <div>{dayjs(data.createdAt).format("YYYY-MM-DD")}</div>
-                      </div>
-                    
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
-        <Form
-          name="basic"
-          autoComplete="off"
-          form={form}
-          onFinish={onFinish}
-          onFieldsChange={handleFormChange}
-          className={styles["ant-form"]}
-        >
-          <Form.Item name="content" className={styles.messageInput}>
-            <Input
-              placeholder="Type here to send Message"
-              value={commentContent}
-              onChange={(e) => setCommentContent(e.target.value)}
-              className={styles.input}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              className={styles.sendButton}
-              type="primary"
-              htmlType="submit"
-              disabled={disabledSave}
+    <>
+      <div className={styles.chatPage}>
+        <div className={styles.messageContainer}>
+        <div className={``}>
+            <Form
+              name="basic"
+              autoComplete="off"
+              form={form}
+              onFinish={onFinish}
+              onFieldsChange={handleFormChange}
+              className={styles.antForm}
             >
-              Post
-            </Button>
-          </Form.Item>
-        </Form>
-        {messageList?.length === 0 && <EmptyData />}
+              <Form.Item name="content">
+                <Input
+                  type="text"
+                  value={commentContent}
+                  onChange={(e) => setCommentContent(e.target.value)}
+                  id="exampleFormControlInput2"
+                  style={{width:"100%"}}
+                  placeholder="Type message"
+                />
+              </Form.Item>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={disabledSave}
+                >
+                  <i className="fas fa-paper-plane"></i>
+                </Button>
+              </Form.Item>
+            </Form>
+            {/* {messageList?.length === 0 && <EmptyData />} */}
+          </div>
+          <div className={styles.messageList} >
+            {loading ? (
+              <Loading />
+            ) : (
+              <div className={`col-md-6 col-lg-7 col-xl-8`}>
+                <InfiniteScroll
+                  dataLength={visibleMessages}
+                  next={loadMore}
+                  hasMore={visibleMessages < reversedMessageList.length}
+                  loader={<Loading />}
+                >
+                  {reversedMessageList?.slice(0, visibleMessages).map((data, index) => (
+                    <div
+                      key={index}
+                      className={`${styles.pt3} ${
+                        data.user.userName === userDetail.email
+                          ? styles.justifyContentEnd
+                          : styles.justifyContentStart
+                      }`}
+                      style={{ display: "flex" }}
+                    >
+                      <div
+                        className={
+                          data.user.userName === userDetail.email
+                            ? styles.me3
+                            : styles.ms3
+                        }
+                      >
+                        <div
+                          className={`${styles.small} ${styles.p2} ${styles.mb1} ${styles.rounded3} ${
+                            data.user.userName === userDetail.email
+                              ? styles.textWhite + ' ' + styles.bgPrimary
+                              : styles.bgLight
+                          }`}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            {data.content}
+                            {userDetail.email === data.user.userName && (
+                              <span>
+                                {/* <Button
+                                  type="text"
+                                  icon={<FormOutlined />}
+                                  onClick={() => handleOpenEditModal(data.id)}
+                                /> */}
+                                <Button
+                                  type="text"
+                                  icon={<DeleteOutlined />}
+                                  onClick={() => handleOpenDeleteModal(data.id)}
+                                />
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <p className={ `${styles.mb1} ${styles.fwBold}`}>{data.user.userName}</p>
+                        <p
+                          className={`${styles.textMuted} ${styles.small} ${styles.mb3} ${styles.rounded3} float-${
+                            data.user.userName === userDetail.email
+                              ? 'end'
+                              : 'start'
+                          }`}
+                        >
+                          {dayjs(data.createdAt).format("h:mm A | MMM DD")}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </InfiniteScroll>
+              </div>
+            )}
+          </div>
+          
+        </div>
       </div>
-      <UpdateMessage ref={refUpdateMessage} messageId={messageId}/>
-      <DeleteMessage ref={refDeleteMessage} messageId={messageId}/>
-    </div>
+      <UpdateMessage ref={refUpdateMessage} messageId={messageId} />
+      <DeleteMessage ref={refDeleteMessage} messageId={messageId} />
+    </>
   );
 };
 

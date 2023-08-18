@@ -84,7 +84,18 @@ const LoginPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div>{loading ? <Loading /> : <div id="signInDiv"></div>}</div>;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", minHeight: "80vh" }}>
+      {loading ? (
+        <Loading />
+      ) : (
+        <div style={{ textAlign: "center", color: "#155E75" }}>
+          <h1 >Jiracku</h1>
+          <div id="signInDiv"></div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default LoginPage;

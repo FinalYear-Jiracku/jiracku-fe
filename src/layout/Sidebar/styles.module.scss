@@ -2,18 +2,6 @@
     background: white;
     border-inline-end: none;
     max-width: 200px;
-    @media (max-width: 768px) {
-        width: 0px !important;
-        overflow: hidden;
-        transition: width 0.3s ease-in-out;
-        .logo {
-          display: none;
-        }
-        
-        .menu {
-          display: none;
-        }
-      }
     .sider {
         width: 0px !important;
         background: white;

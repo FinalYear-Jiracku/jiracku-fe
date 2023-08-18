@@ -9,6 +9,7 @@ import subIssueReducer from "./reducer/subIssue-reducer";
 import commentReducer from "./reducer/comment-reducer";
 import notificationReducer from "./reducer/notification-reducer";
 import messageReducer from "./reducer/message-reducer";
+import eventReducer from "./reducer/event-reducer";
 
 export const store = configureStore({
     reducer: {
@@ -20,7 +21,8 @@ export const store = configureStore({
         subIssueReducer,
         commentReducer,
         notificationReducer,
-        messageReducer
+        messageReducer,
+        eventReducer
     },
     middleware:[thunk]
 })

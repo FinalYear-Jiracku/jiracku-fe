@@ -7,7 +7,8 @@ import {
   CarryOutOutlined,
   BellOutlined,
   ProfileOutlined,
-  CommentOutlined
+  CommentOutlined,
+  CalendarOutlined
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Menu, Button, Image } from "antd";
@@ -48,6 +49,8 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     location.pathname === `/report/${projectId}`;
   const isChatPage =
     location.pathname === `/chat/${projectId}`; 
+  const isCalendarPage =
+    location.pathname === `/calendar/${projectId}`; 
   const isUpgradePage =
     location.pathname === `/projects/upgraded/${projectId}`;
 
@@ -115,6 +118,11 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
+        {
+          key: `/calendar/${projectId}`,
+          icon:<CalendarOutlined />,
+          label: "Calendar",
+        },
       );
     }
     if (isIssuesPage) {
@@ -137,7 +145,12 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
-        }
+        },
+        {
+          key: `/calendar/${projectId}`,
+          icon:<CalendarOutlined />,
+          label: "Calendar",
+        },
       );
     }
     if (isNotificationPage) {
@@ -155,7 +168,35 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
-        }
+        },
+        {
+          key: `/calendar/${projectId}`,
+          icon:<CalendarOutlined />,
+          label: "Calendar",
+        },
+      );
+    }
+    if (isCalendarPage) {
+      menuItems.push(
+        {
+          key: `/projects/${projectId}`,
+          icon: <BookOutlined />,
+          label: "Sprint",
+        },
+        {
+          key: `/report/${projectId}`,
+          icon: <LineChartOutlined />,
+          label: "Report",
+        },
+        {
+          key: `/notifications/${projectId}`,
+          label: bellIconWithBadge,
+        },
+        {
+          key: `/calendar/${projectId}`,
+          icon:<CalendarOutlined />,
+          label: "Calendar",
+        },
       );
     }
     if (isReportPage) {
@@ -173,7 +214,12 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
-        }
+        },
+        {
+          key: `/calendar/${projectId}`,
+          icon:<CalendarOutlined />,
+          label: "Calendar",
+        },
       );
     }
     if (isChatPage) {
@@ -191,6 +237,11 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
+        },
+        {
+          key: `/calendar/${projectId}`,
+          icon:<CalendarOutlined />,
+          label: "Calendar",
         },
       );
     }
@@ -228,15 +279,15 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         console.log(`Received message: ${message}`);
         setNotificationCount((prevCount) => prevCount + 1);
         // Fetch the updated notification list when a message is received
-        dispatch(getNotificationListAction(projectId))
-          .then((response) => response)
-          .finally(() => {});
+        // dispatch(getNotificationListAction(projectId))
+        //   .then((response) => response)
+        //   .finally(() => {});
       });
 
       // Fetch the initial notification list after the SignalR connection is established
-      dispatch(getNotificationListAction(projectId))
-        .then((response) => response)
-        .finally(() => {});
+      // dispatch(getNotificationListAction(projectId))
+      //   .then((response) => response)
+      //   .finally(() => {});
     } else {
       const token = window.localStorage.getItem(ACCESS_TOKEN);
       const newConnection = new HubConnectionBuilder()
@@ -275,15 +326,15 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         console.log(`Received message: ${message}`);
         setChatCount((prevCount) => prevCount + 1);
         // Fetch the updated notification list when a message is received
-        dispatch(getMessageListAction(projectId))
-          .then((response) => response)
-          .finally(() => {});
+        // dispatch(getMessageListAction(projectId))
+        //   .then((response) => response)
+        //   .finally(() => {});
       });
 
       // Fetch the initial notification list after the SignalR connection is established
-      dispatch(getMessageListAction(projectId))
-        .then((response) => response)
-        .finally(() => {});
+      // dispatch(getMessageListAction(projectId))
+      //   .then((response) => response)
+      //   .finally(() => {});
     } else {
       const token = window.localStorage.getItem(ACCESS_TOKEN);
       const newConnection = new HubConnectionBuilder()

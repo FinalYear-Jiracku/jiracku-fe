@@ -1,4 +1,4 @@
-import { Suspense, useContext, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 import styles from "./styles.module.scss";
 import SideBar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
@@ -9,10 +9,21 @@ import GoogleAuthContext from "../../context/AuthProvider";
 
 const MainLayout = ({ children }) => {
   const { auth } = useContext(GoogleAuthContext);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(window.innerWidth < 768);
   const handleOnCollapse = () => {
     setCollapsed(!collapsed);
   };
+  useEffect(() => {
+    const handleResize = () => {
+      setCollapsed(window.innerWidth < 768);
+    };
+    
+    window.addEventListener("resize", handleResize);
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return auth.name && window.localStorage.getItem(ACCESS_TOKEN) ? (
     <div>
       <div className={styles.container}>

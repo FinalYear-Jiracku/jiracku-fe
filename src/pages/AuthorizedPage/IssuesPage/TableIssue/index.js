@@ -178,15 +178,17 @@ const TableIssue = () => {
       dataIndex: "dueDate",
       width: "105px",
       align: "center",
-      render: (dueDate, record) => {
-        const currentDate = dayjs(); // Lấy ngày hôm nay
+      render: (_, record) => {
+        const dueDate = record.dueDate;
+        const currentDate = new Date();
     
-        // Kiểm tra nếu dueDate không tồn tại hoặc nó bé hơn ngày hôm nay
-        const isPastDue = dueDate !== null && dayjs(dueDate).isBefore(currentDate, 'day');
+        let cellClassName = styles.dueDateCell; // CSS class for normal dueDate
+        if (dueDate !== null && dayjs(dueDate).isBefore(currentDate, "day")) {
+          cellClassName = styles.overdueDueDateCell; // CSS class for overdue dueDate
+        }
     
-        // Sử dụng className để thêm màu đỏ vào phần tử nếu isPastDue là true
         return (
-          <div className={isPastDue ? "red-text" : ""}>
+          <div className={cellClassName}>
             {dueDate === null ? "" : dayjs(dueDate).format("YYYY-MM-DD")}
           </div>
         );
@@ -290,6 +292,51 @@ const TableIssue = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [projectId,connection]
   );
+  useEffect(() => {
+    if (connection) {
+      connection.on("ReceiveMessage", (message) => {
+        console.log(`Received message: ${message}`);
+
+        // Fetch the updated notification list when a message is received
+        dispatch(getIssueListAction({ sprintId: `${sprintId}` }))
+          .then((response) => response)
+          .finally(() => {
+            setLoading(false);
+          });
+      });
+
+      // Fetch the initial notification list after the SignalR connection is established
+      dispatch(getIssueListAction({ sprintId: `${sprintId}` }))
+        .then((response) => response)
+        .finally(() => {
+          setLoading(false);
+        });
+    } else {
+      const token = window.localStorage.getItem(ACCESS_TOKEN);
+      const newConnection = new HubConnectionBuilder()
+        .withUrl("http://localhost:4204/notification", {
+          accessTokenFactory: () => token,
+        })
+        .build();
+
+      newConnection
+        .start()
+        .then(() => {
+          console.log("Connected to SignalR Hub");
+          newConnection
+            .invoke("OnConnectedAsync", projectId.toString())
+            .then((response) => response)
+            .catch((error) => console.error("Error sending request:", error));
+
+          // Cập nhật kết nối SignalR vào Redux
+          setConnection(newConnection);
+        })
+        .catch((error) =>
+          console.error("Error connecting to SignalR Hub:", error)
+        );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connection]);
 
   return (
     <div>

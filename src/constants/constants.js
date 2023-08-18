@@ -39,6 +39,9 @@ export const MESSAGE = {
   COMPLETE_SPRINT_FAIL: "Complete Sprint Fail",
   UPDATE_MESSAGE_SUCCESS: "Message has been updated",
   DELETE_MESSAGE_SUCCESS: "Message has been deleted",
+  CREATE_EVENT_SUCCESS: "Event has been created",
+  UPDATE_EVENT_SUCCESS: "Event has been updated",
+  DELETE_EVENT_SUCCESS: "Event has been deleted",
 }
 export const ACCESS_TOKEN = "access_token";
 export const REFRESH_TOKEN = "refresh_token";

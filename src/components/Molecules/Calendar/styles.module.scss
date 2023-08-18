@@ -1,0 +1,24 @@
+.button-submit{
+    margin-right: 10px;
+    background-color: #155E75;
+}
+
+.layout{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.date{
+    width:370px
+}
+
+.button-delete {
+    color: initial; /* Đặt màu chữ mặc định */
+    border-color: initial; /* Đặt màu viền mặc định */
+    
+    &:hover {
+      color: red; /* Màu chữ khi hover */
+      border-color: red; /* Màu viền khi hover */
+    }
+  }

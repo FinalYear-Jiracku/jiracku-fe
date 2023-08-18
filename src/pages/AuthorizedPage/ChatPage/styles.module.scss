@@ -1,9 +1,6 @@
-.ant-form{
+.antForm{
     display: flex;
-}
-.input{
-    width: 540px;
-    margin-right: 10px;
+    justify-content: space-between;
 }
 
 .chatPage {
@@ -13,7 +10,7 @@
   }
   
   .messageContainer {
-    flex: 1;
+    
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -23,6 +20,87 @@
     flex: 1;
     overflow-y: auto;
     padding: 1rem;
+  }
+
+  .pt3 {
+    padding-top: 0.75rem;
+  }
+  
+  .justifyContentEnd {
+    justify-content: flex-end;
+  }
+  
+  .justifyContentStart {
+    justify-content: flex-start;
+  }
+  
+  .ms3 {
+    margin-left: 0.75rem;
+  }
+  
+  .me3 {
+    margin-right: 0.75rem;
+  }
+  
+  .small {
+    font-size: 0.875rem;
+  }
+  
+  .p2 {
+    padding: 0.5rem;
+  }
+  
+  .mb1 {
+    margin-bottom: 0.25rem;
+  }
+  
+  .fwBold {
+    font-weight: bold;
+  }
+  
+  .textWhite {
+    color: #fff;
+  }
+  
+  .bgPrimary {
+    background-color: #007bff;
+    border-radius: 10px;
+  }
+  
+  .bgLight {
+    background-color: #d7dade;
+    border-radius: 10px;
+  }
+  
+  .textMuted {
+    color: #6c757d;
+  }
+  
+  .dFlex {
+    display: flex;
+  }
+  
+  .alignItemsCenter {
+    align-items: center;
+  }
+  
+  .pe3 {
+    padding-right: 0.75rem;
+  }
+  
+  .pt3 {
+    padding-top: 0.75rem;
+  }
+  
+  .mt2 {
+    margin-top: 0.5rem;
+  }
+  
+  
+  
+  .formControlLg {
+    max-width: 100% !important;
+    // ... add other styles here
   }
   
   .card {
@@ -46,10 +124,27 @@
   }
   
   .input {
-    flex: 1;
+    width: 100%;
+    max-width: 100% !important;
   }
   
   .sendButton {
-    margin-top: 15px;
-    width: 80px;
+    margin-top: 7px;
   }
+
+  #chat3 .form-control {
+    border-color: transparent;
+    }
+    
+    #chat3 .form-control:focus {
+    border-color: transparent;
+    box-shadow: inset 0px 0px 0px 1px transparent;
+    }
+    
+    .badge-dot {
+    border-radius: 50%;
+    height: 10px;
+    width: 10px;
+    margin-left: 2.9rem;
+    margin-top: -.75rem;
+    }

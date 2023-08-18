@@ -53,6 +53,11 @@
     bottom: 0; /* Add a semi-transparent background */
   }
 
-  .red-text {
+  .dueDateCell {
+    color: black;
+  }
+  
+  .overdueDueDateCell {
     color: red;
+    font-weight: bold;
   }
