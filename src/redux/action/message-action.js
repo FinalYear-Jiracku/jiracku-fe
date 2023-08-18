@@ -5,7 +5,7 @@ import { getMessageDetailReducer, getMessageListReducer } from "../reducer/messa
 
 export const getMessageListAction = (projectId) => {
     return async (dispatch) => {
-      await getListMessage(`${projectId}`)
+      await getListMessage(`messages/${projectId}`)
         .then((response) => {
           dispatch(getMessageListReducer(response));
         })

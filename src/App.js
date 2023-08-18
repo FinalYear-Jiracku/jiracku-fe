@@ -10,7 +10,8 @@ import NotificationPage from "./pages/AuthorizedPage/Notification";
 import ReportPage from "./pages/AuthorizedPage/ReportPage";
 import ChatPage from "./pages/AuthorizedPage/ChatPage";
 import UpgradeProject from "./pages/AuthorizedPage/UpgradePage";
-
+import CalenderPage from "./pages/AuthorizedPage/CalendarPage";
+import MeetingPage from "./pages/AuthorizedPage/MeetingPage";
 
 function App() {
   return (
@@ -22,8 +23,10 @@ function App() {
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:projectId" element={<SprintsPage />} />
             <Route path="/report/:projectId" element={<ReportPage />} />
+            <Route path="/calendar/:projectId" element={<CalenderPage />} />
             <Route path="/projects/upgraded/:projectId" element={<UpgradeProject />} />
             <Route path="/chat/:projectId" element={<ChatPage />} />
+            <Route path="/meeting" element={<MeetingPage />} />
             <Route
               path="/notifications/:projectId"
               element={<NotificationPage />}

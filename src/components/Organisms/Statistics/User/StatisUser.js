@@ -41,18 +41,38 @@ const StatisUser = forwardRef((props, ref) => {
     };
   });
 
-  const getRandomColor = () => {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
+  // const getRandomColor = () => {
+  //   const letters = "0123456789ABCDEF";
+  //   let color = "#";
+  //   for (let i = 0; i < 6; i++) {
+  //     color += letters[Math.floor(Math.random() * 16)];
+  //   }
+  //   return color;
+  // };
+
+  const fixedColors = [
+    "#FF5733", // Màu 1
+    "#36A2EB", // Màu 2
+    "#F7464A", // Màu 3
+    "#46BFBD", // Màu 4
+    "#D4CCC5", // Màu 5
+    "#FFC300", // Màu 6
+    "#9A55FF", // Màu 7
+    "#00BFFF", // Màu 8
+    "#FF1493", // Màu 9
+    "#00FF7F", // Màu 10
+  ];
+
+  const statusColors = {};
 
   const labels = dataUser?.map((userStatus) => userStatus?.email) || [];
-  const datasets =
-    dataUser?.[0]?.statusCounts?.map((statusCount) => ({
+  const datasets = dataUser?.[0]?.statusCounts?.map((statusCount, index) => {
+    if (!statusColors[statusCount.statusName]) {
+      statusColors[statusCount.statusName] =
+        fixedColors[index % fixedColors.length];
+    }
+  
+    return {
       label: statusCount?.statusName,
       data: dataUser?.map(
         (userStatus) =>
@@ -60,8 +80,9 @@ const StatisUser = forwardRef((props, ref) => {
             (count) => count?.statusName === statusCount?.statusName
           )?.issueCount || 0
       ),
-      backgroundColor: getRandomColor(),
-    })) || [];
+      backgroundColor: statusColors[statusCount.statusName],
+    };
+  }) || [];
 
   const data = {
     labels: labels,

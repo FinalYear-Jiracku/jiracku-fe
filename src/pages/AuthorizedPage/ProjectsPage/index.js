@@ -198,7 +198,7 @@ const ProjectsPage = () => {
           {projectList?.data?.map((data) => (
             <Card key={data?.id} className={styles.card}>
               <div className={styles.button}>
-                <div></div>
+                <div style={{color: "#155E75"}} >{data.isUpgraded ? "PREMIUM" : ""}</div>
                 <div>
                   <Button
                     type="text"
@@ -238,7 +238,6 @@ const ProjectsPage = () => {
                   <p>{data.name}</p>
                 </Link>
                 <div className={styles.button}>
-                  <DatabaseOutlined />
                   <p>{data.sprints} Sprints</p>
                 </div>
               </div>

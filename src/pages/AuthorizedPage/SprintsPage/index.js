@@ -166,7 +166,6 @@ const SprintsPage = () => {
     if (params.page) {
       setLoading(true);
       dispatch(getUserDetailAction());
-
       dispatch(
         getSprintListAction({
           projectId: projectId,
@@ -235,8 +234,8 @@ const SprintsPage = () => {
           {sprintList?.sprints?.data?.map((data, index) => (
             <Card
               key={index}
-              className={`${styles.card} 
-              // ${data.isCompleted ? styles["disabled-card"] : ""}`}
+              className={`${styles.card}`}
+              // ${data.isCompleted ? styles["disabled-card"] : ""}
             >
               <div className={styles.button}>
                 <div
