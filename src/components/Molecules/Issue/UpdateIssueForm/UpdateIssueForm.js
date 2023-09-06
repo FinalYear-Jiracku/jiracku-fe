@@ -141,14 +141,6 @@ const UpdateIssueForm = ({
     onSubmit(data);
   };
 
-  const validateName = (_, value) => {
-    const { name } = form.getFieldsValue(["name"]);
-    if (value && name && value.trim().length > 30) {
-      return Promise.reject("Sprint Name field max length 30 characters");
-    }
-    return Promise.resolve();
-  };
-
   const validateStoryPoint = (_, value) => {
     const check = /[^0-9]+/;
     const { storyPoint } = form.getFieldsValue(["storyPoint"]);
@@ -455,9 +447,7 @@ const UpdateIssueForm = ({
                         },
                         {
                           validator:
-                            form.name === "name"
-                              ? validateName
-                              : form.name === "startDate" ||
+                            form.name === "startDate" ||
                                 form.name === "dueDate"
                               ? validateEndDate
                               : form.name === "storyPoint"
@@ -488,7 +478,7 @@ const UpdateIssueForm = ({
                           allowClear={form.name === "userId" || form.name === "statusId" ? true : false}
                         />
                       ) : form.type === "files" ? (
-                        <div className={styles["file-list-container"]}>
+                        <div>
                           <input
                             type="file"
                             accept="image/png, image/jpg, image/jpeg"
@@ -498,17 +488,19 @@ const UpdateIssueForm = ({
                               setStart(false)
                             }}
                           />
-                          {renderAttachment?.map((data) => (
-                            <div key={data.id} className={styles.file}>
-                              <Image src={data.fileName} />
-                              <button
-                                className={styles.deleteButton}
-                                onClick={() => handleDelete(data.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          ))}
+                           <div className={styles["file-list-container"]}>
+                            {renderAttachment?.map((data) => (
+                              <div key={data.id} className={styles.file}>
+                                <Image src={data.fileName} />
+                                <button
+                                  //className={styles.deleteButton}
+                                  onClick={() => handleDelete(data.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       ) : (
                         <DatePicker format={"YYYY-MMMM-DD"} />
@@ -534,7 +526,7 @@ const UpdateIssueForm = ({
           columns={defaultColumns}
           dataSource={renderSubIssues}
           pagination={false}
-          scroll={{ x: 800, y: 190 }}
+          scroll={{ x: 600, y: 190 }}
           rowKey={(record) => record?.id}
           className={styles.table}
           bordered

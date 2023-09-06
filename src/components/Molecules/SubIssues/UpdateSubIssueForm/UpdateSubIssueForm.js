@@ -18,7 +18,6 @@ import {
   FormOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import icon from "../../../../assets/anh.jpg";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getDropdownStatusListAction } from "../../../../redux/action/status-action";
@@ -110,14 +109,6 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
       files: renderAttachment.map((attachment) => attachment),
     };
     onSubmit(data);
-  };
-
-  const validateName = (_, value) => {
-    const { name } = form.getFieldsValue(["name"]);
-    if (value && name && value.trim().length > 30) {
-      return Promise.reject("Sprint Name field max length 30 characters");
-    }
-    return Promise.resolve();
   };
 
   const validateStoryPoint = (_, value) => {
@@ -274,9 +265,7 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
                         },
                         {
                           validator:
-                            form.name === "name"
-                              ? validateName
-                              : form.name === "startDate" ||
+                            form.name === "startDate" ||
                                 form.name === "dueDate"
                               ? validateEndDate
                               : form.name === "storyPoint"

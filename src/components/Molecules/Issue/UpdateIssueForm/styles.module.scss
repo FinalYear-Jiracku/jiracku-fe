@@ -5,6 +5,7 @@
 .layout{
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 .form-item {
     :global{
@@ -21,7 +22,7 @@
     :global{
         .ant-table-thead{
             .ant-table-cell{
-                background-color: #0597c4;
+                background-color: #305966;
                 color: white;
             }
         }
@@ -100,26 +101,19 @@
 }
 
 .upload-button-text {
-margin-top: 8px;
+    margin-top: 8px;
 }
 
 .file-list-container {
-    overflow-x: auto;
-    .item-upload{
-        display: flex;
-        flex-wrap: nowrap;
-        :global{
-            .ant-upload-list-item-container{
-                margin-block: 0 2px !important;
-                margin-inline: 0 2px !important;
-            }
-        }
-    }
+    display: flex;
+    overflow: scroll;
+    max-width: 30vw;
+    gap: 10px;
 }
 
 .file{
     display: flex;
-    overflow-x: auto; /* Tạo thanh cuộn ngang khi nội dung vượt quá kích thước container */
-    white-space: nowrap; /* Ngăn các thẻ img xuống dòng */
+    overflow-x: auto;
+    white-space: nowrap;
     width: 100%;
 }

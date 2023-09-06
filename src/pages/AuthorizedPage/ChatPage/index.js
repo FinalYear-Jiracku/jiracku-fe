@@ -35,15 +35,10 @@ const ChatPage = () => {
   const [visibleMessages, setVisibleMessages] = useState(10);
   const messageList = useSelector((state) => state.messageReducer.messageList);
   const userDetail = useSelector((state) => state.userReducer.userDetail);
-  const reversedMessageList = [...messageList].reverse();
+ 
   const handleFormChange = () => {
     const hasErrors = form.getFieldsError().some(({ errors }) => errors.length);
     setDisabledSave(hasErrors);
-  };
-
-  const handleOpenEditModal = (messageId) => {
-    setMessageId(messageId);
-    refUpdateMessage.current.openModalHandle();
   };
 
   const handleOpenDeleteModal = (messageId) => {
@@ -164,7 +159,102 @@ const ChatPage = () => {
     <>
       <div className={styles.chatPage}>
         <div className={styles.messageContainer}>
-        <div className={``}>
+          <div className={styles.messageList} >
+            {loading ? (
+              <Loading />
+            ) : (
+              <div
+                className={`col-md-6 col-lg-7 col-xl-8`}
+                id="scrollableDiv"
+                style={{
+                  height: "75vh",
+                  overflow: "auto",
+                  display: "flex",
+                  flexDirection: "column-reverse",
+                }}
+              >
+                { messageList.length > 0 ? (
+                  <InfiniteScroll
+                  dataLength={visibleMessages}
+                  next={loadMore}
+                  inverse={true}
+                  hasMore={visibleMessages < messageList.length}
+                  endMessage={<p>No more messages</p>}
+                  scrollableTarget="scrollableDiv"
+                  style={{ display: "flex", flexDirection: "column-reverse" }}
+                >
+                  {messageList?.slice(0, visibleMessages).map((data, index) => (
+                    <div
+                      key={index}
+                      className={`${styles.pt3} ${
+                        data.user.userName === userDetail.email
+                          ? styles.justifyContentEnd
+                          : styles.justifyContentStart
+                      }`}
+                      style={{ display: "flex" }}
+                    >
+                      <div
+                        className={
+                          data.user.userName === userDetail.email
+                            ? styles.me3
+                            : styles.ms3
+                        }
+                      >
+                        <div
+                          className={`${styles.small} ${styles.p2} ${
+                            styles.mb1
+                          } ${styles.rounded3} ${
+                            data.user.userName === userDetail.email
+                              ? styles.textWhite + " " + styles.bgPrimary
+                              : styles.bgLight
+                          }`}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                            }}
+                          >
+                            {data.content}
+                            {userDetail.email === data.user.userName && (
+                              <span>
+                                <Button
+                                  type="text"
+                                  icon={<DeleteOutlined />}
+                                  onClick={() =>
+                                    handleOpenDeleteModal(data.id)
+                                  }
+                                />
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <p className={`${styles.mb1} ${styles.fwBold}`}>
+                          {data.user.userName}
+                        </p>
+                        <p
+                          className={`${styles.textMuted} ${styles.small} ${
+                            styles.mb3
+                          } ${styles.rounded3} float-${
+                            data.user.userName === userDetail.email
+                              ? "end"
+                              : "start"
+                          }`}
+                        >
+                          {dayjs(data.createdAt).format("h:mm A | MMM DD")}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </InfiniteScroll>
+                ) : (
+                  <EmptyData message="No messages available." />
+                )}
+              </div>
+            )}
+          </div>
+          <div className={``}>
             <Form
               name="basic"
               autoComplete="off"
@@ -193,85 +283,8 @@ const ChatPage = () => {
                 </Button>
               </Form.Item>
             </Form>
-            {/* {messageList?.length === 0 && <EmptyData />} */}
+
           </div>
-          <div className={styles.messageList} >
-            {loading ? (
-              <Loading />
-            ) : (
-              <div className={`col-md-6 col-lg-7 col-xl-8`}>
-                <InfiniteScroll
-                  dataLength={visibleMessages}
-                  next={loadMore}
-                  hasMore={visibleMessages < reversedMessageList.length}
-                  loader={<Loading />}
-                >
-                  {reversedMessageList?.slice(0, visibleMessages).map((data, index) => (
-                    <div
-                      key={index}
-                      className={`${styles.pt3} ${
-                        data.user.userName === userDetail.email
-                          ? styles.justifyContentEnd
-                          : styles.justifyContentStart
-                      }`}
-                      style={{ display: "flex" }}
-                    >
-                      <div
-                        className={
-                          data.user.userName === userDetail.email
-                            ? styles.me3
-                            : styles.ms3
-                        }
-                      >
-                        <div
-                          className={`${styles.small} ${styles.p2} ${styles.mb1} ${styles.rounded3} ${
-                            data.user.userName === userDetail.email
-                              ? styles.textWhite + ' ' + styles.bgPrimary
-                              : styles.bgLight
-                          }`}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                              alignItems: "center",
-                            }}
-                          >
-                            {data.content}
-                            {userDetail.email === data.user.userName && (
-                              <span>
-                                {/* <Button
-                                  type="text"
-                                  icon={<FormOutlined />}
-                                  onClick={() => handleOpenEditModal(data.id)}
-                                /> */}
-                                <Button
-                                  type="text"
-                                  icon={<DeleteOutlined />}
-                                  onClick={() => handleOpenDeleteModal(data.id)}
-                                />
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <p className={ `${styles.mb1} ${styles.fwBold}`}>{data.user.userName}</p>
-                        <p
-                          className={`${styles.textMuted} ${styles.small} ${styles.mb3} ${styles.rounded3} float-${
-                            data.user.userName === userDetail.email
-                              ? 'end'
-                              : 'start'
-                          }`}
-                        >
-                          {dayjs(data.createdAt).format("h:mm A | MMM DD")}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </InfiniteScroll>
-              </div>
-            )}
-          </div>
-          
         </div>
       </div>
       <UpdateMessage ref={refUpdateMessage} messageId={messageId} />

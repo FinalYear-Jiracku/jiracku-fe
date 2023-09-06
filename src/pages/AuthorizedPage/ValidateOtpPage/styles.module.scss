@@ -1,0 +1,13 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa theo chiều dọc */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    min-height: 90vh; /* Đảm bảo nội dung căn giữa ngay cả khi chiều cao ngắn hơn */
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa theo chiều ngang */
+  }

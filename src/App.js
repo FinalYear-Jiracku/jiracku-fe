@@ -12,6 +12,10 @@ import ChatPage from "./pages/AuthorizedPage/ChatPage";
 import UpgradeProject from "./pages/AuthorizedPage/UpgradePage";
 import CalenderPage from "./pages/AuthorizedPage/CalendarPage";
 import MeetingPage from "./pages/AuthorizedPage/MeetingPage";
+import ValidateOtp from "./pages/AuthorizedPage/ValidateOtpPage";
+import ListUserPage from "./pages/AdminPage/ListUserPage";
+import DashBoardPage from "./pages/AdminPage/DashBoardPage";
+import NotFoundPage from "./pages/AuthorizedPage/404Page";
 
 function App() {
   return (
@@ -19,6 +23,9 @@ function App() {
         <MainLayout>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/admin/userList" element={<ListUserPage />} />
+            <Route path="/admin/dashBoard" element={<DashBoardPage />} />
+            <Route path="/validateOtp" element={<ValidateOtp />} />
             <Route path="/user" element={<UsersPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:projectId" element={<SprintsPage />} />
@@ -38,6 +45,10 @@ function App() {
             <Route
               path="/accept-invite/:inviteToken"
               element={<AcceptInvite />}
+            />
+            <Route
+              path="*"
+              element={<NotFoundPage />}
             />
           </Routes>
         </MainLayout>

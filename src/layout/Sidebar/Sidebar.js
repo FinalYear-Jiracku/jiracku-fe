@@ -8,7 +8,9 @@ import {
   BellOutlined,
   ProfileOutlined,
   CommentOutlined,
-  CalendarOutlined
+  CalendarOutlined,
+  DashboardOutlined,
+  IdcardOutlined
 } from "@ant-design/icons";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Layout, Menu, Button, Image } from "antd";
@@ -53,6 +55,10 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     location.pathname === `/calendar/${projectId}`; 
   const isUpgradePage =
     location.pathname === `/projects/upgraded/${projectId}`;
+  const isUserListPage =
+    location.pathname === `/admin/userList`;
+  const isDashBoradPage =
+    location.pathname === `/admin/dashBoard`;
 
   const clearNotificationCount = () => {
     setNotificationCount(0);
@@ -88,6 +94,34 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   
   const getMenuItems = () => {
     let menuItems = [];
+    if (isDashBoradPage) {
+      menuItems.push(
+        {
+          key: "/admin/dashBoard",
+          icon: <DashboardOutlined />,
+          label: "DashBoard",
+        },
+        {
+          key: "/admin/userList",
+          icon: <IdcardOutlined />,
+          label: "Users",
+        }
+      );
+    }
+    if (isUserListPage) {
+      menuItems.push(
+        {
+          key: "/admin/dashBoard",
+          icon: <DashboardOutlined />,
+          label: "DashBoard",
+        },
+        {
+          key: "/admin/userList",
+          icon: <IdcardOutlined />,
+          label: "Users",
+        }
+      );
+    }
     if (isUsersPage) {
       menuItems.push({
         key: "/user",
@@ -118,11 +152,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
-        {
-          key: `/calendar/${projectId}`,
-          icon:<CalendarOutlined />,
-          label: "Calendar",
-        },
       );
     }
     if (isIssuesPage) {
@@ -146,11 +175,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
-        {
-          key: `/calendar/${projectId}`,
-          icon:<CalendarOutlined />,
-          label: "Calendar",
-        },
       );
     }
     if (isNotificationPage) {
@@ -168,11 +192,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
-        },
-        {
-          key: `/calendar/${projectId}`,
-          icon:<CalendarOutlined />,
-          label: "Calendar",
         },
       );
     }
@@ -192,11 +211,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
-        {
-          key: `/calendar/${projectId}`,
-          icon:<CalendarOutlined />,
-          label: "Calendar",
-        },
       );
     }
     if (isReportPage) {
@@ -214,11 +228,6 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
         {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
-        },
-        {
-          key: `/calendar/${projectId}`,
-          icon:<CalendarOutlined />,
-          label: "Calendar",
         },
       );
     }
@@ -238,19 +247,21 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
           key: `/notifications/${projectId}`,
           label: bellIconWithBadge,
         },
+      );
+    }
+    
+    if (projectDetail?.isUpgraded && !isProjectsPage && !isUpgradePage && !isUsersPage) {
+      menuItems.push(
         {
           key: `/calendar/${projectId}`,
           icon:<CalendarOutlined />,
           label: "Calendar",
         },
+        {
+          key: `/chat/${projectId}`,
+          label: chatIconWithBadge,
+        }
       );
-    }
-    
-    if (projectDetail?.isUpgraded && !isProjectsPage && !isUpgradePage && !isUsersPage) {
-      menuItems.push({
-        key: `/chat/${projectId}`,
-        label: chatIconWithBadge,
-      });
     }
     return menuItems;
   };

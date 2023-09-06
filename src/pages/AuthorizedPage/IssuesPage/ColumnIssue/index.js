@@ -357,22 +357,24 @@ const ColumnIssue = () => {
         );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connection]);
+  }, [connection, sprintId]);
 
   return (
     <div>
       <div className={styles["common-bar"]}>
         <div className={styles["invite-user"]}>
-          <SeachBar
-            onChangeEvent={handleSearch}
-            placeholder="Search Issues"
-            borderColor="#155E75"
-          />
-          <Button
-            icon={<UserAddOutlined />}
-            onClick={() => handleOpenInviteUserModal()}
-            className={styles["button-invite"]}
-          />
+          <div className={styles["filter"]}>
+            <SeachBar
+              onChangeEvent={handleSearch}
+              placeholder="Search Issues"
+              borderColor="#155E75"
+            />
+            <Button
+              icon={<UserAddOutlined />}
+              onClick={() => handleOpenInviteUserModal()}
+              className={styles["button-invite"]}
+            />
+          </div>
           <div className={styles["filter"]}>
             <div className={styles.text}>Type:</div>
             <div>
@@ -424,12 +426,14 @@ const ColumnIssue = () => {
         </div>
         {check() ? (
           <CreateButton
+            className={styles["create-button"]}
             content="Complete Sprint"
             color="#155E75"
             action={() => refComplete?.current?.openModalHandle()}
           />
         ) : projectDetail?.createdBy !== userDetail?.email ? (
           <CreateButton
+            className={styles["create-button"]}
             content="Complete Sprint"
             color="#155E75"
             action={() => refComplete?.current?.openModalHandle()}
@@ -442,6 +446,7 @@ const ColumnIssue = () => {
           >
             <Tooltip title={tooltipTitle} open={isTooltipVisible}>
               <CreateButton
+                className={styles["create-button"]}
                 content="Complete Sprint"
                 color="#155E75"
                 action={() => refComplete?.current?.openModalHandle()}
@@ -468,10 +473,16 @@ const ColumnIssue = () => {
                   <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
-                    className={`${styles.column} ${styles["scrollable-container"]}`}
+                    className={`${styles.column}`}
                   >
                     <div className={styles["status-button"]}>
-                      <h2>{column.name}</h2>
+                      <h2
+                        // className={
+                        //   column.name.split("").length > 8 ? styles.data : null
+                        // }
+                      >
+                        {column.name}
+                      </h2>
                       <div>
                         <Button
                           type="text"
@@ -511,7 +522,15 @@ const ColumnIssue = () => {
                           >
                             <div>
                               <div className={styles.card}>
-                                <div>{item.name}</div>
+                                <div
+                                  className={
+                                    item.name.split("").length > 30
+                                      ? styles.data
+                                      : null
+                                  }
+                                >
+                                  {item.name}
+                                </div>
                                 <div className={styles.card}>
                                   <div>
                                     {item.type === 1 ? (

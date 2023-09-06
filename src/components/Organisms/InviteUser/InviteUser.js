@@ -44,7 +44,11 @@ const InviteUser = forwardRef((props, ref) => {
         navigate(`/projects/${projectId}`);
       })
       .catch((error) => {
-        
+        if (error?.response?.status === 400) {
+          if (error?.response?.data === "Email must be end @fpt.edu.vn or @fe.edu.vn") {
+            message.error(MESSAGE.FPT_FE);
+          }
+        }
       });
   };
 

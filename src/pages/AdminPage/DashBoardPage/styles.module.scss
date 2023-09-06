@@ -1,0 +1,23 @@
+.filter{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.text{
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.select{
+    width: 100px;
+}
+
+.invite-user{
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+}
