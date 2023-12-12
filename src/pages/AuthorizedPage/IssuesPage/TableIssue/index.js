@@ -80,7 +80,7 @@ const TableIssue = () => {
     {
       title: "Name",
       dataIndex: "name",
-      width: "300px",
+      width: "250px",
       align: "center",
       render: (_, record) => {
         return (

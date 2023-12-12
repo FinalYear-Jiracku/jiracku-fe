@@ -4,10 +4,6 @@
     justify-content: space-between;
     margin: 10px 10px 0px;
 }
-.status{
-    border: 1px solid black;
-    border-radius: 3px;
-}
       
 .table{
     width: auto; 
@@ -21,24 +17,11 @@
         }
     }
 }
+
 .avatar{
     width: 30px !important;
     height: 30px !important;
     border-radius: 20px !important;
-}
-
-.invite-user{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.button-invite{
-    margin-left: 5px;
-}
-
-.button-left{
-    margin-right: 5px;
 }
 
 .loading-container {
@@ -53,45 +36,11 @@
     bottom: 0; /* Add a semi-transparent background */
   }
 
-  .dueDateCell {
-    color: black;
-  }
   
-  .overdueDueDateCell {
-    color: red;
-    font-weight: bold;
-  }
-  .data{
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 200px; 
-}
 
-@media (max-width: 768px) {
-    .common-bar {
-      flex-direction: column; /* Stack items vertically */
-      align-items: stretch; /* Stretch items to full width */
-    }
-    
-    .filter {
-      margin-top: 10px; /* Add some space between filters */
-    }
-  }
-
-  @media (max-width: 768px) {
-    .invite-user {
-      flex-direction: column; /* Stack items vertically */
-      align-items: stretch; /* Stretch items to full width */
-    }
-    
-    .filter {
-      margin-top: 10px; /* Add some space between filters */
-    }
-  }
   @media (max-width: 768px) {
     .table {
-        width: auto;
+        width: fit-content;
     }
   }
 

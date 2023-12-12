@@ -27,6 +27,14 @@ const UpgradeElenment = forwardRef((props, ref) => {
     };
   });
 
+  const appearance = {
+    theme: "stripe",
+  };
+  const options = {
+    clientSecret,
+    appearance,
+  };
+
   const paymentIntentPost = () => {
     const data = {
       projectId: props.projectId,
@@ -40,14 +48,6 @@ const UpgradeElenment = forwardRef((props, ref) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clientSecret]);
-
-  const appearance = {
-    theme: "stripe",
-  };
-  const options = {
-    clientSecret,
-    appearance,
-  };
 
   return (
     <Modal

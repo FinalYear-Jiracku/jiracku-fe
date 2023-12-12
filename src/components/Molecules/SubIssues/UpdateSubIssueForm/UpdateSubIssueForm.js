@@ -294,7 +294,7 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
                           allowClear={form.name === "userId" || form.name === "statusId" ? true : false}
                         />
                       ) : form.type === "files" ? (
-                        <div className={styles["file-list-container"]}>
+                        <div>
                           <input
                             type="file"
                             accept="image/png, image/jpg, image/jpeg"
@@ -304,17 +304,21 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
                               setStart(false)
                             }}
                           />
-                          {renderAttachment?.map((data) => (
-                            <div key={data.id} className={styles.file}>
-                              <Image src={data.fileName} />
-                              <button
-                                className={styles.deleteButton}
-                                onClick={() => handleDelete(data.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          ))}
+                           <div className={styles["file-list-container"]}>
+                           <div className={styles.fileContainer}>
+                            {renderAttachment?.map((data) => (
+                              <div key={data.id} className={styles.file}>
+                                <Image src={data.fileName} />
+                                <button
+                                  //className={styles.deleteButton}
+                                  onClick={() => handleDelete(data.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          </div>
                         </div>
                       ) : (
                         <DatePicker format={"YYYY-MMMM-DD"} />

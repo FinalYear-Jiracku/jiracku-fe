@@ -20,6 +20,7 @@ export const MESSAGE = {
   CREATE_SPRINT_SUCCESS: "Sprint has been created",
   SPRINT_NAME_EXIST: "Sprint Name already Exist",
   UPDATE_SPRINT_SUCCESS: "Sprint has been updated",
+  START_SPRINT_SUCCESS: "Sprint has been started",
   DELETE_SPRINT_SUCCESS: "Sprint has been deleted",
   CREATE_ISSUE_SUCCESS: "Issue has been created",
   UPDATE_ISSUE_SUCCESS: "Issue has been updated",

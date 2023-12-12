@@ -70,7 +70,7 @@ const DeleteStatus = forwardRef((props, ref) => {
   const handleDelete = async () => {
     await deleteStatus(props.statusId)
       .then((res) => {
-        message.success(MESSAGE.DELETE_PROJECT_SUCCESS);
+        message.success(MESSAGE.DELETE_STATUS_SUCCESS);
         setOpenModal(false);
         navigate(`/projects/${projectId}/${sprintId}`);
         sendMessage(

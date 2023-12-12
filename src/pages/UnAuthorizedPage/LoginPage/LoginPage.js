@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../../../components/Atoms/Loading/Loading";
 import jwtDecode from "jwt-decode";
 import styles from "./styles.module.scss";
-import Cookies from "js-cookie";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -24,12 +23,9 @@ const LoginPage = () => {
     if (
       window.localStorage.getItem(ACCESS_TOKEN) &&
       window.localStorage.getItem(REFRESH_TOKEN)
-      // Cookies.get(ACCESS_TOKEN) &&
-      // Cookies.get(REFRESH_TOKEN)
     ) {
       try {
         let infor = jwtDecode(window.localStorage.getItem(ACCESS_TOKEN));
-        //let infor = jwtDecode(Cookies.get(ACCESS_TOKEN));
         setAuth({
           id: infor?.Id,
           name: infor?.Name,
@@ -44,7 +40,7 @@ const LoginPage = () => {
           navigate("/validateOtp");
         }
         if (infor?.IsOtp !== "True" && infor?.IsSms !== "True" && infor?.Role === "Admin" ) {
-          navigate("/admin/dashBoard");
+          navigate("/admin/dashboard");
         }
         if (infor?.IsOtp !== "True" && infor?.IsSms !== "True" && infor?.Role === "User" ) {
           navigate("/projects");
@@ -101,8 +97,6 @@ const LoginPage = () => {
       .then(async (response) => {
         window.localStorage.setItem(ACCESS_TOKEN, response.accessToken);
         window.localStorage.setItem(REFRESH_TOKEN, response.refreshToken);
-        // Cookies.set(ACCESS_TOKEN, response.accessToken);
-        // Cookies.set(REFRESH_TOKEN, response.refreshToken);
         message.success(MESSAGE.AUTHORIZATION_SUCCESS);
         await setAuthUser();
       })

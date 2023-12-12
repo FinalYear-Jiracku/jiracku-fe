@@ -41,6 +41,9 @@ export const GoogleAuthProvider = ({ children }) => {
           name: infor?.Name,
           email: infor.Email,
           image: infor?.Image,
+          isOtp: infor?.IsOtp,
+          isSms: infor?.IsSms,
+          role: infor?.Role,
           exp: infor?.exp,
         });
       } catch (error) {

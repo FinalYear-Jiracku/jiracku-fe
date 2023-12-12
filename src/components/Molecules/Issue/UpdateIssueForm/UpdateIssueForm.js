@@ -489,6 +489,7 @@ const UpdateIssueForm = ({
                             }}
                           />
                            <div className={styles["file-list-container"]}>
+                           <div className={styles.fileContainer}>
                             {renderAttachment?.map((data) => (
                               <div key={data.id} className={styles.file}>
                                 <Image src={data.fileName} />
@@ -500,6 +501,7 @@ const UpdateIssueForm = ({
                                 </button>
                               </div>
                             ))}
+                          </div>
                           </div>
                         </div>
                       ) : (

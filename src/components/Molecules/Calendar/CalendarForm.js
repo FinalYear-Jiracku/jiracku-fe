@@ -116,9 +116,10 @@ const CalenderForm = ({
                 validateTrigger="onBlur"
               >
                 {form.type === "input" ? (
-                   <Button href="https://zoom.us/oauth/authorize?response_type=code&client_id=spqBcTkS4egeysQDEQuBg&redirect_uri=http://localhost:3000/meeting">
-                   Connect Zoom
-                 </Button>
+                //    <Button href="https://zoom.us/oauth/authorize?response_type=code&client_id=spqBcTkS4egeysQDEQuBg&redirect_uri=http://localhost:3000/meeting">
+                //    Connect Zoom
+                //  </Button>
+                  <Input/>
                 ) : form.type === "date" ? (
                   <DatePicker format={"YYYY-MMMM-DD"} className={styles.date} />
                 ) : form.type === "time" ? (

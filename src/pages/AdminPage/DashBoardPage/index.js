@@ -10,10 +10,14 @@ import {
 import { Bar } from "react-chartjs-2";
 import { Select } from "antd";
 import Loading from "../../../components/Atoms/Loading/Loading";
+import GoogleAuthContext from "../../../context/AuthProvider";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const DashBoardPage = () => {
   const header = useContext(HeaderContext);
+  const { auth } = useContext(GoogleAuthContext);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [year, setYear] = useState(null);
   const [loading, setLoading] = useState(false);
   const userStatis = useSelector((state) => state.userReducer.userStatis);
@@ -64,7 +68,7 @@ const updatedUsers = allMonths.map((month) => dataMap.get(month) || 0);
   useEffect(() => {
     header.setHeader({
       title: "DASHBOARD MANAGEMENT",
-      breadCrumb: [{ name: "DashBoard", url: "/admin/dashBoard" }],
+      breadCrumb: [{ name: "DashBoard", url: "/admin/dashboard" }],
     });
     dispatch(getUserStatisAction({ searchKey: year }));
     dispatch(getYearAction());

@@ -58,7 +58,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
   const isUserListPage =
     location.pathname === `/admin/userList`;
   const isDashBoradPage =
-    location.pathname === `/admin/dashBoard`;
+    location.pathname === `/admin/dashboard`;
 
   const clearNotificationCount = () => {
     setNotificationCount(0);
@@ -97,7 +97,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     if (isDashBoradPage) {
       menuItems.push(
         {
-          key: "/admin/dashBoard",
+          key: "/admin/dashboard",
           icon: <DashboardOutlined />,
           label: "DashBoard",
         },
@@ -111,7 +111,7 @@ const SideBar = ({ collapsed, handleOnCollapse }) => {
     if (isUserListPage) {
       menuItems.push(
         {
-          key: "/admin/dashBoard",
+          key: "/admin/dashboard",
           icon: <DashboardOutlined />,
           label: "DashBoard",
         },

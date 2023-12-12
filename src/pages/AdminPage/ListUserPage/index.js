@@ -180,7 +180,6 @@ const ListUserPage = () => {
           <Loading />
         </div>
       ) : (
-        <div>
           <Table
             dataSource={userList?.data}
             columns={defaultColumns}
@@ -190,7 +189,6 @@ const ListUserPage = () => {
             className={styles.table}
             bordered
           />
-        </div>
       )}
       {userList?.data?.length === 0 && <EmptyData />}
       {totalRecord > 8 && (
