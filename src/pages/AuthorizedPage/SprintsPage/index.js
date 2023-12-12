@@ -254,7 +254,7 @@ const SprintsPage = () => {
                     to={`/projects/${projectId}/${data?.id}?page=1`}
                     className={styles.link}
                   >
-                    <p>{data.name}</p>
+                    <p>{data.name} {data.isCompleted === false ? "" : "(COMPLETED)"}</p>
                   </Link>
                 </div>
                 <div>
@@ -263,6 +263,11 @@ const SprintsPage = () => {
                       content="Start Sprint"
                       color="#155E75"
                       action={() => handleOpenStartSprintModal(data?.id)}
+                      disabled={
+                        projectDetail?.createdBy !== userDetail?.email
+                          ? true
+                          : false
+                      }
                     />
                   ) : (
                     ""

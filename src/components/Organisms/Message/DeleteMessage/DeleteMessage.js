@@ -66,9 +66,9 @@ const DeleteMessage = forwardRef((props, ref) => {
       .then((res) => {
         message.success(MESSAGE.DELETE_MESSAGE_SUCCESS);
         setOpenModal(false);
-        sendMessage(
-          `${projectId.toString()}`, "Delete Message"
-        );
+        // sendMessage(
+        //   `${projectId.toString()}`, "Delete Message"
+        // );
         dispatch(getMessageListAction(projectId))
       })
       .catch((error) => {

@@ -30,7 +30,7 @@ const InviteUser = forwardRef((props, ref) => {
     };
   });
   const onSubmitForm = async (item) => {
-    messageApi.open({type:'loading',content:"Action In Progress",duration:4000})
+    
     const inviteUser = {
       to: item.to === undefined ? "" : item.to,
       subject: "WELCOME TO JIRACKU",
@@ -44,7 +44,11 @@ const InviteUser = forwardRef((props, ref) => {
         navigate(`/projects/${projectId}`);
       })
       .catch((error) => {
-        
+        if (error?.response?.status === 400) {
+          if (error?.response?.data === "Email must be end @fpt.edu.vn or @fe.edu.vn") {
+            message.error(MESSAGE.FPT_FE);
+          }
+        }
       });
   };
 
@@ -57,7 +61,7 @@ const InviteUser = forwardRef((props, ref) => {
       footer={null}
       destroyOnClose={true}
     >
-      {contextHolder}
+      
       <InviteForm
         onCancel={closeModalHandle}
         onSubmit={onSubmitForm}

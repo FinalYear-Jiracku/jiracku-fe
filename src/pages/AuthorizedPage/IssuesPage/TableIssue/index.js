@@ -6,7 +6,7 @@ import {
   FlagOutlined,
   PlusSquareOutlined,
   CloseCircleOutlined,
-  UserAddOutlined
+  UserAddOutlined,
 } from "@ant-design/icons";
 import styles from "./styles.module.scss";
 import dayjs from "dayjs";
@@ -41,7 +41,7 @@ const TableIssue = () => {
   const [issueId, setIssueId] = useState(null);
   const [loading, setLoading] = useState(false);
   const header = useContext(HeaderContext);
-  const {connection, setConnection} = useContext(SignalRContext);
+  const { connection, setConnection } = useContext(SignalRContext);
   const [searchParams] = useSearchParams();
   const issueList = useSelector((state) => state.issueReducer.issueList);
   const sprintList = useSelector((state) => state.sprintReducer.sprintList);
@@ -80,12 +80,16 @@ const TableIssue = () => {
     {
       title: "Name",
       dataIndex: "name",
-      width: "300px",
+      width: "250px",
       align: "center",
       render: (_, record) => {
         return (
-          <Button type="text" onClick={() => handleOpenEditModal(record.id)}>
-            {record.name}
+          <Button
+            type="text"
+            onClick={() => handleOpenEditModal(record.id)}
+            className={record.name.split("").length > 30 ? styles.data : null}
+          >
+            <div>{record.name}</div>
           </Button>
         );
       },
@@ -111,10 +115,12 @@ const TableIssue = () => {
         return (
           <div>
             {record.type === 1 ? (
-              <PlusSquareOutlined style={{ color: "green" }}/>
+              <PlusSquareOutlined style={{ color: "green" }} />
             ) : record.type === 2 ? (
               <CloseCircleOutlined style={{ color: "red" }} />
-            ) : ""}
+            ) : (
+              ""
+            )}
           </div>
         );
       },
@@ -135,7 +141,9 @@ const TableIssue = () => {
               <FlagOutlined style={{ color: "blue" }} />
             ) : record.priority === 4 ? (
               <FlagOutlined style={{ color: "grey" }} />
-            ) : ""}
+            ) : (
+              ""
+            )}
           </div>
         );
       },
@@ -146,7 +154,11 @@ const TableIssue = () => {
       width: "105px",
       align: "center",
       render: (_, record) => {
-        return record?.status === null ? "" : <div className={styles.status}>{record?.status?.name}</div>;
+        return record?.status === null ? (
+          ""
+        ) : (
+          <div className={styles.status}>{record?.status?.name}</div>
+        );
       },
     },
     {
@@ -155,7 +167,15 @@ const TableIssue = () => {
       width: "100px",
       align: "center",
       render: (_, record) => {
-        return record?.user === null ? "" : <Image src={record?.user.image} alt="icon" className={styles.avatar} />;
+        return record?.user === null ? (
+          ""
+        ) : (
+          <Image
+            src={record?.user.image}
+            alt="icon"
+            className={styles.avatar}
+          />
+        );
       },
     },
     {
@@ -181,12 +201,12 @@ const TableIssue = () => {
       render: (_, record) => {
         const dueDate = record.dueDate;
         const currentDate = new Date();
-    
+
         let cellClassName = styles.dueDateCell; // CSS class for normal dueDate
         if (dueDate !== null && dayjs(dueDate).isBefore(currentDate, "day")) {
           cellClassName = styles.overdueDueDateCell; // CSS class for overdue dueDate
         }
-    
+
         return (
           <div className={cellClassName}>
             {dueDate === null ? "" : dayjs(dueDate).format("YYYY-MM-DD")}
@@ -259,84 +279,84 @@ const TableIssue = () => {
     sprintName,
   ]);
 
-  useEffect(
-    () => {
-      if (
-        window.localStorage.getItem(ACCESS_TOKEN) &&
-        window.localStorage.getItem(REFRESH_TOKEN) &&
-        connection !== null &&
-        connection.state !== "Connected"
-      ) {
-        const token = window.localStorage.getItem(ACCESS_TOKEN);
-        const newConnection = new HubConnectionBuilder()
-          .withUrl("http://localhost:4204/notification", {
-            accessTokenFactory: () => token,
-          })
-          .build();
-        setConnection(newConnection);
-        newConnection
-          .start()
-          .then(() => {
-            console.log("Connected to SignalR Hub");
-            newConnection
-              .invoke("OnConnectedAsync", projectId.toString())
-              .then((response) => response)
-              .catch((error) => console.error("Error sending request:", error));
-          })
-          .catch((error) =>
-            console.error("Error connecting to SignalR Hub:", error)
-          );
-      }
-    },
-   
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [projectId,connection]
-  );
-  useEffect(() => {
-    if (connection) {
-      connection.on("ReceiveMessage", (message) => {
-        console.log(`Received message: ${message}`);
+  // useEffect(
+  //   () => {
+  //     if (
+  //       window.localStorage.getItem(ACCESS_TOKEN) &&
+  //       window.localStorage.getItem(REFRESH_TOKEN) &&
+  //       connection !== null &&
+  //       connection.state !== "Connected"
+  //     ) {
+  //       const token = window.localStorage.getItem(ACCESS_TOKEN);
+  //       const newConnection = new HubConnectionBuilder()
+  //         .withUrl("http://localhost:4204/notification", {
+  //           accessTokenFactory: () => token,
+  //         })
+  //         .build();
+  //       setConnection(newConnection);
+  //       newConnection
+  //         .start()
+  //         .then(() => {
+  //           console.log("Connected to SignalR Hub");
+  //           newConnection
+  //             .invoke("OnConnectedAsync", projectId.toString())
+  //             .then((response) => response)
+  //             .catch((error) => console.error("Error sending request:", error));
+  //         })
+  //         .catch((error) =>
+  //           console.error("Error connecting to SignalR Hub:", error)
+  //         );
+  //     }
+  //   },
 
-        // Fetch the updated notification list when a message is received
-        dispatch(getIssueListAction({ sprintId: `${sprintId}` }))
-          .then((response) => response)
-          .finally(() => {
-            setLoading(false);
-          });
-      });
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   [projectId,connection]
+  // );
+  // useEffect(() => {
+  //   if (connection) {
+  //     connection.on("ReceiveMessage", (message) => {
+  //       console.log(`Received message: ${message}`);
 
-      // Fetch the initial notification list after the SignalR connection is established
-      dispatch(getIssueListAction({ sprintId: `${sprintId}` }))
-        .then((response) => response)
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      const token = window.localStorage.getItem(ACCESS_TOKEN);
-      const newConnection = new HubConnectionBuilder()
-        .withUrl("http://localhost:4204/notification", {
-          accessTokenFactory: () => token,
-        })
-        .build();
+  //       // Fetch the updated notification list when a message is received
+  //       dispatch(getIssueListAction({ sprintId: `${sprintId}` }))
+  //         .then((response) => response)
+  //         .finally(() => {
+  //           setLoading(false);
+  //         });
+  //     });
 
-      newConnection
-        .start()
-        .then(() => {
-          console.log("Connected to SignalR Hub");
-          newConnection
-            .invoke("OnConnectedAsync", projectId.toString())
-            .then((response) => response)
-            .catch((error) => console.error("Error sending request:", error));
+  //     // Fetch the initial notification list after the SignalR connection is established
+  //     dispatch(getIssueListAction({ sprintId: `${sprintId}` }))
+  //       .then((response) => response)
+  //       .finally(() => {
+  //         setLoading(false);
+  //       });
+  //   } else {
+  //     const token = window.localStorage.getItem(ACCESS_TOKEN);
+  //     const newConnection = new HubConnectionBuilder()
+  //       .withUrl("http://localhost:4204/notification", {
+  //         accessTokenFactory: () => token,
+  //       })
+  //       .build();
 
-          // Cập nhật kết nối SignalR vào Redux
-          setConnection(newConnection);
-        })
-        .catch((error) =>
-          console.error("Error connecting to SignalR Hub:", error)
-        );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connection]);
+  //     newConnection
+  //       .start()
+  //       .then(() => {
+  //         console.log("Connected to SignalR Hub");
+  //         newConnection
+  //           .invoke("OnConnectedAsync", projectId.toString())
+  //           .then((response) => response)
+  //           .catch((error) => console.error("Error sending request:", error));
+
+  //         // Cập nhật kết nối SignalR vào Redux
+  //         setConnection(newConnection);
+  //       })
+  //       .catch((error) =>
+  //         console.error("Error connecting to SignalR Hub:", error)
+  //       );
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [connection,sprintId]);
 
   return (
     <div>
@@ -361,7 +381,7 @@ const TableIssue = () => {
       </div>
       {loading ? (
         <div className={styles["loading-container"]}>
-        <Loading />
+          <Loading />
         </div>
       ) : (
         <div>
@@ -376,8 +396,13 @@ const TableIssue = () => {
           />
         </div>
       )}
-      <NewIssue ref={refAddModal} userDetail={userDetail}/>
-      <UpdateIssue ref={refEditModal} issueId={issueId} userDetail={userDetail} sprintName={sprintName}/>
+      <NewIssue ref={refAddModal} userDetail={userDetail} />
+      <UpdateIssue
+        ref={refEditModal}
+        issueId={issueId}
+        userDetail={userDetail}
+        sprintName={sprintName}
+      />
       <DeleteIssue ref={refDeleteModal} issueId={issueId} />
       <InviteUser ref={refInviteUser} projectName={projectName} />
     </div>

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { ACCESS_TOKEN, MESSAGE, REFRESH_TOKEN } from "../constants/constants";
-import Cookies from "js-cookie";
 import { message } from "antd";
 
 const baseURL = `${process.env.REACT_APP_API_URL}`;

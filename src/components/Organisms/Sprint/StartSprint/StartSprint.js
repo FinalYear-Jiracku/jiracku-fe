@@ -50,7 +50,7 @@ const StartSprint = forwardRef((props, ref) => {
     };
     await startSprint(updateSprintData)
       .then((res) => {
-        message.success(MESSAGE.UPDATE_SPRINT_SUCCESS);
+        message.success(MESSAGE.START_SPRINT_SUCCESS);
         setOpenModal(false);
         navigate(`/projects/${projectId}?page=${currentPage}`);
         dispatch(

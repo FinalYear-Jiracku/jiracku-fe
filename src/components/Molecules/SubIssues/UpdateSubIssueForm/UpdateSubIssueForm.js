@@ -18,7 +18,6 @@ import {
   FormOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import icon from "../../../../assets/anh.jpg";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getDropdownStatusListAction } from "../../../../redux/action/status-action";
@@ -110,14 +109,6 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
       files: renderAttachment.map((attachment) => attachment),
     };
     onSubmit(data);
-  };
-
-  const validateName = (_, value) => {
-    const { name } = form.getFieldsValue(["name"]);
-    if (value && name && value.trim().length > 30) {
-      return Promise.reject("Sprint Name field max length 30 characters");
-    }
-    return Promise.resolve();
   };
 
   const validateStoryPoint = (_, value) => {
@@ -274,9 +265,7 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
                         },
                         {
                           validator:
-                            form.name === "name"
-                              ? validateName
-                              : form.name === "startDate" ||
+                            form.name === "startDate" ||
                                 form.name === "dueDate"
                               ? validateEndDate
                               : form.name === "storyPoint"
@@ -305,7 +294,7 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
                           allowClear={form.name === "userId" || form.name === "statusId" ? true : false}
                         />
                       ) : form.type === "files" ? (
-                        <div className={styles["file-list-container"]}>
+                        <div>
                           <input
                             type="file"
                             accept="image/png, image/jpg, image/jpeg"
@@ -315,17 +304,21 @@ const UpdateSubIssueForm = ({ onSubmit, setChangedFieldName, onCancel, editMode,
                               setStart(false)
                             }}
                           />
-                          {renderAttachment?.map((data) => (
-                            <div key={data.id} className={styles.file}>
-                              <Image src={data.fileName} />
-                              <button
-                                className={styles.deleteButton}
-                                onClick={() => handleDelete(data.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          ))}
+                           <div className={styles["file-list-container"]}>
+                           <div className={styles.fileContainer}>
+                            {renderAttachment?.map((data) => (
+                              <div key={data.id} className={styles.file}>
+                                <Image src={data.fileName} />
+                                <button
+                                  //className={styles.deleteButton}
+                                  onClick={() => handleDelete(data.id)}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          </div>
                         </div>
                       ) : (
                         <DatePicker format={"YYYY-MMMM-DD"} />

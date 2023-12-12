@@ -14,7 +14,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { header } = useContext(HeaderContext);
   const {connection, chatConnection} = useContext(SignalRContext);
-  //const connection = useSelector((state) => state.signalRReducer.connection);
   const { auth, setAuth } = useContext(GoogleAuthContext);
   const [breadCrumb, setBreadCrumb] = useState({ title: "", data: [] });
 
@@ -51,9 +50,13 @@ const Navbar = () => {
             <div></div>
           ) : (
             <>
-              <Link to={"/user"} className={styles.link}>
-                <Button>Profile</Button>
-              </Link>
+              {auth?.role === "User" ? (
+                <Link to={"/user"} className={styles.link}>
+                  <Button>Profile</Button>
+                </Link>
+              ) : (
+                <div></div>
+              )}
               <Button className={styles["button-logout"]} onClick={logOut}>
                 <LogoutOutlined className={styles.logout} />
               </Button>

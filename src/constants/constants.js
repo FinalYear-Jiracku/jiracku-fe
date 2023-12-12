@@ -1,6 +1,8 @@
 export const MESSAGE = {
+  AUTHORIZATION_SUCCESS: "Login Successfully",
   AUTHORIZATION_FAIL: "Login Fail",
   USER_NOT_FOUND: "User Not Found",
+  USER_DELETED: "User Already Deleted",
   INVALID_REQUEST : "Invalid client request",
   FPT_FE: "Email must be end @fpt.edu.vn or @fe.edu.vn",
   AUTHORIZATION: "Don't have permission to access this page",
@@ -18,6 +20,7 @@ export const MESSAGE = {
   CREATE_SPRINT_SUCCESS: "Sprint has been created",
   SPRINT_NAME_EXIST: "Sprint Name already Exist",
   UPDATE_SPRINT_SUCCESS: "Sprint has been updated",
+  START_SPRINT_SUCCESS: "Sprint has been started",
   DELETE_SPRINT_SUCCESS: "Sprint has been deleted",
   CREATE_ISSUE_SUCCESS: "Issue has been created",
   UPDATE_ISSUE_SUCCESS: "Issue has been updated",
@@ -42,6 +45,17 @@ export const MESSAGE = {
   CREATE_EVENT_SUCCESS: "Event has been created",
   UPDATE_EVENT_SUCCESS: "Event has been updated",
   DELETE_EVENT_SUCCESS: "Event has been deleted",
+  SUCCESS_TOTP: "Two-Factor Auth Enabled Successfully",
+  DISABLE_SUCCESS_TOTP: "Two-Factor Auth Disabled Successfully",
+  FAIL_TOTP: "Two-Factor Auth Fail",
+  SUCCESS_SMS: "Text Message (SMS) Enabled Successfully",
+  DISABLE_SUCCESS_SMS: "Text Message (SMS) Auth Disabled Successfully",
+  FAIL_SMS: "Text Message (SMS) Auth Fail",
+  SMS_429: "Please Resend after 10 sencends",
+  DISABLE_SU: "Disable User Successfully",
+  DISABLE_FAIL: "Disable User Fail",
+  ENABLE_SU: "Enable User Successfully",
+  ENABLE_FAIL: "Enable User Fail"
 }
 export const ACCESS_TOKEN = "access_token";
 export const REFRESH_TOKEN = "refresh_token";

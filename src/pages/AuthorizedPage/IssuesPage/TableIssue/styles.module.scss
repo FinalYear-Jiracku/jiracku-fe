@@ -15,7 +15,7 @@
     :global{
         .ant-table-thead{
             .ant-table-cell{
-                background-color: #0597c4;
+                background-color: #305966;
                 color: white;
             }
         }
@@ -61,3 +61,37 @@
     color: red;
     font-weight: bold;
   }
+  .data{
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 200px; 
+}
+
+@media (max-width: 768px) {
+    .common-bar {
+      flex-direction: column; /* Stack items vertically */
+      align-items: stretch; /* Stretch items to full width */
+    }
+    
+    .filter {
+      margin-top: 10px; /* Add some space between filters */
+    }
+  }
+
+  @media (max-width: 768px) {
+    .invite-user {
+      flex-direction: column; /* Stack items vertically */
+      align-items: stretch; /* Stretch items to full width */
+    }
+    
+    .filter {
+      margin-top: 10px; /* Add some space between filters */
+    }
+  }
+  @media (max-width: 768px) {
+    .table {
+        width: auto;
+    }
+  }
+

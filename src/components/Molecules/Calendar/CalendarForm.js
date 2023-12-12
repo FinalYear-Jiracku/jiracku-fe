@@ -4,7 +4,13 @@ import styles from "./styles.module.scss";
 import dayjs from "dayjs";
 import { INFO_FORM } from "./FormField";
 
-const CalenderForm = ({ onSubmit, onCancel, editMode, eventDetail,onDelete }) => {
+const CalenderForm = ({
+  onSubmit,
+  onCancel,
+  editMode,
+  eventDetail,
+  onDelete,
+}) => {
   const [form] = Form.useForm();
 
   const validateTitle = (_, value) => {
@@ -77,97 +83,103 @@ const CalenderForm = ({ onSubmit, onCancel, editMode, eventDetail,onDelete }) =>
   }, [editMode, form, eventDetail]);
 
   return (
-      <Form
-        name="basic"
-        initialValues={{
-          remember: true,
-        }}
-        onFinish={onFinish}
-        autoComplete="off"
-        form={form}
-      >
-        {INFO_FORM.map((form) => {
-          return (
-            <Row key={form.id}>
-              <Col flex="100px">{form.label}</Col>
-              <Col flex="auto">
-                <Form.Item
-                  name={form.name}
-                  rules={[
-                    {
-                      required: form.require,
-                      message: form.error,
-                    },
-                    {
-                      validator:
-                        form.name === "title"
-                          ? validateTitle
-                          : form.name === "startTime" || form.name === "endTime"
-                          ? validateEndDate
-                          : ignore,
-                    },
-                  ]}
-                  validateTrigger="onBlur"
-                >
-                  {form.type === "input" ? (
-                    <Input />
-                  ) : form.type === "date" ? (
-                    <DatePicker
-                      format={"YYYY-MMMM-DD"}
-                      className={styles.date}
-                    />
-                  ) : (
-                    <TimePicker className={styles.date} />
-                  )}
-                </Form.Item>
-              </Col>
-            </Row>
-          );
-        })}
-        <Form.Item>
-          <div className={styles.layout}>
-            <div>
-              {editMode && (
-                <Button
-                  type="dashed"
-                  htmlType="button"
-                  className={styles["button-delete"]}
-                  on
-                  onClick={() => {onDelete()}}
-                >
-                  Delete
-                </Button>
-              )}
-            </div>
-            <div>
-              {editMode ? (
-                <Button
-                  className={styles["button-submit"]}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  Save
-                </Button>
-              ) : (
-                <Button
-                  className={styles["button-submit"]}
-                  type="primary"
-                  htmlType="submit"
-                >
-                  Submit
-                </Button>
-              )}
-              <Button
-                className={styles["button-cancel"]}
-                htmlType="button"
-                onClick={onCancel}
+    <Form
+      name="basic"
+      initialValues={{
+        remember: true,
+      }}
+      onFinish={onFinish}
+      autoComplete="off"
+      form={form}
+    >
+      {INFO_FORM.map((form) => {
+        return (
+          <Row key={form.id}>
+            <Col flex="100px">{form.label}</Col>
+            <Col flex="auto">
+              <Form.Item
+                name={form.name}
+                rules={[
+                  {
+                    required: form.require,
+                    message: form.error,
+                  },
+                  {
+                    validator:
+                      form.name === "title"
+                        ? validateTitle
+                        : form.name === "startTime" || form.name === "endTime"
+                        ? validateEndDate
+                        : ignore,
+                  },
+                ]}
+                validateTrigger="onBlur"
               >
-                Cancel
+                {form.type === "input" ? (
+                //    <Button href="https://zoom.us/oauth/authorize?response_type=code&client_id=spqBcTkS4egeysQDEQuBg&redirect_uri=http://localhost:3000/meeting">
+                //    Connect Zoom
+                //  </Button>
+                  <Input/>
+                ) : form.type === "date" ? (
+                  <DatePicker format={"YYYY-MMMM-DD"} className={styles.date} />
+                ) : form.type === "time" ? (
+                  <TimePicker className={styles.date} />
+                ) : (
+                  <Button href="https://zoom.us/oauth/authorize?response_type=code&client_id=spqBcTkS4egeysQDEQuBg&redirect_uri=http://localhost:3000/meeting">
+                    Connect Zoom
+                  </Button>
+                )}
+              </Form.Item>
+            </Col>
+          </Row>
+        );
+      })}
+      <Form.Item>
+        <div className={styles.layout}>
+          <div>
+            {editMode && (
+              <Button
+                type="dashed"
+                htmlType="button"
+                className={styles["button-delete"]}
+                on
+                onClick={() => {
+                  onDelete();
+                }}
+              >
+                Delete
               </Button>
-            </div>
+            )}
           </div>
-        </Form.Item>
-      </Form>
+          <div>
+            {editMode ? (
+              <Button
+                className={styles["button-submit"]}
+                type="primary"
+                htmlType="submit"
+              >
+                Save
+              </Button>
+            ) : (
+              <Button
+                className={styles["button-submit"]}
+                type="primary"
+                htmlType="submit"
+              >
+                Submit
+              </Button>
+            )}
+            <Button
+              className={styles["button-cancel"]}
+              htmlType="button"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      </Form.Item>
+    </Form>
   );
 };
 

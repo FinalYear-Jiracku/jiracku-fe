@@ -1,0 +1,62 @@
+.common-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 10px 0px;
+}
+      
+.table{
+    width: auto; 
+    margin: 10px 10px 0;
+    :global{
+        .ant-table-thead{
+            .ant-table-cell{
+                background-color: #305966;
+                color: white;
+            }
+        }
+    }
+}
+
+.avatar{
+    width: 30px !important;
+    height: 30px !important;
+    border-radius: 20px !important;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Set the container height to fill the entire viewport */
+    position: fixed; /* Use fixed positioning to keep it centered even when scrolling */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0; /* Add a semi-transparent background */
+  }
+
+  
+
+  @media (max-width: 768px) {
+    .table {
+        width: fit-content;
+    }
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.button-enable{
+  background-color: rgb(68, 209, 164);
+  color: white;
+}
+.button-disable{
+  background-color: rgb(185, 63, 63);
+  color: white;
+}
+
